@@ -1,0 +1,308 @@
+@import '../../assets/styles/global.less';
+
+.prices-page {
+  padding: 20px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  // 页面标题
+  .page-title {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+    border-bottom: 1px solid @border-color;
+
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      color: #2c1810;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      font-size: 16px;
+      color: #665248;
+      margin: 0;
+    }
+  }
+
+  // 价格套餐网格
+  .pricing-grid {
+    margin: 0 -12px;
+  }
+
+  // 价格套餐卡片
+  .pricing-card {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid @border-color;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    // 推荐标签
+    .popular-tag {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background-color: #f5222d;
+      color: #fff;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      z-index: 10;
+    }
+
+    // 图片区域
+    .plan-image-wrapper {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+      background-color: #fafafa;
+
+      .plan-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover .plan-image {
+        transform: scale(1.05);
+      }
+    }
+
+    // 信息区域
+    .plan-info {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    // 套餐名称
+    .plan-name {
+      font-size: 24px;
+      font-weight: 600;
+      color: #2c1810;
+      margin: 0 0 8px 0;
+    }
+
+    // 套餐描述
+    .plan-description {
+      font-size: 14px;
+      color: #666;
+      margin: 0 0 20px 0;
+      line-height: 1.5;
+    }
+
+    // 价格
+    .plan-price {
+      margin-bottom: 20px;
+
+      .price-value {
+        font-size: 36px;
+        font-weight: 600;
+        color: #f5222d;
+      }
+
+      .price-unit {
+        font-size: 16px;
+        color: #666;
+        vertical-align: super;
+        margin-left: 4px;
+      }
+    }
+
+    // 分隔线
+    .plan-divider {
+      width: 100%;
+      margin-bottom: 20px;
+      border-color: @border-color;
+    }
+
+    // 功能列表
+    .plan-features {
+      width: 100%;
+      margin-bottom: 24px;
+      height: 250px; // 固定高度，确保所有卡片的功能列表高度相同
+      overflow-y: auto; // 允许垂直滚动查看所有内容
+      padding-right: 0; // 移除滚动条预留空间
+
+      // 隐藏滚动条但保持滚动功能（跨浏览器兼容）
+      scrollbar-width: none; // Firefox
+      -ms-overflow-style: none; // IE 10+
+
+      &::-webkit-scrollbar {
+        display: none; // Chrome, Safari, Edge
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .feature-icon {
+          font-size: 16px;
+          color: #52c41a;
+          flex-shrink: 0;
+        }
+
+        .feature-text {
+          font-size: 14px;
+          color: #666;
+          text-align: left;
+          flex: 1;
+        }
+      }
+    }
+
+    // 评分
+    .plan-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+
+      .rating-star {
+        font-size: 16px;
+        color: #f5f5f5;
+
+        &.filled {
+          color: #ffc107;
+        }
+      }
+
+      .rating-text {
+        font-size: 14px;
+        color: #666;
+        margin-left: 8px;
+      }
+    }
+
+    // 选择按钮
+    .select-plan-btn {
+      margin-top: auto;
+      border-radius: 4px;
+      padding: 8px 32px;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    // 热门套餐样式
+    &.popular {
+      border-color: #f5222d;
+      box-shadow: 0 0 0 2px rgba(245, 34, 45, 0.08);
+
+      .select-plan-btn {
+        background-color: #f5222d;
+        border-color: #f5222d;
+        color: #fff;
+
+        &:hover {
+          background-color: #ff4d4f;
+          border-color: #ff4d4f;
+        }
+      }
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .prices-page {
+    padding: 16px;
+
+    .page-title {
+      margin-bottom: 24px;
+
+      h1 {
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 14px;
+      }
+    }
+
+    .pricing-grid {
+      margin: 0;
+    }
+
+    .pricing-card {
+      margin-bottom: 16px;
+
+      .plan-image-wrapper {
+        height: 180px;
+      }
+
+      .plan-info {
+        padding: 16px;
+      }
+
+      .plan-name {
+        font-size: 20px;
+      }
+
+      .plan-price {
+        .price-value {
+          font-size: 28px;
+        }
+      }
+
+      .plan-features {
+        .feature-item {
+          margin-bottom: 10px;
+
+          .feature-text {
+            font-size: 13px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .prices-page {
+    .pricing-card {
+      .plan-image-wrapper {
+        height: 150px;
+      }
+
+      .plan-name {
+        font-size: 18px;
+      }
+
+      .plan-price {
+        .price-value {
+          font-size: 24px;
+        }
+      }
+
+      .select-plan-btn {
+        width: 100%;
+      }
+    }
+  }
+}

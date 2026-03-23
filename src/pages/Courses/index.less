@@ -1,0 +1,244 @@
+@import '../../assets/styles/global.less';
+
+.courses-page {
+  padding: 20px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  // 页面标题
+  .page-title {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+    border-bottom: 1px solid @border-color;
+
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      color: #2c1810;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      font-size: 16px;
+      color: #665248;
+      margin: 0;
+    }
+  }
+
+  // 课程网格
+  .courses-grid {
+    margin: 0 -12px;
+  }
+
+  // 课程卡片
+  .course-card {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid @border-color;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .course-image-wrapper {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+      background-color: #fafafa;
+
+      .course-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover .course-image {
+        transform: scale(1.05);
+      }
+    }
+
+    .course-info {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .course-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .meta-icon {
+          font-size: 14px;
+          color: #999;
+        }
+
+        .meta-text {
+          font-size: 14px;
+          color: #666;
+        }
+      }
+    }
+
+    .course-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #2c1810;
+      margin: 0 0 12px 0;
+    }
+
+    .course-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 12px;
+
+      .rating-star {
+        font-size: 16px;
+        color: #f5f5f5;
+
+        &.filled {
+          color: #ffc107;
+        }
+      }
+
+      .rating-text {
+        font-size: 14px;
+        color: #666;
+        margin-left: 8px;
+      }
+    }
+
+    .course-description {
+      font-size: 14px;
+      color: #666;
+      margin: 0 0 16px 0;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .course-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+
+      .course-tag {
+        font-size: 12px;
+        background-color: #f5f5f5;
+        border-color: #e0e0e0;
+        color: #666;
+      }
+    }
+
+    .course-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+
+      .course-price {
+        font-size: 20px;
+        font-weight: 600;
+        color: #f5222d;
+      }
+
+      .enroll-btn {
+        background-color: #2c1810;
+        border-color: #2c1810;
+        color: #fff;
+        border-radius: 4px;
+        padding: 6px 16px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: #1a0f0a;
+          border-color: #1a0f0a;
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .courses-page {
+    padding: 16px;
+
+    .page-title {
+      margin-bottom: 24px;
+
+      h1 {
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 14px;
+      }
+    }
+
+    .courses-grid {
+      margin: 0;
+    }
+
+    .course-card {
+      margin-bottom: 16px;
+
+      .course-image-wrapper {
+        height: 180px;
+      }
+
+      .course-info {
+        padding: 12px;
+      }
+
+      .course-title {
+        font-size: 16px;
+      }
+
+      .course-price {
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .courses-page {
+    .course-card {
+      .course-image-wrapper {
+        height: 150px;
+      }
+
+      .course-meta {
+        gap: 8px;
+
+        .meta-item {
+          .meta-text {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}

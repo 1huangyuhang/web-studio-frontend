@@ -1,0 +1,195 @@
+/* 动画图片示例页面样式 */
+@import '@/assets/styles/global.less';
+.animated-image-demo {
+  background-color: #f8f5f4;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+/* 页面头部 */
+.demo-header {
+  text-align: center;
+  margin-bottom: 80px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.demo-header h1 {
+  font-size: 36px;
+  font-weight: 700;
+  color: @dark-color;
+  margin-bottom: 16px;
+}
+
+.demo-header p {
+  font-size: 18px;
+  color: @text-color-secondary;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 内容区域 */
+.demo-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 60px;
+}
+
+/* 示例项 */
+.demo-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.demo-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* 示例项标题 */
+.demo-item-title {
+  padding: 24px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.demo-item-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: @dark-color;
+}
+
+.demo-item-title code {
+  background-color: rgba(128, 50, 46, 0.1);
+  color: @primary-color;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 示例图片容器 */
+.demo-item-image {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+/* 示例图片 */
+.demo-image {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  height: auto;
+}
+
+/* 页面底部 */
+.demo-footer {
+  text-align: center;
+  margin-top: 100px;
+  padding: 40px 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.demo-footer p {
+  font-size: 16px;
+  color: @text-color-secondary;
+  margin: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .animated-image-demo {
+    padding: 20px 16px;
+  }
+
+  .demo-header {
+    margin-bottom: 40px;
+    padding: 24px 16px;
+  }
+
+  .demo-header h1 {
+    font-size: 28px;
+  }
+
+  .demo-header p {
+    font-size: 16px;
+  }
+
+  .demo-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .demo-item {
+    margin-bottom: 0;
+  }
+
+  .demo-item-title {
+    padding: 16px;
+  }
+
+  .demo-item-title h3 {
+    font-size: 16px;
+  }
+
+  .demo-item-image {
+    padding: 16px;
+  }
+
+  .demo-footer {
+    margin-top: 60px;
+    padding: 24px 16px;
+  }
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .animated-image-demo {
+    background-color: #1a1a1a;
+  }
+
+  .demo-header,
+  .demo-item,
+  .demo-item-title,
+  .demo-footer {
+    background-color: rgba(30, 30, 30, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .demo-header h1,
+  .demo-item-title h3 {
+    color: #fff;
+  }
+
+  .demo-header p,
+  .demo-footer p {
+    color: #aaa;
+  }
+}

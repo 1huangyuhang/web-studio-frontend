@@ -1,0 +1,1179 @@
+.management-layout {
+  height: 100vh;
+  background-color: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+
+  // 腾讯云风格顶部导航栏
+  .tencent-cloud-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: none;
+    z-index: 100;
+    flex: 0 0 auto;
+    height: 64px;
+    padding: 0 40px;
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      // 移除max-width限制，让header-content随窗口宽度自适应
+      max-width: 100%;
+      margin: 0 auto;
+      
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        // 允许header-left在空间不足时收缩
+        flex: 1;
+        // 确保logo和菜单在同一行
+        white-space: nowrap;
+        
+        // 品牌Logo容器
+        .logo-container {
+          display: flex;
+          align-items: center;
+          margin-right: 40px;
+          // 确保logo不会收缩
+          flex-shrink: 0;
+          
+          .logo {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #80322E;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          }
+        }
+        
+        // 菜单滑动容器
+        .menu-slide-container {
+          display: flex;
+          align-items: center;
+          height: 100%;
+          position: relative;
+          flex: 1;
+          min-width: 0;
+        }
+        
+        // 菜单容器
+        .menu-container {
+          flex: 1;
+          height: 100%;
+          overflow: hidden;
+          position: relative;
+          min-width: 0;
+        }
+        
+        // 菜单包装器
+        .menu-wrapper {
+          width: auto;
+          height: 100%;
+          overflow-x: auto;
+          overflow-y: hidden;
+          transition: scroll-left 0.3s ease;
+          white-space: nowrap;
+          
+          // 隐藏水平滚动条但保持滚动功能
+          &::-webkit-scrollbar {
+            display: none;
+          }
+          
+          // Firefox
+          scrollbar-width: none;
+          
+          // IE/Edge
+          -ms-overflow-style: none;
+        }
+        
+        // 腾讯云风格菜单
+        .tencent-cloud-menu {
+          background-color: transparent;
+          border-bottom: none;
+          display: flex;
+          align-items: center;
+          height: 100%;
+          min-width: auto;
+          width: auto;
+          transition: all 0.3s ease;
+          
+          // 水平菜单样式
+          &.ant-menu-horizontal {
+            border-bottom: none;
+            flex-wrap: nowrap;
+            overflow-x: visible;
+            min-width: auto;
+            width: auto;
+            
+            // 菜单项样式
+            .ant-menu-item {
+              margin: 0;
+              padding: 0 24px;
+              height: 100%;
+              line-height: 64px;
+              border-radius: 0;
+              background-color: transparent;
+              color: #333;
+              font-size: 14px;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              border-bottom: 2px solid transparent;
+              white-space: nowrap;
+              flex-shrink: 0;
+              
+              // 移除图标默认间距
+              .anticon {
+                margin-right: 8px;
+                font-size: 16px;
+              }
+              
+              // 悬停效果 - 平滑过渡
+              &:hover {
+                background-color: rgba(128, 50, 46, 0.05);
+                color: #80322E;
+                border-bottom-color: #80322E;
+                transform: translateY(0);
+              }
+              
+              // 选中效果
+              &.ant-menu-item-selected {
+                background-color: transparent;
+                color: #80322E;
+                border-bottom-color: #80322E;
+              }
+              
+              // 移除默认的前缀和后缀元素
+              &::before,
+              &::after {
+                display: none;
+              }
+            }
+            
+            // 确保菜单容器高度正确
+            .ant-menu-overflow {
+              height: 100%;
+              display: flex;
+              align-items: center;
+            }
+          }
+        }
+        
+        // 菜单滑动按钮
+        .menu-slide-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background-color: rgba(255, 255, 255, 0.9);
+          border: 1px solid #e0e0e0;
+          color: #666;
+          font-size: 16px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          z-index: 10;
+          flex-shrink: 0;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          
+          // 按钮悬停效果
+          &:hover {
+            background-color: #fff;
+            color: #0052d9;
+            border-color: #0052d9;
+            box-shadow: 0 2px 12px rgba(128, 50, 46, 0.2);
+          }
+          
+          // 按钮激活效果
+          &:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 82, 217, 0.2);
+          }
+          
+          // 左侧按钮样式
+          &.menu-slide-btn-left {
+            margin-right: 8px;
+          }
+          
+          // 右侧按钮样式
+          &.menu-slide-btn-right {
+            margin-left: 8px;
+          }
+          
+          // 按钮图标样式
+          .anticon {
+            font-size: 14px;
+          }
+        }
+      }
+      
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        // 确保header-right不会收缩，保持用户信息可见
+        flex-shrink: 0;
+        
+        // 用户中心
+        .user-center {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0 16px;
+          height: 36px;
+          line-height: 36px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          color: #666;
+          // 确保用户中心不收缩
+          flex-shrink: 0;
+          
+          &:hover {
+            background-color: #f5f5f5;
+            color: #0052d9;
+          }
+          
+          .anticon {
+            font-size: 16px;
+          }
+          
+          .admin-name {
+            font-size: 14px;
+            font-weight: 500;
+          }
+        }
+        
+        // 移动端菜单按钮
+        .mobile-menu-btn {
+          display: none;
+          color: #333;
+          // 确保移动端菜单按钮不收缩
+          flex-shrink: 0;
+          
+          @media (max-width: 768px) {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            background-color: transparent;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              background-color: #f5f5f5;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  > .ant-layout {
+    flex: 1 1 auto;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .management-content-layout {
+    flex: 1 1 auto;
+    display: flex;
+    overflow: hidden;
+    
+    .management-main-content {
+      padding: 24px;
+      background-color: #f0f2f5;
+      flex: 1 1 auto;
+      overflow-y: auto;
+      
+      // 响应式设计
+      @media (max-width: 768px) {
+        padding: 16px;
+      }
+    }
+  }
+}
+
+/* Dashboard Styles - 腾讯云风格 */
+.dashboard {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+    
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    
+
+  }
+
+  .dashboard-stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+
+    .stat-card {
+      flex: 1;
+      min-width: 200px;
+      background-color: #fafafa;
+      padding: 24px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border: 1px solid #e0e0e0;
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #0052d9;
+      }
+
+      h3 {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        color: #666;
+        font-weight: 500;
+      }
+
+      p {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+        color: #0052d9;
+      }
+    }
+  }
+  
+  // 脉动动画
+  @keyframes pulse {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .statistics-row {
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    .ant-statistic-title {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .ant-statistic-content-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: #0052d9;
+    }
+  }
+
+  .overview-row {
+    margin-bottom: 24px;
+  }
+
+  .overview-card {
+    .ant-card-head-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .ant-card {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0;
+    }
+
+    .empty-state {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      color: #999;
+      font-size: 14px;
+    }
+  }
+}
+
+/* Management Page Styles - 腾讯云风格 */
+.management-page {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  // 确保页面内容不会溢出
+  overflow: hidden;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #0052d9;
+    // 防止内容溢出
+    overflow: hidden;
+    
+    // 响应式布局调整
+    flex-wrap: wrap;
+    gap: 16px;
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      color: #333;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      // 确保标题不会溢出
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ant-btn {
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 8px 20px;
+      height: 36px;
+      
+      &.ant-btn-primary {
+        background-color: #0052d9;
+        border-color: #0052d9;
+        box-shadow: 0 2px 8px rgba(0, 82, 217, 0.2);
+        
+        &:hover {
+          background-color: #9a4038;
+          border-color: #187aff;
+          box-shadow: 0 4px 12px rgba(128, 50, 46, 0.3);
+        }
+        
+        &:active {
+          background-color: #6d2a25;
+          border-color: #003a99;
+        }
+      }
+      
+      &.ant-btn-default {
+        border-color: #d9d9d9;
+        
+        &:hover {
+          color: #0052d9;
+          border-color: #0052d9;
+          background-color: #f8f0ef;
+        }
+      }
+    }
+  }
+
+  .table-container {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    position: relative;
+    border: 2px solid #e0e0e0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    // 添加滑动性能优化
+    -webkit-overflow-scrolling: touch;
+    // 添加平滑滚动
+    scroll-behavior: smooth;
+    // 增加内边距，确保内容不被边框截断
+    padding: 16px;
+    margin-bottom: 24px;
+    
+    // 移除滑动视觉指示器，避免滚动时显示白色线条
+    &::before,
+    &::after {
+      display: none;
+    }
+    
+    // 触摸反馈样式
+    &.is-touching {
+      // 触摸时添加轻微的阴影变化
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transition: box-shadow 0.2s ease;
+    }
+
+    /* 添加水平滚动条样式 */
+    &::-webkit-scrollbar {
+      height: 8px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #c1c1c1;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+      
+      &:hover {
+        background-color: #0052d9;
+      }
+    }
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f5f5f5;
+
+    /* IE/Edge */
+    -ms-overflow-style: auto;
+    
+    // 表格包裹器，用于实现惯性滚动
+    .ant-table {
+      min-width: fit-content;
+      // 允许表格内容换行
+      white-space: normal;
+      // 滚动吸附点
+      scroll-snap-align: start;
+      // 添加硬件加速，提升滚动性能
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      perspective: 1000px;
+      // 确保表格内容不会溢出
+      overflow: hidden;
+      // 重置表格的margin和padding，确保内容居中显示
+      margin: 0 auto;
+      padding: 0;
+      // 增加表格内边距，确保内容不被截断
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+  }
+  
+  // 分页控件容器样式
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0;
+    margin-top: 16px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+    // 确保分页控件不随列表滚动
+    position: relative;
+    z-index: 10;
+  }
+  
+  // 优化分页控件样式 - 统一腾讯云风格
+  .ant-pagination {
+    margin: 0;
+    
+    // 分页项样式
+    .ant-pagination-item {
+      // 移除旧的高亮样式，使用统一的深棕红色主题
+      &.ant-pagination-item-active {
+        a {
+          // 使用统一的深棕红色主题色
+          background-color: #80322E;
+          border-color: #80322E;
+          color: #fff;
+          // 添加更细腻的阴影效果，与整体设计风格一致
+          box-shadow: 0 2px 8px rgba(128, 50, 46, 0.2);
+          // 优化过渡效果
+          transition: all 0.3s ease;
+        }
+      }
+      
+      a {
+        // 优化过渡效果
+        transition: all 0.3s ease;
+        
+        // 优化悬停效果，使用统一的深棕红色主题色
+        &:hover {
+          color: #80322E;
+          border-color: #80322E;
+        }
+      }
+      
+      // 优化边框和圆角，与整体设计风格一致
+      border-radius: 4px;
+    }
+    
+    // 分页按钮样式
+    .ant-pagination-prev,
+    .ant-pagination-next {
+      .ant-pagination-item-link {
+        // 优化过渡效果
+        transition: all 0.3s ease;
+        // 优化边框和圆角
+        border-radius: 4px;
+        
+        &:hover {
+          // 使用统一的蓝色主题色
+          border-color: #0052d9;
+          color: #0052d9;
+        }
+      }
+    }
+    
+    // 分页输入框样式
+    .ant-pagination-options {
+      .ant-select-selector,
+      .ant-input {
+        border-radius: 4px;
+        border: 1px solid #d9d9d9;
+        // 优化过渡效果
+        transition: all 0.3s ease;
+        
+        &:hover {
+          // 使用统一的蓝色主题色
+          border-color: #0052d9;
+        }
+        
+        &:focus {
+          // 使用统一的蓝色主题色
+          border-color: #0052d9;
+          box-shadow: 0 0 0 2px rgba(0, 82, 217, 0.2);
+        }
+      }
+    }
+    
+    // 优化分页信息样式
+    .ant-pagination-total-text {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    // 优化分页跳转区域样式
+    .ant-pagination-jump-prev,
+    .ant-pagination-jump-next {
+      .ant-pagination-item-link {
+        &:hover {
+          // 使用统一的蓝色主题色
+          border-color: #0052d9;
+          color: #0052d9;
+        }
+      }
+    }
+  }
+
+  .ant-table {
+    border-radius: 8px;
+    overflow: hidden;
+    border: none;
+    width: 100%;
+    // 确保表格不会溢出容器
+    max-width: 100%;
+    table-layout: auto;
+    
+    // 表头样式优化
+    .ant-table-thead > tr > th {
+      background-color: #fafafa;
+      border-bottom: 1px solid #e0e0e0;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+      white-space: nowrap;
+      padding: 16px 20px;
+      text-align: left;
+      // 固定表头高度
+      height: 56px;
+      // 确保表头内容不会溢出
+      overflow: hidden;
+      text-overflow: ellipsis;
+      // 设置最小宽度
+      min-width: 80px;
+      // 设置最大宽度
+      max-width: 300px;
+      
+      // 移除默认排序图标样式
+      .ant-table-column-sorter {
+        margin-left: 4px;
+      }
+    }
+    
+    // 表格主体样式
+    .ant-table-tbody {
+      > tr {
+        transition: background-color 0.3s ease;
+        border-bottom: 1px solid #f0f0f0;
+        // 自适应行高
+        height: auto;
+        min-height: 64px;
+        
+        &:hover {
+          background-color: #f0f7ff;
+        }
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        > td {
+          border-bottom: none;
+          font-size: 14px;
+          color: #333;
+          padding: 16px 20px;
+          line-height: 1.6;
+          // 允许文本换行
+          white-space: normal;
+          // 设置最小宽度
+          min-width: 80px;
+          // 设置最大宽度
+          max-width: 300px;
+          // 确保单元格内容不会溢出
+          box-sizing: border-box;
+          // 防止单元格选中状态扩散
+          &:hover {
+            // 只在当前单元格悬停时显示效果，不影响其他单元格
+            background-color: #e6f7ff;
+          }
+          // 移除默认的单元格选中样式
+          &:active,
+          &:focus {
+            background-color: transparent;
+            outline: none;
+          }
+        }
+        
+        // 斑马纹样式
+        &:nth-child(even) {
+          background-color: #fafafa;
+        }
+      }
+    }
+    
+    // 特殊列样式 - 操作列不换行
+    .ant-table-tbody > tr > td:last-child {
+      white-space: nowrap;
+      // 设置最小宽度，确保操作按钮有足够的空间
+      min-width: 160px;
+      // 确保操作按钮不被隐藏
+      overflow: visible;
+      // 调整操作按钮布局
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+        // 确保按钮不会换行
+        flex-wrap: nowrap;
+      }
+    }
+    
+    // 特殊列样式 - 日期列不换行
+    .ant-table-tbody > tr > td:nth-last-child(2) {
+      white-space: nowrap;
+      min-width: 180px;
+      // 确保日期不会溢出或覆盖其他元素
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    // 特殊列样式 - 图片列
+    .ant-table-tbody > tr > td:nth-child(4) {
+      white-space: nowrap;
+      min-width: 100px;
+      // 确保图片不会影响其他列
+      overflow: hidden;
+    }
+    
+    // 特殊列样式 - 是否新品列
+    .ant-table-tbody > tr > td:nth-child(5) {
+      white-space: nowrap;
+      min-width: 100px;
+      // 确保内容居中显示
+      text-align: center;
+      // 确保内容不会溢出
+      overflow: hidden;
+    }
+    
+    // 优化空状态样式
+    .ant-empty {
+      padding: 48px 24px;
+      
+      .ant-empty-description {
+        color: #999;
+      }
+    }
+    
+    // 确保表格容器不会溢出
+    .ant-table-container {
+      overflow: auto;
+      box-sizing: border-box;
+    }
+    
+    // 修复表格边框重叠问题
+    .ant-table-cell {
+      box-sizing: border-box;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    
+    .ant-btn {
+      border-radius: 4px;
+      font-size: 12px;
+      padding: 4px 12px;
+      font-weight: 500;
+      
+      &.ant-btn-primary {
+        background-color: #0052d9;
+        border-color: #0052d9;
+        
+        &:hover {
+          background-color: #187aff;
+          border-color: #187aff;
+        }
+      }
+      
+      &.ant-btn-danger {
+        background-color: #ff4d4f;
+        border-color: #ff4d4f;
+        
+        &:hover {
+          background-color: #ff7875;
+          border-color: #ff7875;
+        }
+      }
+      
+      &.ant-btn-default {
+        &:hover {
+          color: #0052d9;
+          border-color: #0052d9;
+        }
+      }
+    }
+
+    .edit-button {
+      margin-right: 0;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    
+    .ant-btn {
+      border-radius: 4px;
+      font-size: 14px;
+      padding: 6px 16px;
+      font-weight: 500;
+      
+      &.ant-btn-primary {
+        background-color: #0052d9;
+        border-color: #0052d9;
+        
+        &:hover {
+          background-color: #187aff;
+          border-color: #187aff;
+        }
+      }
+      
+      &.ant-btn-default {
+        &:hover {
+          color: #0052d9;
+          border-color: #0052d9;
+        }
+      }
+    }
+  }
+
+  .form-help-text {
+    margin-top: 8px;
+    color: #8c8c8c;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  
+  /* 表单样式优化 */
+  .ant-form {
+    .ant-form-item-label {
+      .ant-form-item-required {
+        &::before {
+          color: #ff4d4f;
+        }
+      }
+      
+      > label {
+        color: #333;
+        font-weight: 500;
+        font-size: 14px;
+      }
+    }
+    
+    .ant-form-item-control {
+      .ant-input,
+      .ant-select-selector,
+      .ant-input-textarea {
+        border-radius: 4px;
+        border: 1px solid #d9d9d9;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        
+        &:hover {
+          border-color: #0052d9;
+        }
+        
+        &:focus {
+          border-color: #0052d9;
+          box-shadow: 0 0 0 2px rgba(0, 82, 217, 0.2);
+        }
+      }
+      
+      .ant-select {
+        .ant-select-selector {
+          height: 36px;
+          display: flex;
+          align-items: center;
+        }
+      }
+    }
+  }
+  
+  /* 模态框样式优化 */
+  .ant-modal {
+    .ant-modal-header {
+      border-bottom: 1px solid #e0e0e0;
+      
+      .ant-modal-title {
+        color: #333;
+        font-weight: 600;
+        font-size: 16px;
+      }
+    }
+    
+    .ant-modal-footer {
+      border-top: 1px solid #e0e0e0;
+    }
+  }
+  
+  /* 上传组件样式优化 */
+  .ant-upload {
+    .ant-upload-select {
+      border-radius: 4px;
+      
+      &:hover {
+        border-color: #0052d9;
+      }
+    }
+  }
+}
+
+/* Responsive Design - 腾讯云风格 */
+// 平板端样式（中等屏幕）
+@media (max-width: 1024px) and (min-width: 769px) {
+  .management-layout {
+    .tencent-cloud-header {
+      padding: 0 24px;
+      
+      .header-content {
+        max-width: 100%;
+        
+        .header-left {
+          .logo-container {
+            margin-right: 30px;
+          }
+          
+          // 平板端始终显示桌面端菜单
+          .tencent-cloud-menu {
+            display: flex;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 移动端样式（窄屏）
+@media (max-width: 768px) {
+  .management-layout {
+    .tencent-cloud-header {
+      padding: 0 16px;
+      
+      .header-content {
+        .header-left {
+          .logo-container {
+            margin-right: 20px;
+            
+            .logo {
+              font-size: 18px;
+            }
+          }
+          
+          // 移动端隐藏桌面端菜单
+          .tencent-cloud-menu {
+            display: none;
+          }
+        }
+      }
+    }
+    
+    .management-content-layout {
+      .management-main-content {
+        padding: 16px;
+      }
+    }
+  }
+
+  .dashboard {
+    padding: 16px;
+    
+    .dashboard-title {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    
+    .dashboard-stats {
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+
+      .stat-card {
+        min-width: auto;
+        padding: 20px;
+        
+        p {
+          font-size: 24px;
+        }
+      }
+    }
+  }
+
+  .management-page {
+    padding: 16px;
+
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+
+      h1 {
+        font-size: 18px;
+      }
+      
+      .ant-btn {
+        width: 100%;
+      }
+    }
+    
+    .table-container {
+      border-radius: 4px;
+    }
+    
+    .ant-table {
+      .ant-table-thead > tr > th {
+        font-size: 12px;
+        padding: 8px;
+      }
+      
+      .ant-table-tbody > tr > td {
+        font-size: 12px;
+        padding: 8px;
+      }
+      
+      .ant-table-pagination {
+        margin: 8px;
+      }
+    }
+    
+    /* 移动端分页控件优化 */
+    .pagination-container {
+      padding: 12px 0;
+      margin-top: 12px;
+    }
+    
+    .ant-pagination {
+      .ant-pagination-item {
+        min-width: 32px;
+        height: 32px;
+        line-height: 30px;
+        
+        a {
+          font-size: 12px;
+        }
+      }
+      
+      .ant-pagination-prev,
+      .ant-pagination-next {
+        .ant-pagination-item-link {
+          min-width: 32px;
+          height: 32px;
+          line-height: 30px;
+        }
+      }
+      
+      .ant-pagination-options {
+        .ant-select-selector,
+        .ant-input {
+          height: 32px;
+          font-size: 12px;
+        }
+      }
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      
+      .ant-btn {
+        width: 100%;
+        margin-bottom: 8px;
+      }
+    }
+    
+    .form-actions {
+      flex-direction: column;
+      gap: 8px;
+      
+      .ant-btn {
+        width: 100%;
+      }
+    }
+    
+    .ant-form {
+      .ant-form-item {
+        margin-bottom: 16px;
+      }
+      
+      .ant-form-item-label {
+        margin-bottom: 8px;
+      }
+    }
+  }
+  
+  /* 移动端模态框优化 */
+  .ant-modal {
+    .ant-modal-content {
+      border-radius: 8px 8px 0 0;
+    }
+  }
+}

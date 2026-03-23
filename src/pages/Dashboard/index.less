@@ -1,0 +1,81 @@
+.dashboard-page {
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .page-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+
+      .action-button {
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .dashboard-content {
+    .dashboard-card {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+      h2 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 16px;
+      }
+
+      .overview-content {
+        p {
+          font-size: 14px;
+          color: #666;
+          line-height: 1.6;
+          margin-bottom: 8px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+
+      .chart-placeholder {
+        height: 200px;
+        background-color: #fafafa;
+        border: 1px dashed #e8e8e8;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        p {
+          color: #999;
+          font-size: 14px;
+        }
+      }
+
+      .table-placeholder {
+        height: 300px;
+        background-color: #fafafa;
+        border: 1px dashed #e8e8e8;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        p {
+          color: #999;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}

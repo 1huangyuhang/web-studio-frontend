@@ -1,0 +1,352 @@
+@import '../../../assets/styles/global.less';
+
+.about-page {
+  padding: 20px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  // 页面标题
+  .page-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+    border-bottom: 1px solid @border-color;
+
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      color: #2c1810;
+      margin: 0 0 12px 0;
+    }
+
+    .ant-typography-text {
+      font-size: 16px;
+      color: #665248;
+      line-height: 1.5;
+    }
+  }
+
+  // 通用区块标题
+  .section-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c1810;
+    margin: 0 0 24px 0;
+    text-align: center;
+  }
+
+  // 关于我们区块
+  .about-section {
+    margin-bottom: 32px;
+  }
+
+  // 关于图片
+  .about-image-wrapper {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    .about-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  // 关于内容
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .about-text {
+      font-size: 16px;
+      color: #666;
+      line-height: 1.8;
+      margin: 0 0 20px 0;
+      text-align: justify;
+    }
+  }
+
+  // 区块分隔线
+  .section-divider {
+    margin: 48px 0;
+    border-color: @border-color;
+  }
+
+  // 核心优势区块
+  .advantages-section {
+    margin-bottom: 32px;
+  }
+
+  // 优势卡片
+  .advantage-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid @border-color;
+    transition: all 0.3s ease;
+    height: 100%;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .ant-card-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  }
+
+  // 优势图标
+  .advantage-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #f0f5ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+
+    .advantage-icon {
+      font-size: 24px;
+      font-weight: 600;
+      color: @primary-color;
+    }
+  }
+
+  // 优势标题
+  .advantage-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c1810;
+    margin: 0 0 12px 0;
+  }
+
+  // 优势描述
+  .advantage-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  // 发展历程区块
+  .history-section {
+    margin-bottom: 32px;
+  }
+
+  // 时间线
+  .history-timeline {
+    position: relative;
+    padding-left: 32px;
+
+    // 时间线主轴
+    &::before {
+      content: '';
+      position: absolute;
+      left: 12px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: @border-color;
+    }
+  }
+
+  // 时间线项
+  .history-item {
+    position: relative;
+    margin-bottom: 32px;
+    padding-left: 32px;
+
+    // 时间线节点
+    &::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 8px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background-color: @primary-color;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px @primary-color;
+    }
+  }
+
+  // 时间年份
+  .history-year {
+    font-size: 20px;
+    font-weight: 600;
+    color: @primary-color;
+    margin: 0 0 8px 0;
+  }
+
+  // 时间线内容
+  .history-content {
+    background-color: #fafafa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid @primary-color;
+
+    .history-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2c1810;
+      margin: 0 0 8px 0;
+    }
+
+    .history-description {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  // 响应式设计
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    .page-header {
+      margin-bottom: 24px;
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .ant-typography-text {
+        font-size: 14px;
+      }
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    .about-image-wrapper {
+      margin-bottom: 24px;
+      min-height: 250px;
+    }
+
+    .about-content {
+      .about-text {
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
+    }
+
+    .section-divider {
+      margin: 32px 0;
+    }
+
+    .advantage-card {
+      .ant-card-body {
+        padding: 16px;
+      }
+
+      .advantage-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 12px;
+
+        .advantage-icon {
+          font-size: 20px;
+        }
+      }
+
+      .advantage-title {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+
+      .advantage-description {
+        font-size: 13px;
+      }
+    }
+
+    .history-timeline {
+      padding-left: 24px;
+
+      &::before {
+        left: 8px;
+      }
+    }
+
+    .history-item {
+      margin-bottom: 24px;
+      padding-left: 24px;
+
+      &::before {
+        left: 2px;
+      }
+    }
+
+    .history-year {
+      font-size: 18px;
+    }
+
+    .history-content {
+      padding: 16px;
+
+      .history-title {
+        font-size: 14px;
+      }
+
+      .history-description {
+        font-size: 13px;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-header {
+      h1 {
+        font-size: 20px;
+      }
+    }
+
+    .section-title {
+      font-size: 18px;
+    }
+
+    .about-image-wrapper {
+      min-height: 200px;
+    }
+
+    .advantage-card {
+      .ant-card-body {
+        padding: 12px;
+      }
+    }
+
+    .history-timeline {
+      padding-left: 20px;
+
+      &::before {
+        left: 6px;
+      }
+    }
+
+    .history-item {
+      padding-left: 20px;
+
+      &::before {
+        left: 0;
+      }
+    }
+  }
+}

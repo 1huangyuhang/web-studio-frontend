@@ -1,0 +1,64 @@
+@import '@/assets/styles/global.less';
+
+// 基础样式 - 避免容器限制的字体效果
+.hover-text {
+  position: relative;
+  display: inline; // 使用 inline 允许文字正常换行，避免容器限制
+  color: var(--base-color, #2c1810); // 默认基础颜色 - 深棕色
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  overflow: visible; // 确保文字效果不被容器裁剪
+  
+  // 基础文字阴影 - 增强文字立体感
+  text-shadow: 0 0 0 transparent;
+  
+  // 装饰性下划线，初始隐藏
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--hover-color, #165DFF); // 下划线颜色
+    transition: width 0.3s ease, background-color 0.3s ease;
+    z-index: -1;
+  }
+}
+
+// 悬停时样式 - 增强文字效果，避免容器限制
+.hover-text:hover {
+  color: var(--hover-color, #165DFF) !important; // 悬停颜色 - 蓝色
+  
+  // 增强文字阴影效果，创造发光感
+  text-shadow: 
+    0 0 10px rgba(22, 93, 255, 0.3),
+    0 0 20px rgba(22, 93, 255, 0.2),
+    0 0 30px rgba(22, 93, 255, 0.1);
+  
+  // 显示下划线动画
+  &::after {
+    width: 100%;
+    background-color: var(--hover-color, #165DFF);
+  }
+}
+
+// 优化多行文本的显示效果
+.hover-text {
+  & > span {
+    position: relative;
+  }
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+  .hover-text {
+    &:hover {
+      // 移动端简化文字阴影，提高性能
+      text-shadow: 
+        0 0 5px rgba(22, 93, 255, 0.3),
+        0 0 10px rgba(22, 93, 255, 0.2);
+    }
+  }
+}

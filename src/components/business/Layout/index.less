@@ -1,0 +1,324 @@
+@import '@/assets/styles/global.less';
+
+.top-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: @light-color;
+
+  // 顶部栏 - 玻璃拟态效果
+  .top-bar {
+    background-color: rgba(248, 245, 244, 0.95); // 调整内部填充色，使用主题浅色
+    backdrop-filter: blur(10px); // 轻微模糊效果
+    -webkit-backdrop-filter: blur(10px); // Safari 兼容
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    border: 1px solid rgba(255, 255, 255, 0.2); // 清晰边缘轮廓
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); // 适当层次感
+    transition: all 0.3s ease;
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .top-bar-center {
+      display: flex;
+      align-items: center;
+    }
+
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .top-bar-icon {
+      font-size: 20px;
+      color: @text-color-secondary;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 8px;
+      border-radius: 8px;
+
+      &:hover {
+        color: @primary-color;
+        background-color: @light-color;
+        transform: translateY(-2px);
+      }
+    }
+
+    .user-icon {
+      font-size: 22px;
+    }
+
+    .phone-number {
+      font-size: 15px;
+      color: @text-color-secondary;
+      font-weight: 500;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: @primary-color;
+      }
+    }
+
+    .logo {
+      width: 96px;
+      height: 36px;
+      cursor: pointer;
+      object-fit: contain;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+
+    .contact-button {
+      background: @gradient-primary !important;
+      border: none !important;
+      color: #ffffff !important;
+      font-weight: 600;
+      border-radius: 8px !important;
+      padding: 8px 20px !important;
+      font-size: 15px !important;
+      transition: all 0.3s ease !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+      &:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+      }
+    }
+  }
+
+  // 导航栏 - 玻璃拟态效果
+  .nav-bar {
+    background-color: rgba(248, 245, 244, 0.9); // 调整内部填充色，使用主题浅色
+    backdrop-filter: blur(10px); // 轻微模糊效果
+    -webkit-backdrop-filter: blur(10px); // Safari 兼容
+    border: 1px solid rgba(255, 255, 255, 0.2); // 清晰边缘轮廓
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0 48px !important;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06); // 适当层次感
+    height: 64px;
+    display: flex;
+    align-items: center;
+    // 隐藏滚动条，但允许内容滚动（用于触摸设备）
+    overflow-x: auto;
+    // 隐藏滚动条样式
+    -ms-overflow-style: none; // IE and Edge
+    scrollbar-width: none; // Firefox
+
+    // Chrome, Safari and Opera
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .nav-menu {
+    border-bottom: none !important;
+    background-color: transparent !important;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+    // 确保菜单不会溢出导航栏
+    width: 100%;
+
+    .ant-menu-item, .ant-menu-submenu-title {
+      color: @text-color-secondary;
+      font-size: 15px;
+      font-weight: 500;
+      padding: 0 20px !important;
+      height: 64px;
+      line-height: 64px;
+      transition: all 0.3s ease;
+      margin: 0 !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      border-radius: 8px;
+
+      &:hover {
+        color: @primary-color;
+        background-color: rgba(238, 232, 230, 0.8); // 调整内部填充色，使用主题浅色
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); // 轻微阴影，增强立体感
+      }
+    }
+
+    .ant-menu-item {
+      &.ant-menu-item-selected {
+        color: @primary-color !important;
+        background-color: rgba(128, 50, 46, 0.15) !important; // 调整内部填充色，增强选中效果
+        border-bottom: none !important;
+        position: relative;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 8px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 20px;
+          height: 3px;
+          background: @primary-color;
+          border-radius: 2px;
+        }
+      }
+    }
+
+    // 子菜单激活状态
+    .ant-menu-submenu-selected > .ant-menu-submenu-title {
+      color: @primary-color !important;
+      background-color: rgba(128, 50, 46, 0.15) !important; // 调整内部填充色，与菜单项选中状态保持一致
+    }
+
+    // 自定义子菜单展开/折叠图标
+    .ant-menu-submenu {
+      &:not(.ant-menu-submenu-vertical) {
+        // 确保子菜单标题与其他菜单项间距一致
+        margin: 0 !important;
+
+        > .ant-menu-submenu-title {
+          // 调整内容对齐，确保图标不影响间距
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+
+        // 自定义向下三角形图标
+        > .ant-menu-submenu-title::after {
+          content: '';
+          display: inline-block;
+          margin-left: 4px;
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 5px solid @text-color-secondary;
+          transition: all 0.3s ease;
+          // 确保图标不影响菜单项宽度计算
+          flex-shrink: 0;
+        }
+
+        // 展开状态的图标
+        &.ant-menu-submenu-open > .ant-menu-submenu-title::after {
+          transform: rotate(180deg);
+          border-top-color: @primary-color;
+        }
+      }
+    }
+
+    // 省略号菜单项样式
+    .ant-menu-overflow-item {
+      transition: all 0.3s ease-in-out;
+    }
+
+    // 菜单项进入/离开动画
+    .ant-menu-item,
+    .ant-menu-submenu {
+      transition: all 0.3s ease-in-out;
+    }
+  }
+
+  // 内容区域
+  .app-content {
+    background-color: @light-color;
+    padding: 32px 48px;
+    flex: 1;
+    overflow: auto;
+    margin: 0 !important;
+    transition: all 0.3s ease;
+  }
+
+  // 响应式设计
+  @media (max-width: 1200px) {
+    .top-bar {
+      padding: 0 20px;
+    }
+
+    .nav-bar {
+      padding: 0 20px !important;
+    }
+
+    .app-content {
+      padding: 24px 20px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .top-bar {
+      padding: 0 16px;
+      height: 44px;
+
+      .phone-number {
+        display: none;
+      }
+
+      .top-bar-right {
+        gap: 12px;
+      }
+
+      .contact-button {
+        padding: 4px 12px;
+        font-size: 13px;
+      }
+    }
+
+    .nav-bar {
+      padding: 0 16px !important;
+      height: 48px;
+      // 保持与基本样式一致的滚动行为
+      overflow-x: auto;
+    }
+
+    .nav-menu {
+      .ant-menu-item {
+        padding: 0 12px !important;
+        height: 48px;
+        line-height: 48px;
+        font-size: 13px;
+      }
+    }
+
+    .app-content {
+      padding: 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .top-bar {
+      .logo {
+        font-size: 18px;
+      }
+
+      .top-bar-icon {
+        font-size: 16px;
+      }
+
+      .user-icon {
+        font-size: 18px;
+      }
+
+      .contact-button {
+        padding: 4px 10px;
+        font-size: 12px;
+      }
+    }
+
+    .nav-menu {
+      .ant-menu-item {
+        padding: 0 10px !important;
+        font-size: 12px;
+      }
+    }
+  }
+}

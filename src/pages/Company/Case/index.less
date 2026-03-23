@@ -1,0 +1,226 @@
+@import '../../../assets/styles/global.less';
+
+.case-page {
+  padding: 20px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  // 页面标题
+  .page-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px 0;
+    border-bottom: 1px solid @border-color;
+
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      color: #2c1810;
+      margin: 0 0 12px 0;
+    }
+
+    .ant-typography-text {
+      font-size: 16px;
+      color: #665248;
+      line-height: 1.5;
+    }
+  }
+
+  // 案例内容
+  .case-content {
+    margin-bottom: 32px;
+  }
+
+  // 案例卡片
+  .case-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid @border-color;
+    transition: all 0.3s ease;
+    overflow: hidden;
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .ant-card-body {
+      padding: 24px;
+    }
+  }
+
+  // 案例图片
+  .case-image-wrapper {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    border-radius: 4px 4px 0 0;
+
+    .case-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  // 案例信息
+  .case-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  // 案例元数据
+  .case-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .meta-text {
+      font-size: 14px;
+
+      &.client {
+        color: @primary-color;
+        font-weight: 500;
+      }
+
+      &.date {
+        color: #999;
+      }
+    }
+  }
+
+  // 案例标题
+  .case-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c1810;
+    margin: 0 0 16px 0;
+    line-height: 1.4;
+
+    &:hover {
+      color: @primary-color;
+      cursor: pointer;
+    }
+  }
+
+  // 案例描述
+  .case-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  // 案例标签
+  .case-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  // 案例标签样式
+  .case-tag {
+    background-color: #f0f0f0;
+    border-color: #e0e0e0;
+    color: #666;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 12px;
+  }
+
+  // 案例操作
+  .case-actions {
+    margin-top: auto;
+
+    .view-details {
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // 分页
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+  }
+
+  // 响应式设计
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    .page-header {
+      margin-bottom: 24px;
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .ant-typography-text {
+        font-size: 14px;
+      }
+    }
+
+    .case-card {
+      .ant-card-body {
+        padding: 16px;
+      }
+    }
+
+    .case-image-wrapper {
+      height: 200px;
+    }
+
+    .case-title {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    .case-description {
+      -webkit-line-clamp: 2;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-header {
+      h1 {
+        font-size: 20px;
+      }
+    }
+
+    .case-image-wrapper {
+      height: 180px;
+    }
+
+    .case-title {
+      font-size: 16px;
+    }
+
+    .case-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+
+      .meta-text {
+        font-size: 13px;
+      }
+    }
+  }
+}

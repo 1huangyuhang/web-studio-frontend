@@ -1,0 +1,70 @@
+// 导入全局样式变量
+@import '../../assets/styles/global.less';
+
+/**
+ * 页面游览进度条样式
+ * 固定在页面顶部，随滚动进度变化宽度
+ * 包含平滑的动画效果和过渡
+ */
+.progress-bar-container {
+  // 固定定位在页面顶部
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  
+  // 设置为页面最顶层，确保在所有元素之上
+  z-index: 10001;
+  
+  // 初始隐藏
+  opacity: 0;
+  
+  // 高度和背景色
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.05);
+  
+  // 平滑的显示/隐藏过渡
+  transition: opacity 0.3s ease;
+  
+  // 鼠标事件穿透，不影响页面交互
+  pointer-events: none;
+  
+  // 可见状态
+  &.visible {
+    opacity: 1;
+  }
+}
+
+.progress-bar {
+  // 进度条高度与容器一致
+  height: 100%;
+  
+  // 使用主题色作为进度条颜色
+  background: linear-gradient(90deg, @primary-color, @accent-color);
+  
+  // 初始宽度为0
+  width: 0%;
+  
+  // 平滑的宽度变化过渡
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  // 添加阴影效果，增强视觉层次感
+  box-shadow: 0 0 8px rgba(128, 50, 46, 0.5);
+  
+  // 圆角边框，增强美观度
+  border-radius: 0 2px 2px 0;
+}
+
+// 响应式设计，在小屏幕上调整高度
+@media (max-width: 768px) {
+  .progress-bar-container {
+    height: 3px;
+  }
+}
+
+// 在大屏幕上增加高度，增强可见性
+@media (min-width: 1200px) {
+  .progress-bar-container {
+    height: 5px;
+  }
+}

@@ -1,0 +1,44 @@
+/* 滚动触发动画图片组件样式 - 已移除所有动画效果 */
+
+/* 基础图片样式 */
+.animated-image {
+  opacity: 1; /* 初始状态可见 */
+  background-color: #ffffff; /* 白色背景填充 */
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover; /* 保持宽高比并覆盖整个容器 */
+  object-position: center; /* 居中显示，保留重要内容 */
+  overflow: hidden;
+  /* 移除所有过渡动画 */
+}
+
+/* 移除所有动画类型的初始状态 */
+.animated-image.fade-in,
+.animated-image.slide-up,
+.animated-image.slide-down,
+.animated-image.zoom-in,
+.animated-image.zoom-out,
+.animated-image.slide-left,
+.animated-image.slide-right {
+  opacity: 1;
+  transform: none;
+}
+
+/* 移除动画类定义 - 始终可见 */
+.animated-image.animate-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* 图片加载状态 */
+.animated-image[src^="data:image/svg+xml"] {
+  background-color: #f5f5f5;
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .animated-image[src^="data:image/svg+xml"] {
+    background-color: #333;
+  }
+}

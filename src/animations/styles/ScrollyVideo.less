@@ -1,0 +1,121 @@
+// 导入全局样式文件，获取变量定义
+@import '@/assets/styles/global.less';
+
+/* 核心容器样式 */
+.scrolly-video-container {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* 视频滚动区域高度，在文档流中占据空间 */
+  margin: 0 auto;
+  background: transparent; /* 保持透明，不影响页面背景 */
+  overflow: hidden;
+  z-index: 1;
+  
+  /* 移除对后续内容的背景影响 */
+  + * {
+    position: relative;
+    z-index: 10; /* 确保后续内容在视频之上 */
+    /* 移除强制背景色，使用默认页面背景 */
+    background-color: transparent;
+  }
+  
+  /* 移除过渡渐变效果，避免影响页面背景 */
+  &::after {
+    display: none;
+  }
+}
+
+/* 视频元素核心样式 */
+.scrolly-video-element {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 1;
+  display: block;
+  box-sizing: border-box;
+  overflow: hidden;
+  
+  /* 启用硬件加速 */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: opacity, transform;
+  
+  /* 移除延迟显示的过渡效果，确保立即显示 */
+  transition: none;
+  
+  /* 确保视频始终显示，不再依赖video-ready类 */
+}
+
+/* 视频结束状态样式 */
+.scrolly-video-container.video-ended {
+  .scrolly-video-element {
+    /* 视频结束后，淡出并降低层级 */
+    opacity: 0;
+    z-index: 1;
+    transition: opacity 0.5s ease;
+  }
+}
+
+/* 视频加载和错误状态 */
+.scrolly-video-container.video-loading,
+.scrolly-video-container.video-error {
+  background: transparent;
+  
+  &::before {
+    display: none;
+  }
+}
+
+/* 确保视频加载完成后容器正常显示 */
+.scrolly-video-container.video-loaded {
+  opacity: 1;
+}
+
+/* 后续内容样式 */
+.top-gallery-section {
+  position: relative;
+  z-index: 10;
+  /* 移除强制背景色，使用默认页面背景 */
+  background-color: transparent;
+  padding-top: 40px;
+  margin-top: 0;
+}
+
+/* 缓冲指示器样式 */
+.scrolly-video-buffering {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  text-align: center;
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+  }
+  
+  .buffer-progress {
+    color: #fff;
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
