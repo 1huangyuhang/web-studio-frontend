@@ -1,3 +1,6 @@
+/** 侧载 Request 类型合并；须 import 可解析的 .ts，不能 import 仅存在的 .d.ts（运行时会报 Cannot find module） */
+import './types/expressAugment';
+
 import path from 'path';
 import dotenv from 'dotenv';
 

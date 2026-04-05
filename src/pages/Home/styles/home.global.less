@@ -3,49 +3,47 @@
 /* 首页 / 营销区块（由 global.less 统一引入一次，勿在其它 chunk 重复 import） */
 
 .gallery-title {
-  font-size: @font-size-h2;
-  font-weight: @font-weight-bold;
-  color: @dark-color;
-  margin-bottom: 20px;
+  font-size: var(--type-h2, @font-size-h2);
+  font-weight: var(--app-heading-weight, @font-weight-bold);
+  color: var(--app-heading, @dark-color);
+  margin-bottom: 16px;
   text-align: center;
-  letter-spacing: @letter-spacing-tight;
-  line-height: @line-height-display;
-  font-family: @font-family-heading;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  letter-spacing: var(--track-heading, @letter-spacing-tight);
+  line-height: var(--leading-tight, @line-height-display);
+  font-family: var(--font-heading, @font-family-heading);
 }
 
 .gallery-description {
-  font-size: @font-size-lg;
-  color: @text-color-secondary;
-  line-height: @line-height-base;
+  font-size: var(--type-lead, @font-size-lg);
+  color: var(--app-text-secondary, @text-color-secondary);
+  line-height: var(--leading-body, @line-height-base);
   text-align: center;
-  max-width: 800px;
-  margin: 0 auto 32px;
-  font-weight: @font-weight-normal;
-  font-family: @font-family-base;
+  max-width: min(42rem, 100%);
+  margin: 0 auto 0;
+  font-weight: 400;
+  font-family: var(--font-body, @font-family-base);
 }
 
 .value-title {
-  font-size: @font-size-h3;
-  font-weight: @font-weight-bold;
-  color: #ffffff;
+  font-size: var(--type-h3, @font-size-h3);
+  font-weight: var(--app-heading-weight, @font-weight-bold);
+  color: var(--app-heading);
   margin-bottom: 24px;
   text-align: left;
-  letter-spacing: @letter-spacing-tight;
-  line-height: @line-height-heading;
-  font-family: @font-family-heading;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: var(--track-heading, @letter-spacing-tight);
+  line-height: var(--leading-tight, @line-height-heading);
+  font-family: var(--font-heading, @font-family-heading);
 }
 
 .value-description {
-  font-size: @font-size-base;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: @line-height-base;
-  margin-bottom: 36px;
+  font-size: var(--type-lead, @font-size-base);
+  color: var(--app-text-secondary);
+  line-height: var(--leading-body, @line-height-base);
+  margin-bottom: 0;
   text-align: left;
-  max-width: 500px;
+  max-width: 36rem;
   font-weight: @font-weight-normal;
-  font-family: @font-family-base;
+  font-family: var(--font-body, @font-family-base);
 }
 
 .products-section .section-title {

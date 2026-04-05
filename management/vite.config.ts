@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { devPorts } from '../vite-env-ports';
+
+const ports = devPorts(path.resolve(__dirname, '..'));
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,14 +16,14 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 3002,
+    port: ports.management,
     open: true,
     fs: {
       strict: false,
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: `http://127.0.0.1:${ports.api}`,
         changeOrigin: true,
       },
     },

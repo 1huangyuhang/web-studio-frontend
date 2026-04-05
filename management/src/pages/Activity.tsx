@@ -16,6 +16,7 @@ import wsService from '@/services/websocket';
 import EnhancedPagination from '@/components/EnhancedPagination';
 import AdminListPageShell from '@/components/AdminListPageShell';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useListQueryErrorToast } from '@/hooks/useListQueryErrorToast';
 import { queryKeys } from '@/queryKeys';
 import { fetchActivitiesPage, type ActivityRow } from '@/api/adminLists';
 import './index.less';
@@ -42,19 +43,17 @@ const ActivityManagement: React.FC = () => {
     search: debouncedSearch.trim(),
   };
 
-  const { data, isPending, isFetching, isError, error, refetch } = useQuery({
+  const { data, isPending, isError, error, refetch } = useQuery({
     queryKey: queryKeys.activities.list(listParams),
     queryFn: () => fetchActivitiesPage(listParams),
   });
 
-  useEffect(() => {
-    if (isError && error) {
-      message.error({
-        key: 'mgmt-activities-list',
-        content: `获取活动列表失败: ${error instanceof Error ? error.message : String(error)}`,
-      });
-    }
-  }, [isError, error]);
+  useListQueryErrorToast(
+    isError,
+    error,
+    'mgmt-activities-list',
+    '获取活动列表失败'
+  );
 
   const activities = data?.list ?? [];
   const total = data?.total ?? 0;
@@ -305,7 +304,7 @@ const ActivityManagement: React.FC = () => {
           rowKey="id"
           bordered
           pagination={false}
-          loading={isPending || isFetching}
+          loading={isPending}
         />
       </div>
 

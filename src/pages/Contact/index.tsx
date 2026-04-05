@@ -1,19 +1,35 @@
-import { Typography } from 'antd';
+import { Typography, Tag } from 'antd';
+import { TeamOutlined } from '@ant-design/icons';
 import { MarketingPageShell } from '@/components/page-shell/MarketingPageShell';
 import ContactView from './ContactView';
 import './index.less';
 
-const { Title, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 export default function Contact() {
   return (
     <MarketingPageShell
       pageClass="contact-page"
-      title={<Title level={1}>联系我们</Title>}
+      wide
+      defaultHeroClass="page-header"
+      title={
+        <>
+          <Tag
+            icon={<TeamOutlined />}
+            color="volcano"
+            className="contact-page__hero-tag"
+          >
+            商务与合作
+          </Tag>
+          <Title level={1}>联系我们</Title>
+        </>
+      }
       lead={
-        <Text>
-          如有任何关于我们公司或服务的疑问，欢迎联络我们。我们会尽快回复您。
-        </Text>
+        <Paragraph type="secondary" className="contact-page__hero-lead">
+          售前咨询、合作洽谈或一般问询均可通过下方表单留言，我们会在
+          <strong> 1–2 个工作日内 </strong>
+          回复您。
+        </Paragraph>
       }
     >
       <ContactView />

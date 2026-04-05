@@ -7,10 +7,12 @@ export function getQueryClient(): QueryClient {
     client = new QueryClient({
       defaultOptions: {
         queries: {
-          staleTime: 0,
+          /** 避免一切换窗口/点菜单失焦就整表 refetch + loading 闪动 */
+          staleTime: 30 * 1000,
           gcTime: 5 * 60 * 1000,
           retry: 1,
-          refetchOnWindowFocus: true,
+          refetchOnWindowFocus: false,
+          refetchOnReconnect: true,
         },
       },
     });

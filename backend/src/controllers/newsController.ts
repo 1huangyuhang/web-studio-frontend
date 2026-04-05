@@ -24,7 +24,7 @@ const getAllNews = async (req: Request, res: Response) => {
 
   // 计算分页偏移量
   const { page, pageSize, search, date } = queryParams;
-  const skip = (page - 1) * parseInt(pageSize as any, 10);
+  const skip = (page - 1) * pageSize;
 
   // 构建查询条件
   const where: any = {};
@@ -44,7 +44,7 @@ const getAllNews = async (req: Request, res: Response) => {
     prisma.news.findMany({
       where,
       skip,
-      take: parseInt(pageSize as any, 10), // 确保take参数为数字类型
+      take: pageSize,
       orderBy: {
         createdAt: 'desc', // 默认按创建时间倒序排列
       },

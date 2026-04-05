@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { devPorts } from './vite-env-ports';
+
+const ports = devPorts(__dirname);
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,15 +16,15 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0', // 允许外部访问
-    port: 3001, // 使用不同端口
+    port: ports.management,
     open: '/', // 打开根路径，不指定具体文件
     fs: {
       strict: false,
     },
-    // 配置API代理，避免跨域问题
+    // 与官网、scripts/dev-ports.env、REDWOOD_PORT_API 一致，避免代理仍指向 3000 而后端在其它端口导致「列表 500」
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: `http://127.0.0.1:${ports.api}`,
         changeOrigin: true,
       },
     },

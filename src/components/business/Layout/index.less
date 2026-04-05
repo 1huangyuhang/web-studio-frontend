@@ -12,15 +12,22 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    --site-main-pad-x: clamp(16px, 4vw, 48px);
-    padding: 24px var(--site-main-pad-x) 0;
-    padding-bottom: 48px;
+    --site-main-pad-x: var(--ly-container-pad-x);
+    padding: 28px var(--site-main-pad-x) 0;
+    padding-bottom: 56px;
     box-sizing: border-box;
 
-    .site-main-outlet-wrap {
+    /* 路由出口与懒加载占位（Suspense 不产生 DOM 节点，直接子元素参与 flex） */
+    > :not(.ly-footer) {
       flex: 1 0 auto;
       min-height: 0;
       width: 100%;
+    }
+
+    /* 懒加载子页占位：不用 Spin，避免每次导航/刷新在顶栏下方出现加载动画 */
+    .site-outlet-fallback--silent {
+      flex: 1;
+      min-height: min(40vh, 360px);
     }
   }
 
@@ -41,7 +48,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 48px;
+    padding: 0 var(--ly-container-pad-x);
     border-bottom: 1px solid var(--chrome-header-border);
     box-shadow: var(--chrome-header-shadow);
     transition:
@@ -77,7 +84,6 @@
       &:hover {
         color: var(--app-link-hover);
         background-color: color-mix(in srgb, var(--ly-bg-raised) 55%, transparent);
-        transform: translateY(-2px);
       }
     }
 
@@ -108,7 +114,6 @@
       &:hover {
         color: var(--app-link-hover);
         background-color: color-mix(in srgb, var(--ly-bg-raised) 55%, transparent);
-        transform: translateY(-2px);
       }
 
       &:focus-visible {
@@ -145,7 +150,7 @@
       .app-tx-transform();
 
       &:hover {
-        transform: translateY(-2px);
+        opacity: 0.92;
       }
     }
 
@@ -158,11 +163,11 @@
       padding: 8px 20px !important;
       font-size: 15px !important;
       .app-tx-contact-btn-important();
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
       &:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1) !important;
       }
     }
   }
@@ -172,8 +177,8 @@
     backdrop-filter: blur(var(--ly-glass-blur)) saturate(var(--ly-glass-sat));
     -webkit-backdrop-filter: blur(var(--ly-glass-blur)) saturate(var(--ly-glass-sat));
     border-bottom: 1px solid var(--chrome-header-border);
-    padding: 0 48px !important;
-    box-shadow: var(--chrome-header-shadow);
+    padding: 0 var(--ly-container-pad-x) !important;
+    box-shadow: none;
     height: 64px;
     display: flex;
     align-items: center;
@@ -215,8 +220,6 @@
       &:hover {
         color: var(--app-link-hover) !important;
         background-color: color-mix(in srgb, var(--ly-bg-raised) 65%, transparent) !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
       }
     }
 
@@ -297,28 +300,14 @@
 
   .app-content {
     background-color: transparent;
-    padding: 32px 48px;
+    padding: 32px var(--ly-container-pad-x);
     flex: 1;
     overflow: auto;
     margin: 0 !important;
     transition: background-color var(--motion-duration-md) var(--motion-ease-soft);
   }
 
-  // 响应式设计
-  @media (max-width: 1200px) {
-    .top-bar {
-      padding: 0 20px;
-    }
-
-    .nav-bar {
-      padding: 0 20px !important;
-    }
-
-    .app-content {
-      padding: 24px 20px;
-    }
-  }
-
+  // 响应式设计（水平留白由 --ly-container-pad-x 统一；此处仅收紧小屏专用尺寸）
   @media (max-width: 768px) {
     .top-bar {
       padding: 0 16px;

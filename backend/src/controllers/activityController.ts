@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import prisma from '../utils/prisma';
 import { getIo } from '../socketInstance';
 import {
@@ -20,53 +20,54 @@ function formatActivity<
 }
 
 // 获取所有活动
-const getAllActivities = async (req: Request, res: Response) => {
-  // 使用Zod schema验证查询参数
-  const queryParams = activityQuerySchema.parse(req.query);
+const getAllActivities = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const queryParams = activityQuerySchema.parse(req.query);
+    const { page, pageSize, search } = queryParams;
+    const skip = (page - 1) * pageSize;
 
-  // 计算分页偏移量
-  const { page, pageSize, search } = queryParams;
-  const skip = (page - 1) * parseInt(pageSize as any, 10);
+    const where: Record<string, unknown> = {};
+    if (search) {
+      where['OR'] = [
+        { title: prismaStringContains(search) },
+        { description: prismaStringContains(search) },
+      ];
+    }
 
-  // 构建查询条件
-  const where: any = {};
-  if (search) {
-    where.OR = [
-      { title: prismaStringContains(search) },
-      { description: prismaStringContains(search) },
-    ];
-  }
+    const [activities, total] = await Promise.all([
+      prisma.activity.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      prisma.activity.count({ where }),
+    ]);
 
-  // 查询活动列表和总数
-  const [activities, total] = await Promise.all([
-    prisma.activity.findMany({
-      where,
-      skip,
-      take: parseInt(pageSize as any, 10), // 确保take参数为数字类型
-      orderBy: {
-        createdAt: 'desc', // 默认按创建时间倒序排列
+    const totalPages = Math.ceil(total / pageSize);
+
+    const formattedActivities = activities.map((activity) =>
+      formatActivity(activity)
+    );
+
+    res.json({
+      data: formattedActivities,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages,
       },
-    }),
-    prisma.activity.count({ where }),
-  ]);
-
-  // 计算总页数
-  const totalPages = Math.ceil(total / pageSize);
-
-  const formattedActivities = activities.map((activity) =>
-    formatActivity(activity)
-  );
-
-  // 返回带分页信息的响应
-  res.json({
-    data: formattedActivities,
-    pagination: {
-      page,
-      pageSize,
-      total,
-      totalPages,
-    },
-  });
+    });
+  } catch (e) {
+    next(e);
+  }
 };
 
 // 获取单个活动

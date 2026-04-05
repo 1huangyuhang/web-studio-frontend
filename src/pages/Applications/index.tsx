@@ -78,21 +78,19 @@ export default function Applications() {
       pageClass="applications-page"
       customHeader={
         <div className="applications-hero">
-          <div className="applications-hero-inner">
-            <Tag
-              icon={<RocketOutlined />}
-              color="volcano"
-              className="applications-hero-tag"
-            >
-              站内应用
-            </Tag>
-            <Title level={1} className="applications-title">
-              应用程序
-            </Title>
-            <Paragraph className="applications-lead">
-              从学习到购物、活动与客服，以下入口与站点主要功能一一对应。选择应用即可跳转。
-            </Paragraph>
-          </div>
+          <Tag
+            icon={<RocketOutlined />}
+            color="volcano"
+            className="applications-hero-tag"
+          >
+            站内应用
+          </Tag>
+          <Title level={1} className="applications-title">
+            应用程序
+          </Title>
+          <Paragraph className="applications-lead">
+            从学习到购物、活动与客服，以下入口与站点主要功能一一对应。选择应用即可跳转。
+          </Paragraph>
         </div>
       }
     >

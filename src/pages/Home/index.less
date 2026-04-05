@@ -1,64 +1,12 @@
 @import (reference) '../../assets/styles/foundation/index.less';
 
-// 页面主容器，包含主要内容和页脚
-.home-page-wrapper {
+.home-page {
   position: relative;
   width: 100%;
   min-height: 100vh;
   box-sizing: border-box;
-}
-
-.home-page {
-  // 背景纹路样式
-  
-  // 木纹纹理背景
-  .bg-wood-grain {
-    background-image: 
-      // 主木纹纹理
-      linear-gradient(90deg, rgba(128, 50, 46, 0.02) 0%, rgba(128, 50, 46, 0.04) 10%, rgba(128, 50, 46, 0.02) 20%, transparent 30%),
-      linear-gradient(0deg, rgba(128, 50, 46, 0.01) 0%, rgba(128, 50, 46, 0.03) 50%, rgba(128, 50, 46, 0.01) 100%),
-      // 年轮纹理
-      radial-gradient(circle at 20% 80%, rgba(128, 50, 46, 0.03) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(128, 50, 46, 0.03) 0%, transparent 50%),
-      // 中式花纹纹理
-      repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(128, 50, 46, 0.01) 20px, rgba(128, 50, 46, 0.01) 40px);
-    background-size: cover, cover, 300px 300px, 300px 300px, 80px 80px;
-    background-position: center, center, 0 0, 0 0, 0 0;
-    background-repeat: repeat, repeat, repeat, repeat, repeat;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  // 中式花纹背景
-  .bg-chinese-pattern {
-    background-image: 
-      // 中式回字纹
-      repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(128, 50, 46, 0.02) 10px, rgba(128, 50, 46, 0.02) 12px),
-      repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(128, 50, 46, 0.02) 10px, rgba(128, 50, 46, 0.02) 12px),
-      // 点状纹理
-      radial-gradient(circle, rgba(128, 50, 46, 0.03) 1px, transparent 1px),
-      radial-gradient(circle, rgba(128, 50, 46, 0.03) 1px, transparent 1px);
-    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-    background-position: 0 0, 50px 50px, 0 0, 10px 10px;
-    background-repeat: repeat, repeat, repeat, repeat;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  // 渐变纹理背景
-  .bg-gradient-pattern {
-    background-image: 
-      // 主渐变
-      linear-gradient(135deg, rgba(128, 50, 46, 0.05) 0%, rgba(255, 255, 255, 0) 70%),
-      // 纹理叠加
-      linear-gradient(45deg, transparent 0%, rgba(128, 50, 46, 0.02) 50%, transparent 100%),
-      linear-gradient(-45deg, transparent 0%, rgba(128, 50, 46, 0.02) 50%, transparent 100%);
-    background-size: cover, 100px 100px, 100px 100px;
-    background-position: center, 0 0, 0 0;
-    background-repeat: no-repeat, repeat, repeat;
-    position: relative;
-    overflow: hidden;
-  }
+  /* 区块背景统一交给 body 画布；避免木纹/回纹/斜纹叠层嘈杂 */
+  background: transparent;
 
   // 顶部图片展示区
   .top-gallery-section {
@@ -112,11 +60,9 @@
     }
 
     .gallery-text {
-      max-width: 1400px; /* 增大最大宽度 */
-      margin: 0 auto;
+      margin: 0 auto clamp(28px, 4vw, 48px);
       padding: 0;
-      text-align: center; /* 居中对齐，符合Dify的设计 */
-      margin-top: 0;
+      text-align: center;
 
       .gallery-title {
         font-size: @font-size-h1; /* 使用更大的标题 */
@@ -141,68 +87,39 @@
     }
   }
 
-  // 数据统计区：与 theme-css（--app-* / --section-veil-*）一致，不用独立木纹底
+  /* 数据统计区：表面与出血由 .home-unified-flow-section + home-premium.overrides 统一提供 */
   .stats-section {
     position: relative;
-    padding: clamp(56px, 8vw, 88px) 20px;
-    margin-bottom: 80px;
-    width: 100%;
-    max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
-    border-top: 1px solid var(--app-card-border);
-    border-bottom: 1px solid var(--app-card-border);
-    background:
-      radial-gradient(
-        ellipse 78% 52% at 50% 0%,
-        color-mix(in srgb, var(--app-accent-cinnabar) 12%, transparent),
-        transparent 62%
-      ),
-      linear-gradient(
-        180deg,
-        var(--section-veil-top) 0%,
-        var(--section-veil-mid) 48%,
-        var(--section-veil-bottom) 100%
-      );
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: clamp(16px, 2.5vw, 24px);
-      transform: translateX(-50%);
-      width: min(68%, 480px);
-      height: 1px;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        color-mix(in srgb, var(--app-accent-cinnabar) 45%, transparent),
-        color-mix(in srgb, var(--app-accent-cinnabar) 22%, transparent),
-        transparent
-      );
-      pointer-events: none;
-      opacity: 0.9;
-    }
+    box-sizing: border-box;
+    overflow: visible;
 
     .stats-description {
       position: relative;
       z-index: 1;
-      max-width: 1400px;
-      margin: 0 auto clamp(36px, 5vw, 52px);
+      max-width: min(100%, var(--rf-container-max, 1200px));
+      margin: 0 auto clamp(22px, 3.5vw, 36px);
       text-align: center;
-      padding: 0 clamp(20px, 4vw, 40px);
+      padding: 0;
       width: 100%;
 
       .stats-text {
         margin: 0 auto;
         max-width: 42rem;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(8px, 1.5vw, 14px);
+      }
+
+      .stats-body.ant-typography {
+        margin-bottom: 0;
+        color: inherit;
       }
 
       .stats-kicker {
-        display: inline-block;
-        margin-bottom: 0.65em;
+        display: block;
+        margin: 0;
         font-family: var(--font-heading);
         font-size: var(--type-h4);
         font-weight: var(--app-heading-weight);
@@ -224,7 +141,7 @@
     .stats-grid {
       position: relative;
       z-index: 1;
-      max-width: 1400px;
+      max-width: min(100%, var(--rf-container-max, 1200px));
       margin: 0 auto;
       width: 100%;
     }
@@ -265,78 +182,15 @@
     }
   }
 
-  // 价值主张区
-  .value-proposition-section {
-    padding: 0 20px 80px;
-    width: 100%; /* 使用百分比宽度，避免水平滚动 */
-    max-width: 100%; /* 限制最大宽度 */
-    margin: 0 auto;
-    position: relative;
-    overflow: hidden;
-
-    .value-content {
-      display: flex;
-      align-items: center; /* 垂直居中对齐 */
-      justify-content: space-between;
-      gap: 40px; /* 减小间距，让布局更紧凑 */
-      padding: 0 40px;
-      background-color: transparent;
-      border-radius: 0;
-      color: @dark-color;
-
-      .value-text {
-        flex: 1;
-
-        .value-title {
-          font-size: @font-size-h1;
-          font-weight: @font-weight-bold;
-          color: @dark-color;
-          margin-bottom: 36px;
-          text-align: left;
-          letter-spacing: @letter-spacing-tight;
-          line-height: @line-height-display;
-          max-width: 650px;
-        }
-
-        .value-description {
-          font-size: @font-size-xl;
-          color: @text-color-secondary;
-          line-height: @line-height-base;
-          margin-bottom: 48px;
-          text-align: left;
-          max-width: 650px;
-        }
-
-        .value-button {
-          background-color: @primary-color !important;
-          color: #ffffff !important;
-          border: none !important;
-          font-weight: @font-weight-semibold;
-          border-radius: 12px; /* 增大圆角 */
-          padding: 16px 40px; /* 增大按钮尺寸 */
-          font-size: @font-size-lg; /* 增大按钮字体 */
-        }
-      }
-
-      .value-image {
-        flex: 1;
-        height: 500px; /* 增大图片高度 */
-        border-radius: 16px; /* 增大圆角 */
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
-      }
-    }
-  }
+  /* 价值主张区：见 sections/HomeValueSection.less（毛玻璃 + 红木氛围） */
 
   // 产品展示区
   .products-section {
     padding: 80px 20px;
-    background-color: @background-color;
     margin-bottom: 80px;
     position: relative;
     overflow: hidden;
-    .app-tx-section-ambient-lg();
-    .bg-gradient-pattern; /* 添加渐变纹理背景 */
+    background: transparent;
     width: 100%; /* 使用百分比宽度，避免水平滚动 */
     max-width: 100%; /* 限制最大宽度 */
     margin: 0 auto;
@@ -461,14 +315,12 @@
   // 传承与专业同行区
   .heritage-section {
     padding: 80px 20px;
-    background-color: @background-color;
     margin-bottom: 80px;
-    border-top: 1px solid @border-color;
-    border-bottom: 1px solid @border-color;
-    .bg-chinese-pattern; /* 添加中式花纹背景 */
+    border-top: 1px solid var(--app-card-border);
+    border-bottom: 1px solid var(--app-card-border);
     position: relative;
     overflow: hidden;
-    .app-tx-section-ambient-lg();
+    background: transparent;
     width: 100%; /* 使用百分比宽度，避免水平滚动 */
     max-width: 100%; /* 限制最大宽度 */
     margin: 0 auto;
@@ -548,17 +400,6 @@
           object-fit: cover;
         }
 
-        // 添加图片装饰效果
-        &::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, rgba(128, 50, 46, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
-          pointer-events: none;
-        }
       }
     }
   }
@@ -569,7 +410,7 @@
 // 普通的 section 内容，取消拖动效果
 .action-section-container {
   padding: 120px 20px;
-  background-color: @light-color;
+  background: transparent;
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -679,20 +520,22 @@
 @media (max-width: 1200px) {
   .home-page {
     .top-gallery-section,
-    .stats-section,
-    .value-proposition-section,
     .products-section,
     .heritage-section {
       padding: 0 40px 80px;
     }
 
     .stats-section,
+    .value-proposition-section {
+      padding-block: 72px;
+      padding-inline: var(--site-main-pad-x, clamp(16px, 4vw, 48px));
+    }
+
     .heritage-section {
       padding: 80px 40px;
     }
   }
-  
-  .stats-section,
+
   .heritage-section,
   .action-section-container {
     padding: 80px 40px;
@@ -715,41 +558,23 @@
       }
     }
 
-    .value-proposition-section {
-      .value-content {
-        flex-direction: column;
-        text-align: center;
-        padding: 0;
-
-        .value-text {
-          .value-title,
-          .value-description {
-            text-align: center;
-            margin: 0 auto;
-          }
-        }
-
-        .value-image {
-          width: 100%;
-          max-width: 500px;
-          margin-top: 40px;
-        }
-      }
-    }
   }
 }
 
 @media (max-width: 768px) {
   .home-page {
     .top-gallery-section,
-    .stats-section,
-    .value-proposition-section,
     .products-section,
     .heritage-section {
       padding: 0 20px 60px;
     }
 
     .stats-section,
+    .value-proposition-section {
+      padding-block: 56px;
+      padding-inline: var(--site-main-pad-x, clamp(16px, 4vw, 48px));
+    }
+
     .heritage-section {
       padding: 60px 20px;
     }
@@ -779,8 +604,6 @@
     }
 
     .stats-section {
-      padding: 60px 20px;
-
       .stat-item {
         padding: 0 10px;
 
@@ -827,13 +650,12 @@
       }
     }
   }
-  
-  .stats-section,
+
   .heritage-section,
   .action-section-container {
     padding: 60px 20px;
   }
-  
+
   .action-section-container {
     padding: 60px 20px;
 
@@ -850,14 +672,17 @@
 @media (max-width: 480px) {
   .home-page {
     .top-gallery-section,
-    .stats-section,
-    .value-proposition-section,
     .products-section,
     .heritage-section {
       padding: 0 16px 40px;
     }
 
     .stats-section,
+    .value-proposition-section {
+      padding-block: 44px;
+      padding-inline: var(--site-main-pad-x, 16px);
+    }
+
     .heritage-section {
       padding: 40px 16px;
     }
@@ -916,3 +741,5 @@
     }
   }
 }
+
+@import './home-premium.overrides.less';

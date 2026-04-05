@@ -148,9 +148,10 @@ html[data-theme='light'] {
   );
   --app-link: #b03d36;
   --app-link-hover: #d4655c;
-  --section-veil-top: rgba(248, 250, 252, 0.92);
-  --section-veil-mid: rgba(241, 245, 249, 0.55);
-  --section-veil-bottom: rgba(176, 61, 54, 0.04);
+  /* 与画布同系中性灰，避免 veil 叠出粉/褐条带 */
+  --section-veil-top: rgba(248, 250, 252, 0.65);
+  --section-veil-mid: rgba(248, 250, 252, 0.35);
+  --section-veil-bottom: rgba(241, 245, 249, 0.5);
   --app-text-on-strong: rgba(15, 23, 42, 0.94);
   --app-text-on-strong-muted: rgba(51, 65, 85, 0.82);
   --app-text-on-media: rgba(255, 252, 248, 0.96);
@@ -202,7 +203,7 @@ html[data-theme='light'] {
   --app-card-image-bg: color-mix(in srgb, var(--ly-bg-card) 88%, var(--ly-bg-canvas) 12%);
 
   /* SaaS 产品站卡片（dify.ai 风格：干净浮起、浅描边、冷灰阴影叠层 + 品牌色微晕） */
-  --app-saas-card-radius: 20px;
+  --app-saas-card-radius: 18px;
   --app-saas-card-border: rgba(15, 23, 42, 0.08);
   --app-saas-card-shadow: 0 1px 0 rgba(255, 255, 255, 0.95) inset, 0 0 0 1px rgba(15, 23, 42, 0.06),
     0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -8px rgba(15, 23, 42, 0.08);
@@ -233,14 +234,12 @@ html[data-theme='light'] {
 
   --home-unified-radius: 20px;
   --home-unified-border: rgba(15, 23, 42, 0.08);
-  --home-unified-blur: 10px;
-  --home-unified-shadow: 0 0 0 1px rgba(15, 23, 42, 0.04) inset, 0 20px 48px -28px rgba(15, 23, 42, 0.1),
-    0 0 40px -18px rgba(176, 61, 54, 0.1);
-  --home-unified-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 250, 252, 0.94) 100%),
-    linear-gradient(
-      180deg,
-      var(--section-veil-top) 0%,
-      var(--section-veil-mid) 48%,
-      var(--section-veil-bottom) 100%
-    );
+  --home-unified-blur: 8px;
+  /* 与营销卡片一致：白底微冷灰边，弱化彩色光晕避免与 body 割裂 */
+  --home-unified-shadow: 0 0 0 1px rgba(15, 23, 42, 0.05) inset, 0 10px 32px -20px rgba(15, 23, 42, 0.07);
+  --home-unified-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ly-bg-card) 100%, var(--ly-bg-canvas) 0%) 0%,
+    color-mix(in srgb, var(--ly-bg-card) 94%, var(--ly-bg-canvas) 6%) 100%
+  );
 }

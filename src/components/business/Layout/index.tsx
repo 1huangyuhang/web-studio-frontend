@@ -7,7 +7,6 @@ import {
   Popover,
   Empty,
   message,
-  Spin,
 } from 'antd';
 import type { MenuProps } from 'antd';
 import {
@@ -353,25 +352,16 @@ const Layout = () => {
       />
 
       <main className="site-main">
-        <div className="site-main-outlet-wrap">
-          <Suspense
-            fallback={
-              <div
-                className="site-outlet-fallback"
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  justifyContent: 'center',
-                  padding: 'clamp(32px, 8vw, 64px) 16px',
-                }}
-              >
-                <Spin size="large" />
-              </div>
-            }
-          >
-            <Outlet />
-          </Suspense>
-        </div>
+        <Suspense
+          fallback={
+            <div
+              className="site-outlet-fallback site-outlet-fallback--silent"
+              aria-hidden
+            />
+          }
+        >
+          <Outlet />
+        </Suspense>
         <SiteFooter />
       </main>
     </AntLayout>

@@ -53,15 +53,22 @@ export default function ContactView() {
   };
 
   return (
-    <>
-      <Row gutter={[32, 32]}>
+    <div className="contact-page__body">
+      <Row gutter={[24, 24]} className="contact-page__grid">
         <Col xs={24} md={12}>
-          <Card className="contact-form-card">
+          <Card className="contact-form-card" bordered={false}>
+            <Title level={4} className="contact-form-card__title">
+              在线留言
+            </Title>
+            <Text type="secondary" className="contact-form-card__subtitle">
+              请填写真实联系方式，便于我们与您确认细节。
+            </Text>
             <Form
               form={form}
               layout="vertical"
               onFinish={(v) => void handleSubmit(v)}
               requiredMark="optional"
+              className="contact-form"
             >
               <Row gutter={16}>
                 <Col xs={24} sm={12}>
@@ -70,7 +77,7 @@ export default function ContactView() {
                     label="名称"
                     rules={[{ required: true, message: '请输入您的名称' }]}
                   >
-                    <Input placeholder="请输入您的名称" />
+                    <Input placeholder="请输入您的名称" size="large" />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={12}>
@@ -79,7 +86,7 @@ export default function ContactView() {
                     label="电话号码"
                     rules={[{ required: true, message: '请输入您的电话号码' }]}
                   >
-                    <Input placeholder="请输入您的电话号码" />
+                    <Input placeholder="请输入您的电话号码" size="large" />
                   </Form.Item>
                 </Col>
               </Row>
@@ -94,18 +101,18 @@ export default function ContactView() {
                       { type: 'email', message: '请输入有效的电子邮件地址' },
                     ]}
                   >
-                    <Input placeholder="请输入您的电子邮件" />
+                    <Input placeholder="name@example.com" size="large" />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={12}>
                   <Form.Item name="company" label="公司">
-                    <Input placeholder="请输入您的公司名称" />
+                    <Input placeholder="选填" size="large" />
                   </Form.Item>
                 </Col>
               </Row>
 
               <Form.Item name="subject" label="主旨">
-                <Input placeholder="请输入您的主旨" />
+                <Input placeholder="简要说明来意" size="large" />
               </Form.Item>
 
               <Form.Item
@@ -131,8 +138,13 @@ export default function ContactView() {
         </Col>
 
         <Col xs={24} md={12}>
-          <Card className="company-info-card">
-            <Title level={2}>我的公司</Title>
+          <Card className="company-info-card" bordered={false}>
+            <Title level={4} className="company-info-card__title">
+              联系方式
+            </Title>
+            <Text type="secondary" className="company-info-card__subtitle">
+              林之源 · 红木产业服务
+            </Text>
 
             <Divider className="info-divider" />
 
@@ -153,6 +165,6 @@ export default function ContactView() {
           </Card>
         </Col>
       </Row>
-    </>
+    </div>
   );
 }

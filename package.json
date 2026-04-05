@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "npm run dev --prefix backend",
     "dev:management": "vite --config vite.config.management.ts --base /",
     "build": "tsc && vite build",
     "build:management": "tsc -p management/tsconfig.json && vite build --config vite.config.management.ts",

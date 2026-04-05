@@ -7,36 +7,29 @@
 @surface-canvas-low: #08080a;
 @surface-canvas-deep: #050506;
 
+/* 全页画布：Dify 类站点 — 干净渐变 + 极轻品牌晕，无网格纹理避免嘈杂 */
 .app-canvas-body-dark() {
   background-color: var(--ly-bg-canvas, @surface-canvas-mid);
   background-image:
-    radial-gradient(ellipse 55% 45% at 12% 18%, rgba(212, 101, 92, 0.07), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 88% 22%, rgba(212, 101, 92, 0.05), transparent 52%),
-    radial-gradient(ellipse 60% 48% at 50% 102%, rgba(212, 101, 92, 0.04), transparent 58%),
+    radial-gradient(ellipse 90% 55% at 50% -12%, rgba(212, 101, 92, 0.07), transparent 52%),
     linear-gradient(
       180deg,
       @surface-canvas-top 0%,
-      @surface-canvas-mid 40%,
-      @surface-canvas-mid 60%,
+      @surface-canvas-mid 42%,
       @surface-canvas-low 88%,
       @surface-canvas-deep 100%
-    ),
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: auto, auto, auto, auto, 48px 48px, 48px 48px;
+    );
   background-attachment: scroll;
 }
 
 .app-canvas-body-light() {
+  /* 与 --ly-bg-canvas 一致的单色底 + 极轻顶光，避免纵向条带拼接感 */
   background-color: var(--ly-bg-canvas, #f8fafc);
-  background-image:
-    radial-gradient(ellipse 80% 55% at 50% -8%, rgba(176, 61, 54, 0.06), transparent 55%),
-    radial-gradient(ellipse 42% 36% at 100% 40%, rgba(176, 61, 54, 0.035), transparent 52%),
-    radial-gradient(ellipse 40% 34% at 0% 70%, rgba(15, 23, 42, 0.03), transparent 52%),
-    linear-gradient(180deg, #ffffff 0%, #f8fafc 42%, #f1f5f9 100%),
-    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
-  background-size: auto, auto, auto, auto, 48px 48px, 48px 48px;
+  background-image: radial-gradient(
+    ellipse 100% 55% at 50% -25%,
+    rgba(176, 61, 54, 0.028),
+    transparent 58%
+  );
   background-attachment: scroll;
 }
 

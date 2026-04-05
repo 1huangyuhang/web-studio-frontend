@@ -15,13 +15,12 @@ export default function HomeStatsSection({
   stats,
 }: Props) {
   return (
-    <div className="stats-section">
+    <div className="stats-section home-unified-flow-section">
       <div className="stats-description">
-        <Paragraph className="stats-text">
-          {statsIntroTitle}
-          <br />
-          {statsIntroBody}
-        </Paragraph>
+        <div className="stats-text">
+          <div className="stats-kicker">{statsIntroTitle}</div>
+          <Paragraph className="stats-body">{statsIntroBody}</Paragraph>
+        </div>
       </div>
 
       <Row gutter={[16, 24]} className="stats-grid" wrap>

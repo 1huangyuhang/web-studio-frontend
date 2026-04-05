@@ -1,4 +1,3 @@
-import { Spin } from 'antd';
 import { useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import './index.less';
@@ -50,11 +49,7 @@ const FALLBACK_CATEGORY_IMAGES = [
 const FALLBACK_HERITAGE = [redwoodDetail3, redwoodDetail4, redwoodDetail5];
 
 export default function Home() {
-  const {
-    data: assets = [],
-    isPending,
-    isError,
-  } = useQuery({
+  const { data: assets = [], isError } = useQuery({
     queryKey: ['siteAssets', 'home'],
     queryFn: () => fetchSiteAssetsByPage('home'),
     staleTime: 60_000,
@@ -215,46 +210,30 @@ export default function Home() {
   }, [stats, assets]);
 
   return (
-    <div className="home-page-wrapper">
-      {isPending ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            padding: '48px 0',
-          }}
-        >
-          <Spin size="large" tip="加载首页内容…" />
-        </div>
-      ) : null}
-      <div className="home-page">
-        <HomeScrollyVideo src={heroVideo} />
-        <HomeTopGallery
-          topGallerySrcs={topGallerySrcs}
-          galleryTitle={galleryTitle}
-          galleryDescription={galleryDescription}
-        />
-        <HomeStatsSection
-          statsIntroTitle={statsIntroTitle}
-          statsIntroBody={statsIntroBody}
-          stats={stats}
-        />
-        <HomeValueSection
-          valueTitle={valueTitle}
-          valueDescription={valueDescription}
-          valueImageSrc={valueImageSrc}
-        />
-        <HomeProductsSection productCategories={productCategories} />
-        <HomeHeritageSection
-          heritageTitle={heritageTitle}
-          heritageDescription={heritageDescription}
-          heritageSrcs={heritageSrcs}
-        />
-        <HomeActionSection
-          ctaTitle={ctaTitle}
-          ctaDescription={ctaDescription}
-        />
-      </div>
+    <div className="home-page home-premium">
+      <HomeScrollyVideo src={heroVideo} />
+      <HomeTopGallery
+        topGallerySrcs={topGallerySrcs}
+        galleryTitle={galleryTitle}
+        galleryDescription={galleryDescription}
+      />
+      <HomeStatsSection
+        statsIntroTitle={statsIntroTitle}
+        statsIntroBody={statsIntroBody}
+        stats={stats}
+      />
+      <HomeValueSection
+        valueTitle={valueTitle}
+        valueDescription={valueDescription}
+        valueImageSrc={valueImageSrc}
+      />
+      <HomeProductsSection productCategories={productCategories} />
+      <HomeHeritageSection
+        heritageTitle={heritageTitle}
+        heritageDescription={heritageDescription}
+        heritageSrcs={heritageSrcs}
+      />
+      <HomeActionSection ctaTitle={ctaTitle} ctaDescription={ctaDescription} />
     </div>
   );
 }

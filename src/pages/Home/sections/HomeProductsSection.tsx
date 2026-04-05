@@ -10,13 +10,14 @@ type Props = { productCategories: HomeProductCategory[] };
 export default function HomeProductsSection({ productCategories }: Props) {
   return (
     <ScrollAnimatedSection
-      className="products-section"
+      className="products-section home-unified-flow-section"
       animationType="slideUp"
       duration={1000}
       threshold={0.2}
     >
       <div className="section-header">
-        <Title level={3} className="section-title">
+        <span className="section-kicker">产品与服务</span>
+        <Title level={2} className="section-title">
           产品系列
         </Title>
         <Button type="link" className="section-more">

@@ -1,162 +1,188 @@
 @import (reference) '../../assets/styles/foundation/index.less';
 
 .contact-page {
-  padding: 0;
+  padding-bottom: clamp(32px, 6vw, 64px);
+}
 
-  // 页面标题
-  .page-title {
-    text-align: center;
-    margin-bottom: 40px;
-    padding: 20px 0;
-    border-bottom: 1px solid @border-color;
+.contact-page__hero-tag {
+  margin-bottom: 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
 
-    .ant-typography {
-      margin: 0;
-    }
+.contact-page__hero-lead {
+  max-width: 40rem;
+  margin: 0 auto !important;
+  font-size: var(--type-lead) !important;
+  line-height: var(--leading-snug) !important;
 
-    h1 {
-      font-size: 32px;
-      font-weight: 600;
-      color: var(--app-heading);
-      margin-bottom: 12px;
-    }
+  strong {
+    color: var(--app-heading);
+    font-weight: 600;
+  }
+}
 
-    .ant-typography-text {
-      font-size: 16px;
-      color: var(--app-text-secondary);
-      line-height: 1.5;
+.contact-page__body {
+  width: 100%;
+}
+
+.contact-page__grid {
+  max-width: min(1040px, 100%);
+  margin: 0 auto;
+}
+
+.contact-form-card,
+.company-info-card {
+  border-radius: var(--app-saas-card-radius);
+  border: 1px solid var(--app-saas-card-border);
+  box-shadow: var(--app-saas-card-shadow);
+  background: var(--ly-bg-raised);
+  height: 100%;
+  transition:
+    box-shadow var(--motion-duration-md) var(--motion-ease-soft),
+    border-color var(--motion-duration-md) var(--motion-ease-soft);
+
+  .ant-card-body {
+    padding: clamp(22px, 3vw, 32px);
+  }
+}
+
+.contact-form-card:hover {
+  border-color: var(--app-card-border-hover);
+  box-shadow: var(--app-saas-card-shadow-hover);
+}
+
+.contact-form-card__title,
+.company-info-card__title {
+  margin: 0 0 6px !important;
+  font-family: var(--font-heading) !important;
+  font-size: var(--type-h4) !important;
+  font-weight: 600 !important;
+  color: var(--app-heading) !important;
+}
+
+.contact-form-card__subtitle,
+.company-info-card__subtitle {
+  display: block;
+  margin-bottom: 20px;
+  font-size: var(--type-small);
+}
+
+.contact-form {
+  .ant-form-item {
+    margin-bottom: 18px;
+  }
+
+  .ant-form-item-label > label {
+    color: var(--app-heading);
+    font-weight: 500;
+    font-size: var(--type-small);
+  }
+
+  .ant-input,
+  .ant-input-affix-wrapper {
+    border-radius: var(--ly-radius-md);
+    border-color: var(--ly-border-subtle);
+    background: var(--ly-bg-card);
+
+    &:hover {
+      border-color: color-mix(in srgb, var(--app-accent-cinnabar) 35%, var(--ly-border-subtle));
     }
   }
 
-  // 联系表单卡片
-  .contact-form-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid @border-color;
-    padding: 24px;
-
-    .ant-form-item {
-      margin-bottom: 16px;
-    }
-
-    .ant-form-item-label > label {
-      color: #333;
-      font-weight: 500;
-    }
-
-    .ant-input,
-    .ant-select-selector {
-      border-radius: 4px;
-      border-color: @border-color;
-      padding: 8px 12px;
-
-      &:focus {
-        border-color: @primary-color;
-        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
-      }
-    }
-
-    .ant-input-textarea {
-      resize: vertical;
-    }
-
-    .submit-btn {
-      border-radius: 4px;
-      padding: 8px 32px;
-      font-size: 14px;
-      font-weight: 500;
-    }
+  .ant-input:focus,
+  .ant-input-focused,
+  .ant-input-affix-wrapper-focused {
+    border-color: var(--app-accent-cinnabar);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent-cinnabar) 18%, transparent);
   }
 
-  // 公司信息卡片
+  .ant-input-textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+}
+
+.submit-btn {
+  min-width: 140px;
+  margin-top: 4px;
+  border-radius: var(--ly-radius-md) !important;
+  padding: 10px 28px !important;
+  font-size: var(--type-body) !important;
+  font-weight: 600 !important;
+}
+
+.company-info-card {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--app-accent-cinnabar) 55%, transparent),
+      transparent
+    );
+    opacity: 0.85;
+    pointer-events: none;
+  }
+}
+
+.info-divider {
+  margin: 12px 0 20px !important;
+  border-color: var(--ly-border-subtle);
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: var(--ly-radius-md);
+  background: color-mix(in srgb, var(--ly-bg-canvas) 65%, var(--ly-bg-raised));
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-icon {
+    font-size: 18px;
+    color: var(--app-accent-cinnabar);
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .ant-typography {
+    font-size: var(--type-body);
+    color: var(--app-text-secondary);
+    line-height: var(--leading-snug);
+    margin: 0;
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-page__grid {
+    margin: 0;
+  }
+
+  .contact-form-card,
   .company-info-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid @border-color;
-    padding: 24px;
-    height: 100%;
-
-    h2 {
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--app-heading);
-      margin-bottom: 16px;
-    }
-
-    .info-divider {
-      margin: 16px 0;
-      border-color: @border-color;
-    }
-
-    .info-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 20px;
-
-      .info-icon {
-        font-size: 20px;
-        color: @primary-color;
-        margin-top: 2px;
-        flex-shrink: 0;
-      }
-
-      .ant-typography-text {
-        font-size: 16px;
-        color: #333;
-        line-height: 1.5;
-        margin: 0;
-        white-space: normal;
-        word-break: break-word;
-      }
+    .ant-card-body {
+      padding: 18px;
     }
   }
 
-  // 响应式设计
-  @media (max-width: 768px) {
-    padding: 0;
-
-    .page-title {
-      margin-bottom: 24px;
-
-      h1 {
-        font-size: 24px;
-      }
-
-      .ant-typography-text {
-        font-size: 14px;
-      }
-    }
-
-    .contact-form-card,
-    .company-info-card {
-      padding: 16px;
-    }
-
-    .company-info-card {
-      margin-top: 0;
-    }
-
-    .info-item {
-      margin-bottom: 16px;
-
-      .ant-typography-text {
-        font-size: 14px;
-      }
-    }
-  }
-
-  @media (max-width: 480px) {
-    .page-title {
-      h1 {
-        font-size: 20px;
-      }
-    }
-
-    .company-info-card {
-      h2 {
-        font-size: 18px;
-      }
-    }
+  .info-item {
+    padding: 10px 12px;
+    margin-bottom: 14px;
   }
 }

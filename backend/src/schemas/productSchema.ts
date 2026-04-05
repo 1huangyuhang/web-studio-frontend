@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  listQueryPage,
+  listQueryPageSize,
+  listQuerySearch,
+} from './listQueryCommon';
 
 const optionalImageUrl = z
   .union([z.string().url('请输入有效图片 URL').max(2048), z.literal('')])
@@ -64,22 +69,14 @@ export const updateProductSchema = z.object({
 
 // 产品查询参数的Zod schema
 export const productQuerySchema = z.object({
-  page: z
-    .string()
-    .default('1')
-    .transform((val) => parseInt(val))
-    .refine((val) => val > 0, '页码必须大于0'),
-  pageSize: z
-    .string()
-    .default('10')
-    .transform((val) => parseInt(val))
-    .refine((val) => val > 0 && val <= 100, '每页数量必须在1-100之间'),
+  page: listQueryPage,
+  pageSize: listQueryPageSize,
   category: z.string().optional(),
   isNew: z
     .string()
     .transform((val) => val.toLowerCase() === 'true')
     .optional(),
-  search: z.string().optional(),
+  search: listQuerySearch,
 });
 
 // 导出类型

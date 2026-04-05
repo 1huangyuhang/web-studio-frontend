@@ -22,6 +22,7 @@ import {
 import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
 import { ADMIN_NAV_GROUPS, getBreadcrumbSegments } from '@/config/menuConfig';
 import AdminWorkbenchBar from '@/components/AdminWorkbenchBar';
+import { prefetchManagementRoute } from '@/utils/prefetchManagementRoute';
 import './index.less';
 
 const { Header, Content, Sider } = Layout;
@@ -79,12 +80,15 @@ const AdminLayout: React.FC = () => {
           key: r.menuKey,
           icon: <r.Icon />,
           label: r.label,
+          /** 勿用 label 包一层自定义节点，会打断 rc-menu 的点击/选中；预加载用官方 item 事件 */
+          onMouseEnter: () => prefetchManagementRoute(r.menuKey),
         })),
       })),
     []
   );
 
   const onMenuClick: MenuProps['onClick'] = ({ key }) => {
+    prefetchManagementRoute(key);
     navigate(key === '/' ? '/' : key);
     setMobileMenuOpen(false);
   };

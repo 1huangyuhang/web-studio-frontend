@@ -2,8 +2,7 @@ import { lazy } from 'react';
 import type { ReactNode } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import Layout from './components/business/Layout';
-
-const Home = lazy(() => import('./pages/Home'));
+import Home from './pages/Home';
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Applications = lazy(() => import('./pages/Applications'));
 const Account = lazy(() => import('./pages/Account'));

@@ -32,6 +32,7 @@ import {
 } from '@/utils/persistedTableColumns';
 import { canWriteInManagementUi } from '@/utils/managementWriteAccess';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useListQueryErrorToast } from '@/hooks/useListQueryErrorToast';
 import { queryKeys } from '@/queryKeys';
 import { fetchProductsPage, type ProductRow } from '@/api/adminLists';
 import './index.less';
@@ -112,19 +113,17 @@ const ProductManagement: React.FC = () => {
     search: urlSearch,
   };
 
-  const { data, isPending, isFetching, isError, error, refetch } = useQuery({
+  const { data, isPending, isError, error, refetch } = useQuery({
     queryKey: queryKeys.products.list(queryListParams),
     queryFn: () => fetchProductsPage(queryListParams),
   });
 
-  useEffect(() => {
-    if (isError && error) {
-      message.error({
-        key: 'mgmt-products-list',
-        content: `获取产品列表失败: ${error instanceof Error ? error.message : String(error)}`,
-      });
-    }
-  }, [isError, error]);
+  useListQueryErrorToast(
+    isError,
+    error,
+    'mgmt-products-list',
+    '获取产品列表失败'
+  );
 
   const products = data?.list ?? [];
   const total = data?.total ?? 0;
@@ -516,7 +515,7 @@ const ProductManagement: React.FC = () => {
           rowKey="id"
           bordered
           pagination={false}
-          loading={isPending || isFetching}
+          loading={isPending}
         />
       </div>
 

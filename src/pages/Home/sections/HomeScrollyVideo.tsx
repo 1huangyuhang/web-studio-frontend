@@ -23,12 +23,12 @@ export default function HomeScrollyVideo({ src = DEFAULT_HERO_VIDEO }: Props) {
         height="clamp(420px, 88dvh, 920px)"
       >
         <div className="home-hero-scrolly__content">
-          <span className="home-hero-scrolly__eyebrow">林之源红木美学空间</span>
+          <span className="home-hero-scrolly__eyebrow">林之源 · 红木美学</span>
           <Title level={1} className="home-hero-scrolly__title">
-            传承工艺精粹，筑就恒久之美
+            传承工艺，筑就恒久之美
           </Title>
           <Paragraph className="home-hero-scrolly__lead">
-            甄选良材与匠心雕琢，为当代居所呈现温润、克制而有力的东方气质。向下滚动，探索品牌故事与作品系列。
+            甄选良材与匠心雕琢，为居所呈现温润、克制的东方气质。向下滚动，探索品牌与作品系列。
           </Paragraph>
           <Space size="middle" className="home-hero-scrolly__actions" wrap>
             <Button

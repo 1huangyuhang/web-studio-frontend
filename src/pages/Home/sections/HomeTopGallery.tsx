@@ -22,7 +22,17 @@ export default function HomeTopGallery({
       duration={1000}
       threshold={0.2}
     >
-      <Row gutter={[0, 0]} className="gallery-grid">
+      <div className="gallery-text ly-container">
+        <span className="section-kicker">品牌叙事</span>
+        <Title level={2} className="gallery-title">
+          <HoverText text={galleryTitle} />
+        </Title>
+        <Paragraph className="gallery-description">
+          {galleryDescription}
+        </Paragraph>
+      </div>
+
+      <Row gutter={[0, 0]} className="gallery-grid ly-container">
         <Col xs={24} md={12}>
           <div className="gallery-item large">
             <AnimatedImage src={topGallerySrcs[0]} alt="红木原材料" />
@@ -37,15 +47,6 @@ export default function HomeTopGallery({
           </div>
         </Col>
       </Row>
-
-      <div className="gallery-text">
-        <Title level={3} className="gallery-title">
-          <HoverText text={galleryTitle} />
-        </Title>
-        <Paragraph className="gallery-description">
-          {galleryDescription}
-        </Paragraph>
-      </div>
     </ScrollAnimatedSection>
   );
 }

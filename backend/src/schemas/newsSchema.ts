@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  listQueryPage,
+  listQueryPageSize,
+  listQuerySearch,
+} from './listQueryCommon';
 
 const optionalImageUrl = z
   .union([z.string().url().max(2048), z.literal('')])
@@ -47,17 +52,9 @@ export const updateNewsSchema = z.object({
 
 // 新闻查询参数的Zod schema
 export const newsQuerySchema = z.object({
-  page: z
-    .string()
-    .default('1')
-    .transform((val) => parseInt(val))
-    .refine((val) => val > 0, '页码必须大于0'),
-  pageSize: z
-    .string()
-    .default('10')
-    .transform((val) => parseInt(val))
-    .refine((val) => val > 0 && val <= 100, '每页数量必须在1-100之间'),
-  search: z.string().optional(),
+  page: listQueryPage,
+  pageSize: listQueryPageSize,
+  search: listQuerySearch,
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式必须为YYYY-MM-DD')

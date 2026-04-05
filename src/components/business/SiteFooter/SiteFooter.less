@@ -22,12 +22,9 @@
   }
 }
 
-.ly-footer__main {
+.ly-footer__content {
   position: relative;
   z-index: 1;
-}
-
-.ly-footer__content {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -58,15 +55,10 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 56px;
-    height: 3px;
+    width: 36px;
+    height: 2px;
     background: var(--ly-footer-accent);
     border-radius: 2px;
-    transition: width var(--motion-duration-md) var(--motion-ease-soft);
-  }
-
-  &:hover::after {
-    width: 100%;
   }
 }
 

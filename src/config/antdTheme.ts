@@ -3,8 +3,8 @@ import { theme } from 'antd';
 import type { ThemeMode } from '@/redux/slices/themeSlice';
 
 const shared = {
-  borderRadius: 10,
-  borderRadiusLG: 16,
+  borderRadius: 11,
+  borderRadiusLG: 18,
   borderRadiusSM: 8,
   fontFamily:
     "'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif",
@@ -45,7 +45,7 @@ const darkTokens: ThemeConfig = {
       footerBg: 'transparent',
     },
     Card: {
-      borderRadiusLG: 16,
+      borderRadiusLG: 18,
       paddingLG: 24,
     },
     Button: {
@@ -122,7 +122,7 @@ const lightTokens: ThemeConfig = {
       footerBg: 'transparent',
     },
     Card: {
-      borderRadiusLG: 16,
+      borderRadiusLG: 18,
       paddingLG: 24,
     },
     Button: {

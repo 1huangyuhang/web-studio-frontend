@@ -24,7 +24,7 @@ const ScrollAnimatedSectionComponent: React.FC<ScrollAnimatedSectionProps> = ({
   return (
     <div
       id={id}
-      className={`scroll-animated-section ${className} animate-visible`}
+      className={`scroll-animated-section scroll-section--inview ${className} animate-visible`}
       style={{
         opacity: 1,
         transform: 'none',

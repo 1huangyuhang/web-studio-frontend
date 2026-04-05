@@ -42,7 +42,7 @@ const NewsManagement: React.FC = () => {
     search: debouncedSearch.trim(),
   };
 
-  const { data, isPending, isFetching, isError, error, refetch } = useQuery({
+  const { data, isPending, isError, error, refetch } = useQuery({
     queryKey: queryKeys.news.list(listParams),
     queryFn: () => fetchNewsPage(listParams),
   });
@@ -318,7 +318,7 @@ const NewsManagement: React.FC = () => {
           rowKey="id"
           bordered
           pagination={false}
-          loading={isPending || isFetching}
+          loading={isPending}
         />
       </div>
 

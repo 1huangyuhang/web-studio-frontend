@@ -1,0 +1,344 @@
+/**
+ * 价值主张：Dify 式分层布局 + 红木暖色微光 + 毛玻璃面板
+ * 依赖父级 .home-page；与 Layout site-main 水平对齐逻辑保持不变。
+ */
+@import (reference) '@/assets/styles/foundation/index.less';
+
+.home-page .value-proposition-section {
+  @vp-pad-x: var(--site-main-pad-x, clamp(16px, 4vw, 48px));
+
+  position: relative;
+  box-sizing: border-box;
+  margin-left: calc(-1 * @vp-pad-x);
+  margin-right: calc(-1 * @vp-pad-x);
+  width: calc(100% + 2 * @vp-pad-x);
+  max-width: none;
+  padding: clamp(32px, 5vw, 56px) @vp-pad-x;
+  margin-bottom: clamp(48px, 7vw, 80px);
+  overflow: visible;
+  /* 外圈只做氛围，不用「第二道卡片框」，避免与内层毛玻璃割裂 */
+  border-radius: calc(var(--app-saas-card-radius, 20px) + 8px);
+  border: 1px solid color-mix(in srgb, var(--app-accent-cinnabar) 6%, rgba(15, 23, 42, 0.04));
+  box-shadow: 0 20px 56px -32px color-mix(in srgb, var(--app-accent-cinnabar) 12%, rgba(15, 23, 42, 0.06));
+  isolation: isolate;
+
+  /* 与全站 body 画布衔接：极轻暖晕，无网格 */
+  .value-proposition-section__ambient {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(
+      ellipse 90% 65% at 50% 0%,
+      color-mix(in srgb, var(--app-accent-cinnabar) 7%, transparent),
+      transparent 58%
+    );
+    opacity: 1;
+  }
+
+  .value-content {
+    position: relative;
+    z-index: 1;
+    max-width: min(100%, var(--rf-container-max, 1200px));
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  /* 单层毛玻璃：文案与配图同一容器，中间仅柔和分割，避免「双卡片」割裂感 */
+  .value-unified-panel {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    border-radius: var(--app-saas-card-radius, 20px);
+    overflow: hidden;
+    transition: box-shadow var(--motion-duration-md) var(--motion-ease-soft);
+
+    @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+      backdrop-filter: blur(20px) saturate(1.12);
+      -webkit-backdrop-filter: blur(20px) saturate(1.12);
+      background: linear-gradient(
+        118deg,
+        rgba(255, 255, 255, 0.45) 0%,
+        rgba(255, 252, 248, 0.32) 42%,
+        rgba(255, 249, 244, 0.26) 100%
+      );
+    }
+
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      background: color-mix(in srgb, var(--app-surface-glass) 92%, transparent);
+    }
+
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.65) inset,
+      0 0 0 1px color-mix(in srgb, var(--app-accent-cinnabar) 7%, transparent),
+      0 10px 40px -18px rgba(15, 23, 42, 0.07);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: var(--app-saas-card-shine);
+      opacity: 0.55;
+    }
+  }
+
+  .value-text {
+    flex: 1 1 52%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(28px, 4vw, 48px) clamp(22px, 3.2vw, 40px);
+    position: relative;
+    z-index: 1;
+    width: auto;
+  }
+
+  /* 渐变分割线：中间实、上下淡出，像一层雾里的接缝而非硬边 */
+  .value-unified-split {
+    flex: 0 0 1px;
+    width: 1px;
+    min-height: 120px;
+    align-self: stretch;
+    margin: clamp(20px, 3vw, 36px) 0;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--app-accent-cinnabar) 22%, transparent) 22%,
+      color-mix(in srgb, var(--app-accent-cinnabar) 12%, rgba(255, 255, 255, 0.35)) 50%,
+      color-mix(in srgb, var(--app-accent-cinnabar) 18%, transparent) 78%,
+      transparent 100%
+    );
+    opacity: 0.85;
+    position: relative;
+    z-index: 1;
+  }
+
+  .value-media {
+    flex: 1 1 46%;
+    min-width: 0;
+    max-width: min(100%, 460px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(14px, 2vw, 20px) clamp(14px, 2vw, 22px) clamp(14px, 2vw, 20px) 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .value-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: clamp(14px, 2vw, 20px);
+    font-size: var(--type-caption);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--app-accent-deep);
+    font-family: var(--font-body);
+
+    &::before {
+      content: '';
+      width: 28px;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--app-accent-cinnabar), rgba(176, 61, 54, 0.2));
+    }
+  }
+
+  .value-title.ant-typography {
+    font-size: var(--type-h2);
+    font-weight: var(--app-heading-weight);
+    letter-spacing: var(--track-heading);
+    line-height: var(--leading-tight);
+    margin: 0 0 clamp(16px, 2.2vw, 24px) !important;
+    font-family: var(--font-heading);
+    text-align: left;
+    background: var(--app-text-gradient-display);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+
+    /* Ant Design 可能内联包裹 span */
+    span {
+      background: inherit;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+
+    @supports not (background-clip: text) {
+      color: var(--app-heading);
+      -webkit-text-fill-color: currentColor;
+      background: none;
+
+      span {
+        color: inherit;
+        -webkit-text-fill-color: inherit;
+        background: none;
+      }
+    }
+  }
+
+  .value-description {
+    font-size: var(--type-lead);
+    line-height: var(--leading-body);
+    color: var(--app-text-secondary);
+    font-family: var(--font-body);
+    letter-spacing: var(--track-body);
+    margin-bottom: 0 !important;
+    max-width: 38rem;
+  }
+
+  .value-image {
+    position: relative;
+    width: 100%;
+    height: clamp(240px, 32vw, 440px);
+    border-radius: calc(var(--app-saas-card-radius, 20px) - 10px);
+    overflow: hidden;
+    /* 不再叠第二层「相框阴影」，与整块玻璃连成一体 */
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.01);
+      transition: transform var(--motion-duration-lg) var(--motion-ease-out);
+    }
+  }
+
+  .value-unified-panel:hover .value-image img {
+    transform: scale(1.03);
+  }
+
+  @media (hover: none) {
+    .value-unified-panel:hover .value-image img {
+      transform: scale(1.01);
+    }
+  }
+}
+
+/* 暗色主题 */
+html[data-theme='dark'] .home-page .value-proposition-section {
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 24px 60px -36px rgba(0, 0, 0, 0.55);
+
+  .value-proposition-section__ambient {
+    background: radial-gradient(
+      ellipse 85% 55% at 50% 0%,
+      rgba(212, 101, 92, 0.12),
+      transparent 55%
+    );
+  }
+
+  .value-unified-panel {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 0 0 1px rgba(0, 0, 0, 0.28),
+      0 18px 48px -24px rgba(0, 0, 0, 0.45);
+
+    @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+      background: linear-gradient(
+        125deg,
+        rgba(38, 36, 44, 0.62) 0%,
+        rgba(26, 24, 30, 0.48) 100%
+      );
+    }
+  }
+
+  .value-unified-split {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 45%,
+      rgba(212, 101, 92, 0.2) 50%,
+      rgba(255, 255, 255, 0.08) 55%,
+      transparent 100%
+    );
+    opacity: 0.9;
+  }
+
+  .value-image {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+
+  .value-eyebrow {
+    color: rgba(240, 168, 160, 0.95);
+  }
+
+  .value-description {
+    color: var(--app-text-secondary);
+  }
+}
+
+@media (max-width: 992px) {
+  .home-page .value-proposition-section {
+    .value-unified-panel {
+      flex-direction: column;
+    }
+
+    .value-text {
+      width: 100%;
+      text-align: center;
+      padding: clamp(24px, 4vw, 40px) clamp(20px, 4vw, 32px) clamp(8px, 2vw, 16px);
+    }
+
+    .value-eyebrow {
+      justify-content: center;
+    }
+
+    .value-title.ant-typography {
+      text-align: center;
+    }
+
+    .value-description {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    .value-unified-split {
+      flex: 0 0 auto;
+      width: min(88%, 320px);
+      height: 1px;
+      min-height: 0;
+      margin: clamp(8px, 2vw, 16px) auto;
+      align-self: center;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--app-accent-cinnabar) 20%, transparent) 20%,
+        color-mix(in srgb, var(--app-accent-cinnabar) 10%, rgba(255, 255, 255, 0.3)) 50%,
+        color-mix(in srgb, var(--app-accent-cinnabar) 18%, transparent) 80%,
+        transparent 100%
+      );
+    }
+
+    .value-media {
+      max-width: 100%;
+      width: 100%;
+      padding: 0 clamp(14px, 3vw, 22px) clamp(18px, 3vw, 28px);
+    }
+
+    .value-image {
+      height: clamp(220px, 52vw, 400px);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page .value-proposition-section .value-image img {
+    transition: none !important;
+  }
+
+  .home-page .value-proposition-section .value-unified-panel {
+    transition: none !important;
+  }
+}

@@ -1,6 +1,5 @@
 import { Typography } from 'antd';
 import { AnimatedImage, ScrollAnimatedSection } from '@/animations';
-import HoverText from '@/components/ui/HoverText';
 
 const { Title, Paragraph } = Typography;
 
@@ -17,15 +16,16 @@ export default function HomeHeritageSection({
 }: Props) {
   return (
     <ScrollAnimatedSection
-      className="heritage-section"
+      className="heritage-section home-unified-flow-section"
       animationType="fadeIn"
       duration={1000}
       threshold={0.2}
     >
       <div className="heritage-content">
         <div className="heritage-text">
-          <Title level={3} className="heritage-title">
-            <HoverText text={heritageTitle} />
+          <span className="section-kicker section-kicker--left">匠心传承</span>
+          <Title level={2} className="heritage-title">
+            {heritageTitle}
           </Title>
           <Paragraph className="heritage-description">
             {heritageDescription}

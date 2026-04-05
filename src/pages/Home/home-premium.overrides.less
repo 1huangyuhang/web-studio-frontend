@@ -25,7 +25,7 @@
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.52;
+    opacity: 0.4;
     background:
       radial-gradient(ellipse 58% 42% at 10% 28%, rgba(212, 101, 92, 0.11), transparent 52%),
       radial-gradient(ellipse 48% 36% at 92% 62%, rgba(196, 165, 116, 0.085), transparent 50%),
@@ -150,60 +150,6 @@
       position: relative;
       z-index: 1;
     }
-
-    .stat-item {
-      position: relative;
-      isolation: isolate;
-      overflow: hidden;
-      border-radius: @premium-radius-xl;
-      background: linear-gradient(
-        152deg,
-        rgba(48, 36, 36, 0.5) 0%,
-        rgba(30, 26, 30, 0.38) 48%,
-        rgba(40, 32, 34, 0.46) 100%
-      );
-      backdrop-filter: blur(28px) saturate(1.15);
-      -webkit-backdrop-filter: blur(28px) saturate(1.15);
-      border: 1px solid rgba(255, 236, 228, 0.12);
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 18px 52px rgba(18, 12, 16, 0.36),
-        0 0 64px -26px rgba(212, 101, 92, 0.16);
-      transition:
-        transform 0.5s @premium-ease-out,
-        box-shadow 0.5s @premium-ease-soft,
-        border-color 0.35s ease;
-
-      &::after {
-        .app-liquid-gloss-layer();
-        z-index: 0;
-        opacity: 0.42;
-        mix-blend-mode: soft-light;
-      }
-
-      .stat-value,
-      .stat-label {
-        position: relative;
-        z-index: 1;
-      }
-
-      .stat-value {
-        font-family: @font-family-heading;
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
-        display: inline-block;
-        font-size: clamp(28px, 2.8vw + 1.25rem, 64px);
-      }
-
-      &:hover {
-        transform: translateY(-6px);
-        border-color: rgba(212, 101, 92, 0.38);
-        box-shadow:
-          @premium-shadow-lift,
-          0 0 0 1px rgba(255, 255, 255, 0.09) inset,
-          0 0 80px -24px rgba(212, 101, 92, 0.28);
-      }
-    }
   }
 
   .value-proposition-section {
@@ -255,7 +201,7 @@
         box-shadow 0.5s @premium-ease-soft;
 
       &:hover {
-        transform: translateY(-6px);
+        transform: translateY(-4px);
         box-shadow: @premium-shadow-lift;
       }
 
@@ -361,6 +307,81 @@
       border-radius: @premium-radius-xl !important;
       box-shadow: 0 18px 48px rgba(18, 12, 16, 0.32) !important;
     }
+
+    .action-actions {
+      justify-content: center;
+    }
+
+    .action-button-secondary.ant-btn.ant-btn-default {
+      min-width: 140px;
+      height: 48px !important;
+      font-weight: 600;
+      color: rgba(252, 248, 244, 0.95) !important;
+      border-color: color-mix(in srgb, rgba(252, 248, 244, 0.95) 42%, transparent) !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+      border-radius: @premium-radius-xl !important;
+
+      &:hover {
+        color: #fff !important;
+        border-color: color-mix(in srgb, #fff 55%, transparent) !important;
+        background: rgba(255, 255, 255, 0.14) !important;
+      }
+    }
+  }
+}
+
+/* 夜间：统计数字卡深色玻璃（避免在日间误用） */
+html[data-theme='dark'] .home-page.home-premium .stats-section.home-unified-flow-section .stat-item {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: @premium-radius-xl;
+  background: linear-gradient(
+    152deg,
+    rgba(48, 36, 36, 0.5) 0%,
+    rgba(30, 26, 30, 0.38) 48%,
+    rgba(40, 32, 34, 0.46) 100%
+  );
+  backdrop-filter: blur(28px) saturate(1.15);
+  -webkit-backdrop-filter: blur(28px) saturate(1.15);
+  border: 1px solid rgba(255, 236, 228, 0.12);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 18px 52px rgba(18, 12, 16, 0.36),
+    0 0 64px -26px rgba(212, 101, 92, 0.16);
+  transition:
+    transform 0.5s @premium-ease-out,
+    box-shadow 0.5s @premium-ease-soft,
+    border-color 0.35s ease;
+
+  &::after {
+    .app-liquid-gloss-layer();
+    z-index: 0;
+    opacity: 0.42;
+    mix-blend-mode: soft-light;
+  }
+
+  .stat-value,
+  .stat-label {
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat-value {
+    font-family: @font-family-heading;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    display: inline-block;
+    font-size: clamp(28px, 2.8vw + 1.25rem, 64px);
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(212, 101, 92, 0.38);
+    box-shadow:
+      @premium-shadow-lift,
+      0 0 0 1px rgba(255, 255, 255, 0.09) inset,
+      0 0 80px -24px rgba(212, 101, 92, 0.28);
   }
 }
 
@@ -555,18 +576,9 @@
   padding-top: clamp(32px, 5vw, 56px);
 }
 
+/* 价值主张区网格改由 HomeValueSection.less 的 __grid 统一提供，避免与毛玻璃层叠重复 */
 .home-page.home-premium .value-proposition-section::before {
-  content: '';
-  position: absolute;
-  inset: -2% 8% 8%;
-  background-image:
-    linear-gradient(rgba(128, 50, 46, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(128, 50, 46, 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(ellipse 70% 65% at 50% 40%, #000 20%, transparent 75%);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.7;
+  content: none;
 }
 
 .home-page.home-premium .value-proposition-section .value-content {
@@ -614,18 +626,20 @@ html[data-theme='dark'] .home-page.home-premium .products-section.home-unified-f
 @media (prefers-reduced-motion: reduce) {
   html[data-theme='light'] .home-page.home-premium::after {
     animation: none !important;
-    opacity: 0.34 !important;
+    opacity: 0.08 !important;
   }
 }
 
 html[data-theme='light'] {
   .home-page.home-premium {
+    /* 固定层极弱，避免与 body 画布叠出「第二块底色」 */
     &::after {
-      opacity: 0.32;
-      background:
-        radial-gradient(ellipse 58% 44% at 8% 22%, rgba(176, 61, 54, 0.05), transparent 56%),
-        radial-gradient(ellipse 48% 38% at 94% 34%, rgba(15, 23, 42, 0.035), transparent 54%),
-        radial-gradient(ellipse 70% 48% at 52% 102%, rgba(176, 61, 54, 0.04), transparent 58%);
+      opacity: 0.12;
+      background: radial-gradient(
+        ellipse 90% 55% at 50% -15%,
+        rgba(176, 61, 54, 0.035),
+        transparent 58%
+      );
       animation: homePremiumLightAmbient 30s ease-in-out infinite alternate;
     }
 
@@ -633,151 +647,137 @@ html[data-theme='light'] {
       color: var(--app-accent-cinnabar);
     }
 
-    /* 明亮：中性白底 + 轻朱红高光（与全站 token 一致） */
     .home-unified-flow-section {
       border: 1px solid var(--home-unified-border);
       box-shadow: var(--home-unified-shadow);
-      backdrop-filter: blur(var(--home-unified-blur)) saturate(1.06);
-      -webkit-backdrop-filter: blur(var(--home-unified-blur)) saturate(1.06);
+      backdrop-filter: blur(var(--home-unified-blur)) saturate(1.04);
+      -webkit-backdrop-filter: blur(var(--home-unified-blur)) saturate(1.04);
       background: var(--home-unified-bg);
     }
 
+    /* 统计区仅保留中性分隔线与极淡顶光，底图与其它 home 模块一致 */
     .stats-section.home-unified-flow-section {
-      background:
-        radial-gradient(ellipse 70% 55% at 50% -12%, rgba(176, 61, 54, 0.08), transparent 54%),
-        radial-gradient(ellipse 55% 42% at 100% 100%, rgba(200, 155, 95, 0.08), transparent 52%),
-        linear-gradient(
-          168deg,
-          rgba(255, 252, 248, 0.94) 0%,
-          rgba(248, 238, 228, 0.9) 48%,
-          rgba(255, 250, 244, 0.93) 100%
-        ),
-        linear-gradient(
-          180deg,
-          var(--section-veil-top) 0%,
-          var(--section-veil-mid) 52%,
-          var(--section-veil-bottom) 100%
-        );
-
       &::before {
         background: linear-gradient(
           90deg,
           transparent,
-          rgba(176, 61, 54, 0.28),
-          rgba(196, 145, 88, 0.35),
+          rgba(15, 23, 42, 0.1),
           transparent
         );
-        opacity: 0.75;
+        opacity: 0.45;
       }
 
       &::after {
         background: radial-gradient(
-          ellipse 58% 70% at 50% 0%,
-          rgba(176, 61, 54, 0.1),
-          transparent 70%
+          ellipse 72% 60% at 50% 0%,
+          rgba(176, 61, 54, 0.04),
+          transparent 68%
         );
       }
     }
 
+    /* 与 HomeValueSection.less 外圈出血/暖边解耦，避免与 unified 表面叠成双框 */
     .value-proposition-section.home-unified-flow-section {
-      background:
-        radial-gradient(ellipse 50% 42% at 0% 50%, rgba(128, 50, 46, 0.06), transparent 52%),
-        radial-gradient(ellipse 58% 48% at 100% 8%, rgba(200, 165, 120, 0.1), transparent 55%),
-        linear-gradient(
-          168deg,
-          rgba(255, 252, 248, 0.94) 0%,
-          rgba(248, 238, 228, 0.9) 48%,
-          rgba(255, 250, 244, 0.93) 100%
-        ),
-        linear-gradient(
-          180deg,
-          var(--section-veil-top) 0%,
-          var(--section-veil-mid) 52%,
-          var(--section-veil-bottom) 100%
-        );
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      border: 1px solid var(--home-unified-border) !important;
+      box-shadow: var(--home-unified-shadow) !important;
     }
 
-    .products-section.home-unified-flow-section {
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.9) inset,
-        0 28px 64px -48px rgba(42, 30, 26, 0.1),
-        0 -16px 44px -38px rgba(176, 61, 54, 0.055);
-      background:
-        radial-gradient(ellipse 62% 50% at 88% -10%, rgba(200, 155, 95, 0.1), transparent 54%),
-        radial-gradient(ellipse 48% 40% at 0% 100%, rgba(176, 61, 54, 0.06), transparent 52%),
-        linear-gradient(
-          168deg,
-          rgba(255, 252, 248, 0.94) 0%,
-          rgba(248, 238, 228, 0.9) 48%,
-          rgba(255, 250, 244, 0.93) 100%
-        ),
-        linear-gradient(
-          180deg,
-          var(--section-veil-top) 0%,
-          var(--section-veil-mid) 52%,
-          var(--section-veil-bottom) 100%
-        );
+    /* 价值区内面板与全站 SaaS 卡片同色系的冷白底 */
+    .value-proposition-section__ambient {
+      opacity: 0.45;
+      background: radial-gradient(
+        ellipse 90% 65% at 50% 0%,
+        rgba(176, 61, 54, 0.035),
+        transparent 58%
+      );
     }
 
-    .heritage-section.home-unified-flow-section {
-      background:
-        radial-gradient(ellipse 55% 44% at 20% 100%, rgba(140, 72, 58, 0.07), transparent 52%),
-        radial-gradient(ellipse 70% 52% at 80% 0%, rgba(196, 155, 100, 0.09), transparent 56%),
-        linear-gradient(
-          168deg,
-          rgba(255, 252, 248, 0.94) 0%,
-          rgba(248, 238, 228, 0.9) 48%,
-          rgba(255, 250, 244, 0.93) 100%
-        ),
-        linear-gradient(
-          180deg,
-          var(--section-veil-top) 0%,
-          var(--section-veil-mid) 52%,
-          var(--section-veil-bottom) 100%
-        );
+    .value-proposition-section .value-unified-panel {
+      backdrop-filter: blur(12px) saturate(1.04);
+      -webkit-backdrop-filter: blur(12px) saturate(1.04);
+      background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--ly-bg-card) 98%, var(--ly-bg-canvas) 2%) 0%,
+        color-mix(in srgb, var(--ly-bg-card) 93%, var(--ly-bg-canvas) 7%) 100%
+      ) !important;
+      border: 1px solid var(--app-saas-card-border) !important;
+      box-shadow: var(--app-saas-card-shadow) !important;
+
+      &::before {
+        opacity: 0.28;
+      }
     }
 
-    .stats-section .stat-item::after {
-      opacity: 0.22;
-      mix-blend-mode: multiply;
-      background:
-        radial-gradient(ellipse 45% 35% at 32% 42%, rgba(212, 175, 130, 0.35), transparent 62%),
-        radial-gradient(ellipse 38% 30% at 72% 58%, rgba(176, 61, 54, 0.18), transparent 58%),
-        radial-gradient(ellipse 30% 25% at 50% 50%, rgba(255, 255, 255, 0.12), transparent 55%);
-      animation: appLiquidGloss 22s ease-in-out infinite;
+    /* 数字卡：与日间卡片表面一致，不用深色玻璃 */
+    .stats-section.home-unified-flow-section .stat-item {
+      background: var(--ly-bg-card);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: 1px solid var(--app-saas-card-border);
+      box-shadow: var(--app-saas-card-shadow);
+
+      &::after {
+        display: none;
+      }
+
+      &:hover {
+        transform: translateY(-4px);
+        border-color: var(--app-card-border-hover);
+        box-shadow: var(--app-saas-card-shadow-hover);
+      }
     }
 
     .action-section-container.home-unified-flow-section {
-      border-top: 1px solid rgba(92, 68, 58, 0.09);
-      border-bottom: 1px solid rgba(92, 68, 58, 0.07);
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.88) inset,
-        0 28px 68px -44px rgba(42, 30, 26, 0.09),
-        0 0 56px -30px rgba(176, 61, 54, 0.06);
+      border-top: 1px solid var(--home-unified-border);
+      border-bottom: 1px solid var(--home-unified-border);
+      box-shadow: var(--home-unified-shadow);
 
       &::before {
-        background:
-          radial-gradient(ellipse 88% 68% at 72% 16%, rgba(200, 155, 95, 0.12), transparent 58%),
-          radial-gradient(ellipse 52% 44% at 22% 86%, rgba(176, 61, 54, 0.08), transparent 60%);
+        background: radial-gradient(
+          ellipse 88% 70% at 72% 12%,
+          rgba(15, 23, 42, 0.035),
+          transparent 58%
+        );
+      }
+
+      .section-kicker {
+        color: var(--app-accent-cinnabar) !important;
+      }
+
+      .action-title.ant-typography {
+        color: var(--app-heading) !important;
+      }
+
+      .action-description.ant-typography {
+        color: var(--app-text-secondary) !important;
+      }
+
+      .action-button-secondary.ant-btn.ant-btn-default {
+        color: var(--app-heading) !important;
+        border-color: color-mix(in srgb, var(--app-heading) 22%, transparent) !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+
+        &:hover {
+          color: var(--app-link-hover) !important;
+          border-color: color-mix(in srgb, var(--app-accent-cinnabar) 35%, transparent) !important;
+          background: #fff !important;
+        }
       }
     }
 
     .value-proposition-section::before {
-      background-image:
-        linear-gradient(rgba(128, 50, 46, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(128, 50, 46, 0.05) 1px, transparent 1px);
-      opacity: 0.55;
+      content: none;
     }
 
     .heritage-section .heritage-item {
-      box-shadow:
-        var(--app-card-shadow),
-        0 0 0 1px rgba(176, 61, 54, 0.05) inset;
+      box-shadow: var(--app-card-shadow);
 
       &:hover {
-        box-shadow:
-          var(--app-card-shadow-hover),
-          0 0 28px rgba(176, 61, 54, 0.1);
+        box-shadow: var(--app-card-shadow-hover);
       }
     }
   }
@@ -785,25 +785,20 @@ html[data-theme='light'] {
   .home-flow-bridge::before {
     background: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(176, 61, 54, 0.04) 42%,
-      rgba(200, 155, 95, 0.07) 50%,
-      rgba(252, 248, 245, 0) 100%
+      transparent 0%,
+      rgba(15, 23, 42, 0.028) 50%,
+      transparent 100%
     );
-    filter: blur(24px);
+    filter: blur(28px);
   }
 
   .home-flow-bridge::after {
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(176, 61, 54, 0.12) 22%,
-      rgba(196, 145, 88, 0.4) 50%,
-      rgba(176, 61, 54, 0.12) 78%,
+      rgba(15, 23, 42, 0.07) 50%,
       transparent 100%
     );
-    box-shadow:
-      0 0 18px rgba(176, 61, 54, 0.08),
-      0 0 40px rgba(200, 155, 95, 0.07);
+    box-shadow: none;
   }
 }
