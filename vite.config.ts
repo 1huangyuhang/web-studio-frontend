@@ -2,6 +2,9 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { devPorts } from './vite-env-ports';
+
+const ports = devPorts(__dirname);
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -72,10 +75,11 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0', // 允许外部访问
-    // 配置API代理，避免跨域问题
+    port: ports.site,
+    // 配置API代理，避免跨域问题（端口见 scripts/dev-ports.env）
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: `http://localhost:${ports.api}`,
         changeOrigin: true,
       },
     },

@@ -7,6 +7,7 @@ import {
   pricingPlanQuerySchema,
 } from '../schemas/pricingPlanSchema';
 import { serializeMediaFields } from '../utils/serializeMedia';
+import { prismaStringContains } from '../utils/prismaStringFilter';
 
 function parseFeatures(raw: string): string {
   try {
@@ -65,8 +66,8 @@ export const getAllPricingPlans = async (req: Request, res: Response) => {
   const where: Record<string, unknown> = {};
   if (search) {
     where['OR'] = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } },
+      { name: prismaStringContains(search) },
+      { description: prismaStringContains(search) },
     ];
   }
   const [rows, total] = await Promise.all([

@@ -7,6 +7,7 @@ import {
   activityQuerySchema,
 } from '../schemas/activitySchema';
 import { serializeMediaFields } from '../utils/serializeMedia';
+import { prismaStringContains } from '../utils/prismaStringFilter';
 
 function formatActivity<
   T extends { image: Uint8Array | null; imageUrl: string | null },
@@ -31,8 +32,8 @@ const getAllActivities = async (req: Request, res: Response) => {
   const where: any = {};
   if (search) {
     where.OR = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } },
+      { title: prismaStringContains(search) },
+      { description: prismaStringContains(search) },
     ];
   }
 

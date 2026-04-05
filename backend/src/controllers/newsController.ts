@@ -7,6 +7,7 @@ import {
   newsQuerySchema,
 } from '../schemas/newsSchema';
 import { serializeMediaFields } from '../utils/serializeMedia';
+import { prismaStringContains } from '../utils/prismaStringFilter';
 
 function formatNews<
   T extends { image: Uint8Array | null; imageUrl: string | null },
@@ -29,9 +30,9 @@ const getAllNews = async (req: Request, res: Response) => {
   const where: any = {};
   if (search) {
     where.OR = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { content: { contains: search, mode: 'insensitive' } },
-      { summary: { contains: search, mode: 'insensitive' } },
+      { title: prismaStringContains(search) },
+      { content: prismaStringContains(search) },
+      { summary: prismaStringContains(search) },
     ];
   }
   if (date) {

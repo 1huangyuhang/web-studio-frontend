@@ -7,6 +7,7 @@ import {
   courseQuerySchema,
 } from '../schemas/courseSchema';
 import { serializeMediaFields } from '../utils/serializeMedia';
+import { prismaStringContains } from '../utils/prismaStringFilter';
 
 function parseTags(raw: string): string {
   try {
@@ -72,9 +73,9 @@ export const getAllCourses = async (req: Request, res: Response) => {
   if (category) where['category'] = category;
   if (search) {
     where['OR'] = [
-      { title: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } },
-      { instructor: { contains: search, mode: 'insensitive' } },
+      { title: prismaStringContains(search) },
+      { description: prismaStringContains(search) },
+      { instructor: prismaStringContains(search) },
     ];
   }
   const [rows, total] = await Promise.all([

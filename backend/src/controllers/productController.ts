@@ -9,6 +9,10 @@ import {
   productQuerySchema,
 } from '../schemas/productSchema';
 import { serializeMediaFields } from '../utils/serializeMedia';
+import {
+  prismaStringContains,
+  prismaStringEquals,
+} from '../utils/prismaStringFilter';
 
 const productInclude = { category: true } satisfies Prisma.ProductInclude;
 type ProductWithCategory = Prisma.ProductGetPayload<{
@@ -31,8 +35,8 @@ async function resolveProductCategoryId(
     const c = await prisma.category.findFirst({
       where: {
         OR: [
-          { name: { equals: label, mode: 'insensitive' } },
-          { slug: { equals: label, mode: 'insensitive' } },
+          { name: prismaStringEquals(label) },
+          { slug: prismaStringEquals(label) },
         ],
       },
     });
@@ -72,8 +76,8 @@ function buildCategoryWhere(
   const q = categoryParam.trim();
   return {
     OR: [
-      { category: { name: { equals: q, mode: 'insensitive' } } },
-      { category: { slug: { equals: q, mode: 'insensitive' } } },
+      { category: { name: prismaStringEquals(q) } },
+      { category: { slug: prismaStringEquals(q) } },
     ],
   };
 }
@@ -91,8 +95,8 @@ const getAllProducts = async (req: Request, res: Response) => {
     const q = search.trim();
     parts.push({
       OR: [
-        { name: { contains: q, mode: 'insensitive' } },
-        { category: { name: { contains: q, mode: 'insensitive' } } },
+        { name: prismaStringContains(q) },
+        { category: { name: prismaStringContains(q) } },
       ],
     });
   }

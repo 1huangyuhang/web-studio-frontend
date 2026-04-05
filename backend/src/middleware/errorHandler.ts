@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { randomUUID } from 'crypto';
 import { ZodError } from 'zod';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { HttpError } from '../utils/httpError';
 
 interface ErrorResponse {
@@ -56,6 +57,21 @@ const errorHandler = (
     if (err.code) {
       errorResponse.code = err.code;
     }
+  } else if (err instanceof PrismaClientKnownRequestError) {
+    errorResponse.error = 'Database Error';
+    errorResponse.code = `PRISMA_${err.code}`;
+    if (err.code === 'P2021' || err.code === 'P2022') {
+      errorResponse.message =
+        '数据库表或字段与当前服务版本不一致，请在部署环境执行 npx prisma migrate deploy（开发环境可用 migrate dev）后重试。';
+      errorResponse.statusCode = 503;
+    } else if (err.code === 'P1001') {
+      errorResponse.message =
+        '无法连接到数据库，请检查 DATABASE_URL 与网络、防火墙及连接池配置。';
+      errorResponse.statusCode = 503;
+    } else {
+      errorResponse.message = '数据库操作失败';
+    }
+    console.error('PrismaClientKnownRequestError:', err.code, err.meta);
   } else if (err.statusCode) {
     errorResponse.error = err.name || 'HTTP Error';
     errorResponse.message = err.message;
