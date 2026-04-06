@@ -530,8 +530,10 @@ html[data-theme='dark'] .home-page.home-premium .heritage-section .heritage-item
 
   .home-flow-bridge--from-hero::before,
   .home-flow-bridge--from-hero::after {
+    animation: none !important;
     filter: none;
     opacity: 0.65;
+    transform: translateY(-50%);
   }
 }
 
@@ -595,40 +597,66 @@ html[data-theme='dark'] .home-page.home-premium .heritage-section .heritage-item
   filter: blur(28px);
 }
 
-/* Hero 视频底部 → 品牌叙事：加高叠化带 + 轻微上移，盖住圆角与硬边 */
+/* Hero 视频底部 → 品牌叙事：较薄叠化 + 缓慢形变/明暗动画，减少静态「雾带」感 */
 .home-flow-bridge--from-hero {
-  height: clamp(64px, 10vw, 120px);
-  margin: clamp(-52px, -7vw, -36px) 0 clamp(-40px, -5.5vw, -28px);
+  height: clamp(52px, 8vw, 96px);
+  margin: clamp(-44px, -6vw, -30px) 0 clamp(-36px, -5vw, -26px);
 }
 
 .home-flow-bridge--from-hero::before {
   left: -12%;
   right: -12%;
-  height: 220%;
+  height: 200%;
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 0%,
-    color-mix(in srgb, var(--ly-bg-canvas) 35%, transparent) 18%,
-    color-mix(in srgb, var(--ly-bg-canvas) 72%, rgba(0, 0, 0, 0.06)) 55%,
-    color-mix(in srgb, var(--ly-bg-canvas) 88%, transparent) 100%
+    color-mix(in srgb, var(--ly-bg-canvas) 22%, transparent) 24%,
+    color-mix(in srgb, var(--ly-bg-canvas) 52%, rgba(0, 0, 0, 0.04)) 52%,
+    color-mix(in srgb, var(--ly-bg-canvas) 72%, transparent) 100%
   );
-  filter: blur(32px);
-  opacity: 0.95;
+  filter: blur(28px);
+  opacity: 0.9;
+  animation: homeBridgeVeilFlow 20s ease-in-out infinite;
 }
 
 .home-flow-bridge--from-hero::after {
-  opacity: 0.55;
+  opacity: 0.5;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(196, 165, 116, 0.35) 48%,
-    rgba(128, 50, 46, 0.22) 50%,
-    rgba(196, 165, 116, 0.35) 52%,
+    rgba(196, 165, 116, 0.32) 48%,
+    rgba(128, 50, 46, 0.2) 50%,
+    rgba(196, 165, 116, 0.32) 52%,
     transparent 100%
   );
   box-shadow:
     0 0 28px color-mix(in srgb, var(--ly-bg-canvas) 40%, rgba(128, 50, 46, 0.12)),
     0 0 64px rgba(196, 165, 116, 0.06);
+  animation: homeBridgeAccentPulse 12s ease-in-out infinite;
+}
+
+@keyframes homeBridgeVeilFlow {
+  0%,
+  100% {
+    opacity: 0.82;
+    transform: translateY(-50%) scaleY(1);
+  }
+  50% {
+    opacity: 0.94;
+    transform: translateY(-52%) scaleY(1.05);
+  }
+}
+
+@keyframes homeBridgeAccentPulse {
+  0%,
+  100% {
+    opacity: 0.38;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.58;
+    filter: brightness(1.12);
+  }
 }
 
 .home-flow-bridge--to-dark::after {
@@ -670,16 +698,16 @@ html[data-theme='dark'] .home-page .home-flow-bridge--from-hero::before {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    color-mix(in srgb, var(--ly-bg-canvas) 18%, transparent) 22%,
-    color-mix(in srgb, var(--ly-bg-canvas) 62%, transparent) 52%,
-    var(--ly-bg-canvas) 100%
+    color-mix(in srgb, var(--ly-bg-canvas) 14%, transparent) 26%,
+    color-mix(in srgb, var(--ly-bg-canvas) 48%, transparent) 54%,
+    color-mix(in srgb, var(--ly-bg-canvas) 82%, transparent) 100%
   );
-  filter: blur(44px);
-  opacity: 0.9;
+  filter: blur(40px);
+  opacity: 0.88;
 }
 
 html[data-theme='dark'] .home-page .home-flow-bridge--from-hero::after {
-  opacity: 0.3;
+  opacity: 0.28;
   background: linear-gradient(
     90deg,
     transparent 0%,
@@ -911,15 +939,15 @@ html[data-theme='light'] {
     background: linear-gradient(
       180deg,
       color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 0%,
-      color-mix(in srgb, var(--ly-bg-canvas) 42%, transparent) 20%,
-      color-mix(in srgb, var(--ly-bg-canvas) 82%, rgba(15, 23, 42, 0.03)) 54%,
-      color-mix(in srgb, var(--ly-bg-canvas) 94%, transparent) 100%
+      color-mix(in srgb, var(--ly-bg-canvas) 28%, transparent) 26%,
+      color-mix(in srgb, var(--ly-bg-canvas) 58%, rgba(15, 23, 42, 0.02)) 52%,
+      color-mix(in srgb, var(--ly-bg-canvas) 78%, transparent) 100%
     );
-    filter: blur(32px);
-    opacity: 0.95;
+    filter: blur(26px);
+    opacity: 0.88;
   }
 
   .home-flow-bridge--from-hero::after {
-    opacity: 0.48;
+    opacity: 0.44;
   }
 }

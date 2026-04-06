@@ -33,23 +33,26 @@
     0 24px 56px rgba(0, 0, 0, 0.18),
     0 0 0 1px color-mix(in srgb, var(--app-text-primary) 6%, transparent);
 
-  /* 视频与下一块内容：底部叠化到页面画布（随滚动略增强，衔接更顺） */
+  /* 视频与下一块：较短的叠化带 + 滚动上移 + 轻微呼吸动画，避免大块静态「白墙」 */
   &::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    height: clamp(96px, 22dvh, 240px);
+    height: clamp(56px, 12dvh, 140px);
     z-index: 2;
     pointer-events: none;
-    opacity: calc(0.82 + var(--scrolly-progress, 0) * 0.2);
+    will-change: transform, opacity;
+    transform: translateY(calc(-6% * var(--scrolly-progress, 0)));
+    opacity: calc(0.68 + var(--scrolly-progress, 0) * 0.26);
+    animation: homeHeroFadeBreath 14s ease-in-out infinite;
     background: linear-gradient(
       180deg,
       transparent 0%,
-      color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 28%,
-      color-mix(in srgb, var(--ly-bg-canvas) 55%, transparent) 62%,
-      var(--ly-bg-canvas) 100%
+      color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 36%,
+      color-mix(in srgb, var(--ly-bg-canvas) 38%, transparent) 68%,
+      color-mix(in srgb, var(--ly-bg-canvas) 72%, transparent) 100%
     );
   }
 
@@ -168,7 +171,19 @@ html[data-theme='light'] .home-hero-scrolly__video .scrolly-video-overlay__scrim
   }
 
   .home-hero-scrolly__video.scrolly-video-container::after {
-    opacity: 0.92;
+    animation: none;
+    opacity: calc(0.78 + var(--scrolly-progress, 0) * 0.18);
+    transform: none;
+  }
+}
+
+@keyframes homeHeroFadeBreath {
+  0%,
+  100% {
+    opacity: calc(0.62 + var(--scrolly-progress, 0) * 0.24);
+  }
+  50% {
+    opacity: calc(0.76 + var(--scrolly-progress, 0) * 0.22);
   }
 }
 
