@@ -8,6 +8,9 @@ const ports = devPorts(path.resolve(__dirname, '..'));
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'import.meta.env.VITE_DEV_API_PORT': JSON.stringify(String(ports.api)),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -23,6 +26,10 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
+        target: `http://127.0.0.1:${ports.api}`,
+        changeOrigin: true,
+      },
+      '/health': {
         target: `http://127.0.0.1:${ports.api}`,
         changeOrigin: true,
       },

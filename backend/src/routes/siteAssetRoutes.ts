@@ -10,23 +10,22 @@ import {
 import { upload } from '../config/multerConfig';
 import { uploadWriteRateLimitMiddleware } from '../middleware/rateLimitMiddleware';
 
-const router = express.Router();
+export const siteAssetPublicRouter = express.Router();
+siteAssetPublicRouter.get('/', getSiteAssets);
+siteAssetPublicRouter.get('/:id', getSiteAssetById);
 
-router.get('/', getSiteAssets);
-router.post('/import-url', createSiteAssetFromUrl);
-router.get('/:id', getSiteAssetById);
-router.post(
+export const siteAssetManagementRouter = express.Router();
+siteAssetManagementRouter.post('/import-url', createSiteAssetFromUrl);
+siteAssetManagementRouter.post(
   '/',
   uploadWriteRateLimitMiddleware,
   upload.single('image'),
   createSiteAsset
 );
-router.put(
+siteAssetManagementRouter.put(
   '/:id',
   uploadWriteRateLimitMiddleware,
   upload.single('image'),
   updateSiteAsset
 );
-router.delete('/:id', deleteSiteAsset);
-
-export default router;
+siteAssetManagementRouter.delete('/:id', deleteSiteAsset);

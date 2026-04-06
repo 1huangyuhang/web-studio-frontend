@@ -8,12 +8,11 @@ import {
 } from '../controllers/activityController';
 import { upload } from '../config/multerConfig';
 
-const router = Router();
+export const activityPublicRouter = Router();
+activityPublicRouter.get('/', getAllActivities);
+activityPublicRouter.get('/:id', getActivityById);
 
-router.get('/', getAllActivities);
-router.get('/:id', getActivityById);
-router.post('/', upload.single('image'), createActivity);
-router.put('/:id', upload.single('image'), updateActivity);
-router.delete('/:id', deleteActivity);
-
-export default router;
+export const activityManagementRouter = Router();
+activityManagementRouter.post('/', upload.single('image'), createActivity);
+activityManagementRouter.put('/:id', upload.single('image'), updateActivity);
+activityManagementRouter.delete('/:id', deleteActivity);

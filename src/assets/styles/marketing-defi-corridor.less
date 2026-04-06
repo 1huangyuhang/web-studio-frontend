@@ -1,0 +1,222 @@
+/**
+ * 营销走廊（商店 / 活动 / 课程 / 价格 / 公司*）：渐变画布与玻璃 hero；
+ * 主导航选中态与全站 .nav-menu 一致，不在此覆盖，避免与红木主题冲突。
+ */
+
+.top-layout--marketing-defi {
+  --mkt-defi-cyan: #22d3ee;
+  --mkt-defi-mint: #34d399;
+  --mkt-defi-violet: #a78bfa;
+}
+
+/* --- 主内容区：网格 + 径向光晕（替代单调平涂） --- */
+html[data-theme='light'] .top-layout--marketing-defi .site-main {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+  background-image:
+    radial-gradient(
+      ellipse 120% 80% at 50% -20%,
+      color-mix(in srgb, var(--mkt-defi-violet) 12%, transparent) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 90% 60% at 100% 40%,
+      color-mix(in srgb, var(--mkt-defi-cyan) 10%, transparent) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 0% 80%,
+      color-mix(in srgb, var(--app-accent-cinnabar) 8%, transparent) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ly-bg-canvas) 100%, #f8fafc) 0%,
+      var(--ly-bg-canvas) 38%,
+      color-mix(in srgb, var(--ly-bg-canvas) 88%, #eef2ff) 100%
+    );
+}
+
+html[data-theme='dark'] .top-layout--marketing-defi .site-main {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+  background-image:
+    radial-gradient(
+      ellipse 100% 70% at 50% -15%,
+      color-mix(in srgb, var(--mkt-defi-cyan) 14%, transparent) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 80% 55% at 100% 30%,
+      color-mix(in srgb, var(--mkt-defi-violet) 10%, transparent) 0%,
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse 60% 45% at 0% 90%,
+      color-mix(in srgb, var(--app-accent-cinnabar) 12%, transparent) 0%,
+      transparent 42%
+    ),
+    linear-gradient(165deg, #070a0f 0%, #0c1018 40%, #0a0d14 100%);
+}
+
+.top-layout--marketing-defi .site-main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image: linear-gradient(
+      rgba(148, 163, 184, 0.06) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.05) 1px,
+      transparent 1px
+    );
+  background-size: 48px 48px;
+  mask-image: linear-gradient(180deg, black 0%, black 55%, transparent 100%);
+}
+
+html[data-theme='dark'] .top-layout--marketing-defi .site-main::before {
+  opacity: 0.22;
+  background-image: linear-gradient(
+      rgba(148, 163, 184, 0.04) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.035) 1px,
+      transparent 1px
+    );
+}
+
+.top-layout--marketing-defi .site-main > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 顶栏底缘：与全站玻璃描边 + 红木点缀一致（不用独立青绿） */
+.top-layout--marketing-defi .site-chrome-shell {
+  box-shadow: 0 1px 0
+    color-mix(
+      in srgb,
+      var(--ly-glass-border) 82%,
+      var(--app-accent-cinnabar) 18%
+    );
+}
+
+/* --- 营销壳：玻璃 hero + 渐变描边 --- */
+.top-layout--marketing-defi main .marketing-page-shell > .page-title:first-child,
+.top-layout--marketing-defi main .marketing-page-shell > .page-header:first-child {
+  position: relative;
+  border: none !important;
+  background: color-mix(in srgb, var(--ly-bg-raised) 72%, transparent) !important;
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow:
+    var(--ly-glass-inset),
+    0 24px 64px -24px color-mix(in srgb, var(--mkt-defi-cyan) 18%, transparent),
+    0 20px 48px -28px color-mix(in srgb, var(--app-accent-cinnabar) 14%, transparent) !important;
+}
+
+.top-layout--marketing-defi main .marketing-page-shell > .page-title:first-child::before,
+.top-layout--marketing-defi main .marketing-page-shell > .page-header:first-child::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    125deg,
+    color-mix(in srgb, var(--mkt-defi-cyan) 55%, transparent) 0%,
+    color-mix(in srgb, var(--mkt-defi-violet) 35%, transparent) 38%,
+    color-mix(in srgb, var(--app-accent-cinnabar) 50%, transparent) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.top-layout--marketing-defi main .marketing-page-shell > .page-title:first-child h1,
+.top-layout--marketing-defi main .marketing-page-shell > .page-header:first-child h1.ant-typography,
+.top-layout--marketing-defi main .marketing-page-shell > .page-header:first-child h2.ant-typography {
+  background: var(--app-text-gradient-display);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+}
+
+html[data-theme='light'] .top-layout--marketing-defi main .marketing-page-shell > .page-title:first-child h1,
+html[data-theme='light']
+  .top-layout--marketing-defi
+  main
+  .marketing-page-shell
+  > .page-header:first-child
+  h1.ant-typography,
+html[data-theme='light']
+  .top-layout--marketing-defi
+  main
+  .marketing-page-shell
+  > .page-header:first-child
+  h2.ant-typography {
+  background: linear-gradient(
+    108deg,
+    var(--app-heading) 0%,
+    color-mix(in srgb, var(--app-heading) 70%, var(--app-accent-deep)) 45%,
+    color-mix(in srgb, var(--mkt-defi-cyan) 55%, var(--app-heading)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* 首屏区块上缘：双色斑（替换单一红木晕） */
+@media (prefers-reduced-motion: no-preference) {
+  .top-layout--marketing-defi
+    main
+    .marketing-page-shell
+    > .marketing-section-block:first-of-type::before {
+    background: radial-gradient(
+        ellipse 100% 100% at 30% 0%,
+        color-mix(in srgb, var(--mkt-defi-cyan) 18%, transparent) 0%,
+        transparent 65%
+      ),
+      radial-gradient(
+        ellipse 90% 90% at 70% 10%,
+        color-mix(in srgb, var(--app-accent-cinnabar) 16%, transparent) 0%,
+        transparent 60%
+      ) !important;
+    opacity: 0.65;
+    filter: blur(16px);
+  }
+}
+
+/* 卡片：略加强层次，与画布分离 */
+.top-layout--marketing-defi main .marketing-page-shell .ant-card {
+  transition:
+    box-shadow 0.28s var(--motion-ease-soft),
+    border-color 0.28s var(--motion-ease-soft),
+    transform 0.28s var(--motion-ease-soft);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .top-layout--marketing-defi main .marketing-page-shell .ant-card:hover {
+    box-shadow: var(--app-saas-card-shadow-hover) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top-layout--marketing-defi main .marketing-page-shell .ant-card {
+    transition: none;
+  }
+}

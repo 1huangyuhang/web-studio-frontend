@@ -9,22 +9,23 @@ import {
 import { upload } from '../config/multerConfig';
 import { uploadWriteRateLimitMiddleware } from '../middleware/rateLimitMiddleware';
 
-const router = express.Router();
+/** 官网可匿名浏览 */
+export const productPublicRouter = express.Router();
+productPublicRouter.get('/', getAllProducts);
+productPublicRouter.get('/:id', getProductById);
 
-router.get('/', getAllProducts);
-router.get('/:id', getProductById);
-router.post(
+/** 管理端写入：需 API Key 或管理 JWT */
+export const productManagementRouter = express.Router();
+productManagementRouter.post(
   '/',
   uploadWriteRateLimitMiddleware,
   upload.single('image'),
   createProduct
 );
-router.put(
+productManagementRouter.put(
   '/:id',
   uploadWriteRateLimitMiddleware,
   upload.single('image'),
   updateProduct
 );
-router.delete('/:id', deleteProduct);
-
-export default router;
+productManagementRouter.delete('/:id', deleteProduct);

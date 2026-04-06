@@ -8,12 +8,11 @@ import {
 } from '../controllers/newsController';
 import { upload } from '../config/multerConfig';
 
-const router = Router();
+export const newsPublicRouter = Router();
+newsPublicRouter.get('/', getAllNews);
+newsPublicRouter.get('/:id', getNewsById);
 
-router.get('/', getAllNews);
-router.get('/:id', getNewsById);
-router.post('/', upload.single('image'), createNews);
-router.put('/:id', upload.single('image'), updateNews);
-router.delete('/:id', deleteNews);
-
-export default router;
+export const newsManagementRouter = Router();
+newsManagementRouter.post('/', upload.single('image'), createNews);
+newsManagementRouter.put('/:id', upload.single('image'), updateNews);
+newsManagementRouter.delete('/:id', deleteNews);

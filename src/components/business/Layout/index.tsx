@@ -27,7 +27,9 @@ import {
   useLayoutEffect,
   useRef,
   useCallback,
+  useMemo,
 } from 'react';
+import type { CSSProperties } from 'react';
 import { logout } from '@/redux/slices/userSlice';
 import BrandLogo from '@/components/ui/BrandLogo/BrandLogo';
 import ProgressBar from '@/components/ui/ProgressBar';
@@ -45,6 +47,8 @@ const CHROME_BLEND_SCROLL_START = 72;
 const CHROME_BLEND_SCROLL_END = 260;
 /** rAF 每帧向目标靠拢比例，越小越柔 */
 const CHROME_BLEND_LERP = 0.09;
+/** 平滑 blend ≥ 此值时视为仍在 Hero 顶区：顶栏壳透明，避免与视频色温拼接 */
+const CHROME_ATOP_HERO_THRESHOLD = 0.72;
 
 function computeChromeTargetBlend(scrollY: number): number {
   if (scrollY <= CHROME_BLEND_SCROLL_START) return 1;
@@ -72,6 +76,8 @@ const Layout = () => {
   const chromeSmoothedRef = useRef(0);
   const chromeBlendLoopRef = useRef<number | null>(null);
   const reduceMotionRef = useRef(false);
+  const chromeShellRef = useRef<HTMLDivElement | null>(null);
+  const chromeMotionSkipMountRef = useRef(true);
   // 监听窗口大小变化，动态调整顶部栏和导航栏高度
   useEffect(() => {
     const updateHeights = () => {
@@ -107,10 +113,15 @@ const Layout = () => {
   }, []);
 
   const applyChromeBlendToDom = useCallback((value: number) => {
-    topLayoutRef.current?.style.setProperty(
-      '--chrome-media-blend',
-      value.toFixed(4)
-    );
+    const el = topLayoutRef.current;
+    if (!el) return;
+    el.style.setProperty('--chrome-media-blend', value.toFixed(4));
+    const onHome = pathnameRef.current === '/';
+    if (onHome && value >= CHROME_ATOP_HERO_THRESHOLD) {
+      el.setAttribute('data-home-atop-hero', '');
+    } else {
+      el.removeAttribute('data-home-atop-hero');
+    }
   }, []);
 
   const tickChromeBlend = useCallback(() => {
@@ -229,11 +240,52 @@ const Layout = () => {
     };
   }, [handleScroll]);
 
+  /**
+   * 在绘制前写入 data-chrome-motion，保证首帧即带上正确 transition（useEffect 晚一拍易导致「瞬切」）。
+   * 时长与 index.less 中 show/hide 一致；首 mount 跳过，避免进页播动画。
+   */
+  useLayoutEffect(() => {
+    if (chromeMotionSkipMountRef.current) {
+      chromeMotionSkipMountRef.current = false;
+      return;
+    }
+    const el = chromeShellRef.current;
+    if (!el) return;
+
+    if (reduceMotionRef.current) {
+      el.removeAttribute('data-chrome-motion');
+      return;
+    }
+
+    el.setAttribute('data-chrome-motion', isNavVisible ? 'show' : 'hide');
+    const maxDurSec = isNavVisible ? 0.52 : 0.4;
+    const id = window.setTimeout(
+      () => {
+        el.removeAttribute('data-chrome-motion');
+      },
+      Math.ceil(maxDurSec * 1000) + 120
+    );
+
+    return () => window.clearTimeout(id);
+  }, [isNavVisible]);
+
   const handleLogout = () => {
     dispatch(logout());
     message.success('已退出登录');
     navigate('/login');
   };
+
+  /** 商店 / 活动 / 课程 / 价格 / 公司子站：启用 DeFi 风营销走廊画布与导航样式 */
+  const marketingDefiCorridor = useMemo(() => {
+    const p = location.pathname;
+    return (
+      p === '/shop' ||
+      p === '/activities' ||
+      p === '/courses' ||
+      p === '/prices' ||
+      p.startsWith('/company/')
+    );
+  }, [location.pathname]);
 
   // 导航菜单
   const navItems = [
@@ -351,19 +403,26 @@ const Layout = () => {
   );
 
   return (
-    <AntLayout ref={topLayoutRef} className="top-layout">
+    <AntLayout
+      ref={topLayoutRef}
+      className={
+        marketingDefiCorridor
+          ? 'top-layout top-layout--marketing-defi'
+          : 'top-layout'
+      }
+      style={
+        {
+          '--ly-chrome-stack-h': `${topBarHeight + navHeight}px`,
+        } as CSSProperties
+      }
+    >
       {/* 页面游览进度条，根据菜单栏显示状态自动控制显示/隐藏 */}
       <ProgressBar isMenuVisible={isNavVisible} />
 
       {/* 顶栏 + 主导航：单容器固定定位，一层玻璃底，消除两行之间的缝与叠影 */}
       <div
+        ref={chromeShellRef}
         className={`site-chrome-shell ${isNavVisible ? '' : 'nav-hidden'}`}
-        style={{
-          transform: isNavVisible
-            ? 'translateY(0)'
-            : `translateY(-${topBarHeight + navHeight}px)`,
-          opacity: isNavVisible ? 1 : 0,
-        }}
       >
         <div className="top-bar">
           <div className="site-chrome-inner">

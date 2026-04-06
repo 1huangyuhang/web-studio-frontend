@@ -3,9 +3,12 @@
 .top-layout {
   /* 首页由 JS 写入 0–1，驱动顶栏/导航与视频 Hero 的柔美叠化（非首页保持 0） */
   --chrome-media-blend: 0;
-  /* 顶栏+主导航整体显隐：略长于 300ms，ease-out 末段更顺（接近 iOS/Material 面板） */
-  --chrome-reveal-duration: 0.48s;
-  --chrome-reveal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /*
+   * 滚动显隐：由 class + transition 驱动（勿用内联 transform 盖掉整段过渡）。
+   * 出现略长、末段舒展；收起略短——落在约 300–500ms 的常见交互区间。
+   */
+  --chrome-tx-dur: 0.44s;
+  --chrome-tx-ease: cubic-bezier(0.33, 1, 0.68, 1);
 
   min-height: 100vh;
   display: flex;
@@ -23,6 +26,7 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    gap: 0;
     overflow: hidden;
     box-shadow: none;
     background: color-mix(
@@ -30,27 +34,86 @@
       var(--ly-chrome-liquid-bg-atop-media) calc(100% * var(--chrome-media-blend, 0)),
       var(--ly-chrome-liquid-bg)
     );
+    /* blur 在「常态栏」与「叠视频」token 之间随 --chrome-media-blend 插值 */
     backdrop-filter: blur(
-        calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
+        calc(
+          var(--ly-chrome-liquid-blur) * (1 - var(--chrome-media-blend, 0)) +
+            var(--ly-chrome-liquid-blur-atop-media) * var(--chrome-media-blend, 0)
+        )
       )
       saturate(var(--ly-chrome-liquid-sat));
     -webkit-backdrop-filter: blur(
-        calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
+        calc(
+          var(--ly-chrome-liquid-blur) * (1 - var(--chrome-media-blend, 0)) +
+            var(--ly-chrome-liquid-blur-atop-media) * var(--chrome-media-blend, 0)
+        )
       )
       saturate(var(--ly-chrome-liquid-sat));
-    border-bottom: 1px solid
-      color-mix(
-        in srgb,
-        var(--ly-chrome-liquid-border-atop-media) calc(100% * var(--chrome-media-blend, 0)),
-        color-mix(in srgb, var(--ly-chrome-liquid-border) 52%, transparent)
-      );
+    /* 刻意不做底边描边：1px border 叠在 Hero/画布上会形成「硬分界线」，破坏全屏画面 */
+    border-bottom: none;
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
     transition:
-      transform var(--chrome-reveal-duration) var(--chrome-reveal-ease),
-      opacity var(--chrome-reveal-duration) var(--chrome-reveal-ease);
+      transform var(--chrome-tx-dur) var(--chrome-tx-ease),
+      opacity var(--chrome-tx-dur) var(--chrome-tx-ease);
+    will-change: transform, opacity;
+
+    /* 滑回视口：稍长、末段轻「落稳」 */
+    &[data-chrome-motion='show'] {
+      --chrome-tx-dur: 0.52s;
+      --chrome-tx-ease: cubic-bezier(0.18, 1, 0.32, 1);
+    }
+
+    /* 滑离视口：略短，仍保持可感知的收起过程 */
+    &[data-chrome-motion='hide'] {
+      --chrome-tx-dur: 0.4s;
+      --chrome-tx-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
     &.nav-hidden {
       pointer-events: none;
+      transform: translate3d(0, -100%, 0);
+      opacity: 0.86;
     }
+
+    /*
+     * 勿对 .nav-bar 单独做 transform/opacity/delay：在带 backdrop-filter 的父级下会多一层合成，
+     * 刷新或显隐动画的某一帧容易出现「顶栏压在导航上的阴影带」假接缝。
+     * 整块顶栏只跟随外壳统一 transform/opacity 即可。
+     */
+    .nav-bar {
+      transform: none !important;
+      opacity: 1 !important;
+      transition: none !important;
+      box-shadow: none !important;
+      filter: none !important;
+    }
+  }
+
+  /* 首页 Hero 顶区：去掉顶栏壳着色与磨砂，与下方视频同色温（data-home-atop-hero 由 Layout TS 写入） */
+  &[data-home-atop-hero] .site-chrome-shell {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* 透明壳时画面透过顶栏：轻字影 / drop-shadow 保菜单与工具行可读 */
+  &[data-home-atop-hero] .top-bar {
+    .phone-number,
+    .logo-chip {
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.48);
+    }
+
+    .top-bar-icon,
+    .top-bar-icon-btn:not(:disabled) .anticon,
+    .top-bar-badge-anchor .anticon {
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.42));
+    }
+  }
+
+  &[data-home-atop-hero] .nav-menu .ant-menu-item,
+  &[data-home-atop-hero] .nav-menu .ant-menu-submenu-title {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.42);
   }
 
   .site-main {
@@ -62,6 +125,11 @@
     padding: 22px var(--site-main-pad-x) 0;
     padding-bottom: 56px;
     box-sizing: border-box;
+
+    /* 首页首屏 Hero 全宽贴顶：去掉顶内边距，避免固定顶栏下方露出一条「画布色」带 */
+    &:has(> .home-page) {
+      padding-top: 0;
+    }
 
     /* 路由出口与懒加载占位（Suspense 不产生 DOM 节点，直接子元素参与 flex） */
     > :not(.ly-footer) {
@@ -95,7 +163,6 @@
     --top-bar-utility-fg-hover: color-mix(in srgb, var(--app-link-hover) 78%, var(--app-text-primary) 22%);
 
     position: relative;
-    isolation: isolate;
     overflow: hidden;
     flex-shrink: 0;
     background: transparent;
@@ -378,13 +445,13 @@
 
   .nav-bar {
     position: relative;
-    isolation: isolate;
     overflow-x: auto;
     overflow-y: hidden;
     flex-shrink: 0;
     background: transparent !important;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    border: none !important;
     border-bottom: none !important;
     padding: 0 var(--ly-container-pad-x) !important;
     box-shadow: none;
@@ -417,12 +484,13 @@
   }
 
   .nav-menu {
+    border: 0 !important;
     border-bottom: none !important;
     background-color: transparent !important;
     display: flex;
     align-items: center;
-    /* 随父级 .nav-bar 显隐时略跟手（opacity 由父层统一也可，此处保留过渡供子项重排时更顺） */
-    transition: opacity var(--chrome-reveal-duration) var(--chrome-reveal-ease);
+    box-shadow: none !important;
+    filter: none !important;
     .app-tx-menu-shell();
     /* flex 子项默认 min-width:auto，横向 Menu 易撑破视口；收缩后交给 overflowedIndicator */
     flex: 1 1 auto;
@@ -668,6 +736,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .top-layout .site-chrome-shell,
+  .top-layout .site-chrome-shell .nav-bar,
   .top-layout .top-bar .logo-chip {
     transition: none !important;
   }
@@ -686,6 +755,13 @@
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     background: var(--ly-glass-top-bar-bg);
+  }
+
+  /* 首页仍在 Hero 顶区时保持透明壳，避免实色顶栏与视频硬切 */
+  .top-layout[data-home-atop-hero] .site-chrome-shell {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .top-layout .top-bar .logo-chip {

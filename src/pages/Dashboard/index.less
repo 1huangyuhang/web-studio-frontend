@@ -1,4 +1,29 @@
 .dashboard-page {
+  &--center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40vh;
+  }
+
+  .dashboard-degraded-banner {
+    margin-bottom: 16px;
+  }
+
+  .dashboard-stat-card {
+    .dashboard-stat-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .dashboard-stat-value {
+      font-size: 22px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+  }
+
   .dashboard-header {
     display: flex;
     justify-content: space-between;

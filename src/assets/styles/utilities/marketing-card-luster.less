@@ -1,0 +1,86 @@
+/**
+ * 营销页卡片：边框环慢速流动高光（::before），与 card-sheen-motion 的 ::after 扫光叠加。
+ * 仅 MarketingPageShell 内；桌面 hover / focus-within 时运转；尊重 prefers-reduced-motion。
+ */
+
+@keyframes mkt-card-luster-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.top-layout main .marketing-page-shell .ant-card:not(.no-card-sheen) {
+  position: relative;
+}
+
+.top-layout main .marketing-page-shell .ant-card:not(.no-card-sheen) > * {
+  position: relative;
+  z-index: 2;
+}
+
+.top-layout main .marketing-page-shell .ant-card:not(.no-card-sheen)::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  /* 压在卡片底色之上、内容之下，边框环才可见 */
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.35s var(--motion-ease-soft, ease);
+  /* 圆锥渐变旋转形成沿边框流动感 */
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 55deg,
+    color-mix(in srgb, var(--app-accent-cinnabar) 70%, transparent) 90deg,
+    transparent 125deg,
+    color-mix(in srgb, var(--app-heading) 18%, transparent) 180deg,
+    transparent 220deg,
+    color-mix(in srgb, var(--app-accent-cinnabar) 55%, transparent) 270deg,
+    transparent 305deg,
+    transparent 360deg
+  );
+  background-origin: border-box;
+  animation: mkt-card-luster-rotate 9s linear infinite;
+  animation-play-state: paused;
+  /* 仅保留约 1px 边框环 */
+  padding: 1px;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  transform-origin: 50% 50%;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .top-layout
+    main
+    .marketing-page-shell
+    .ant-card:not(.no-card-sheen):hover::before,
+  .top-layout
+    main
+    .marketing-page-shell
+    .ant-card:not(.no-card-sheen):focus-within::before {
+    opacity: 0.72;
+    animation-play-state: running;
+  }
+}
+
+/* 触摸设备：无精准 hover 时不常驻流动，避免列表「全场闪烁」 */
+@media (hover: none) and (prefers-reduced-motion: no-preference) {
+  .top-layout main .marketing-page-shell .ant-card:not(.no-card-sheen)::before {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top-layout main .marketing-page-shell .ant-card:not(.no-card-sheen)::before {
+    display: none !important;
+  }
+}

@@ -34,20 +34,25 @@ export function getManagementSocketHttpOrigin(): string {
       const u = new URL(withProto);
       if (import.meta.env.DEV && MGMT_DEV_PORTS.has(u.port)) {
         console.warn(
-          '[management] VITE_API_BASE_URL 的端口像前端 dev（3001/3002），WebSocket 可能连错；请指向后端（默认 3000）'
+          '[management] VITE_API_BASE_URL 的端口像前端 dev（3001/3002），WebSocket 可能连错；请指向后端（与 backend/.env 的 PORT 或 REDWOOD_PORT_API 一致）'
         );
       }
       return `${u.protocol}//${u.host}`;
     } catch {
       if (import.meta.env.DEV) {
         console.warn(
-          '[management] 无法解析 VITE_API_BASE_URL，WebSocket 回退到 http://localhost:3000'
+          '[management] 无法解析 VITE_API_BASE_URL，WebSocket 回退到开发默认端口'
         );
       }
     }
   }
   if (import.meta.env.DEV) {
-    return 'http://localhost:3000';
+    const p =
+      typeof import.meta.env.VITE_DEV_API_PORT === 'string' &&
+      import.meta.env.VITE_DEV_API_PORT.trim() !== ''
+        ? import.meta.env.VITE_DEV_API_PORT.trim()
+        : '3000';
+    return `http://127.0.0.1:${p}`;
   }
   if (typeof window !== 'undefined') {
     return window.location.origin;

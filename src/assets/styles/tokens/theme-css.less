@@ -136,10 +136,11 @@ html[data-theme='dark'] {
 
   /* 顶栏 / 主导航 · 液态玻璃（与 --app-logo-liquid-* 同系；整宽底略淡于 Logo 胶囊） */
   --ly-chrome-liquid-bg: color-mix(in srgb, var(--ly-glass-card-bg) 24%, transparent);
-  /* Hero 视频上：略加厚仍透，白字可读 */
-  --ly-chrome-liquid-bg-atop-media: color-mix(in srgb, var(--ly-glass-card-bg) 15%, transparent);
+  /* Hero 视频上：尽量轻，避免与下方轻 scrim 形成「顶栏一块深、视频突然亮」的横切 */
+  --ly-chrome-liquid-bg-atop-media: color-mix(in srgb, var(--ly-glass-card-bg) 7%, transparent);
   --ly-chrome-liquid-blur: 22px;
-  --ly-chrome-liquid-blur-atop-media: 26px;
+  /* 叠视频时略减 blur，减轻磨砂发闷、拉近与无遮罩区域的亮度感 */
+  --ly-chrome-liquid-blur-atop-media: 17px;
   --ly-chrome-liquid-sat: 1.72;
   --ly-chrome-liquid-border: rgba(255, 255, 255, 0.09);
   --ly-chrome-liquid-border-atop-media: rgba(255, 255, 255, 0.07);
@@ -332,10 +333,10 @@ html[data-theme='light'] {
    * Hero 大光比（雾面/天空很亮）：若仍用浅白玻璃，白字菜单会融进背景。
    * 叠视频时用偏深冷灰半透明 + 更强 blur，仍保持「透」但托起白字与浅色图标。
    */
-  /* 略加深 + 暖边：叠高亮视频时仍像「设计过的」玻璃条，不灰糊 */
-  --ly-chrome-liquid-bg-atop-media: color-mix(in srgb, #0f172a 56%, transparent);
+  /* 日间高亮视频：顶栏勿用过深冷灰块，否则与雾面/天空视频硬分割 */
+  --ly-chrome-liquid-bg-atop-media: color-mix(in srgb, #0f172a 32%, transparent);
   --ly-chrome-liquid-blur: 18px;
-  --ly-chrome-liquid-blur-atop-media: 22px;
+  --ly-chrome-liquid-blur-atop-media: 14px;
   --ly-chrome-liquid-sat: 1.62;
   --ly-chrome-liquid-border: rgba(15, 23, 42, 0.072);
   --ly-chrome-liquid-border-atop-media: rgba(255, 255, 255, 0.2);

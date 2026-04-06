@@ -75,11 +75,10 @@ describe('Regression: HTTP contract', () => {
     expect(typeof res.body.meta.degraded).toBe('boolean');
   });
 
-  test('GET /api/products returns paginated list', async () => {
+  test('GET /api/products returns paginated list without API key (public read)', async () => {
     const res = await request(app)
       .get('/api/products')
-      .query({ page: 1, pageSize: 5 })
-      .set('x-api-key', apiKey);
+      .query({ page: 1, pageSize: 5 });
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('data');
@@ -92,10 +91,8 @@ describe('Regression: HTTP contract', () => {
     expect(typeof res.body.pagination.total).toBe('number');
   });
 
-  test('GET /api/categories returns { data } list', async () => {
-    const res = await request(app)
-      .get('/api/categories')
-      .set('x-api-key', apiKey);
+  test('GET /api/categories returns { data } list (public read)', async () => {
+    const res = await request(app).get('/api/categories');
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('data');
@@ -111,8 +108,7 @@ describe('Regression: HTTP contract', () => {
   test('GET /api/products item shape includes categoryId when list non-empty', async () => {
     const res = await request(app)
       .get('/api/products')
-      .query({ page: 1, pageSize: 1 })
-      .set('x-api-key', apiKey);
+      .query({ page: 1, pageSize: 1 });
 
     expect(res.status).toBe(200);
     if (res.body.data.length > 0) {
@@ -155,10 +151,17 @@ describe('Regression: HTTP contract', () => {
     }
   });
 
-  test('GET /api/site-assets without API key returns 401', async () => {
+  test('GET /api/site-assets without API key returns 200 (public read)', async () => {
     const res = await request(app)
       .get('/api/site-assets')
       .query({ page: 'home' });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('data');
+    expect(Array.isArray(res.body.data)).toBe(true);
+  });
+
+  test('POST /api/site-assets without API key returns 401', async () => {
+    const res = await request(app).post('/api/site-assets').send({});
     expect(res.status).toBe(401);
     expect(res.body).toMatchObject({
       code: 'AUTH_REQUIRED',

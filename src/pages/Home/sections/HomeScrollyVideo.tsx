@@ -20,7 +20,7 @@ export default function HomeScrollyVideo({ src = DEFAULT_HERO_VIDEO }: Props) {
         className="home-hero-scrolly__video"
         src={src}
         id="redwood-video"
-        height="clamp(420px, 88dvh, 920px)"
+        height="clamp(460px, 100dvh, 960px)"
       >
         <div className="home-hero-scrolly__content home-hero-scrolly__content--enter">
           <span className="home-hero-scrolly__eyebrow">林之源 · 红木美学</span>

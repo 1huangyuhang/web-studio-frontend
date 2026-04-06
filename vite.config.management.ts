@@ -8,6 +8,10 @@ const ports = devPorts(__dirname);
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  define: {
+    /** 管理端 WebSocket 等与 Vite /api 代理使用同一后端端口 */
+    'import.meta.env.VITE_DEV_API_PORT': JSON.stringify(String(ports.api)),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './management/src'),

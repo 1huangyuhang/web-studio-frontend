@@ -9,22 +9,21 @@ import {
 import { upload } from '../config/multerConfig';
 import { uploadWriteRateLimitMiddleware } from '../middleware/rateLimitMiddleware';
 
-const router = express.Router();
+export const coursePublicRouter = express.Router();
+coursePublicRouter.get('/', getAllCourses);
+coursePublicRouter.get('/:id', getCourseById);
 
-router.get('/', getAllCourses);
-router.get('/:id', getCourseById);
-router.post(
+export const courseManagementRouter = express.Router();
+courseManagementRouter.post(
   '/',
   uploadWriteRateLimitMiddleware,
   upload.single('image'),
   createCourse
 );
-router.put(
+courseManagementRouter.put(
   '/:id',
   uploadWriteRateLimitMiddleware,
   upload.single('image'),
   updateCourse
 );
-router.delete('/:id', deleteCourse);
-
-export default router;
+courseManagementRouter.delete('/:id', deleteCourse);

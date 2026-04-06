@@ -2,10 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import productRoutes from './routes/productRoutes';
+import {
+  productPublicRouter,
+  productManagementRouter,
+} from './routes/productRoutes';
 import categoryRoutes from './routes/categoryRoutes';
-import activityRoutes from './routes/activityRoutes';
-import newsRoutes from './routes/newsRoutes';
+import {
+  activityPublicRouter,
+  activityManagementRouter,
+} from './routes/activityRoutes';
+import { newsPublicRouter, newsManagementRouter } from './routes/newsRoutes';
 import authRoutes from './routes/authRoutes';
 import statsRoutes from './routes/statsRoutes';
 import {
@@ -16,9 +22,18 @@ import {
   supportTicketPublicRouter,
   supportTicketManagementRouter,
 } from './routes/supportTicketRoutes';
-import courseRoutes from './routes/courseRoutes';
-import pricingPlanRoutes from './routes/pricingPlanRoutes';
-import siteAssetRoutes from './routes/siteAssetRoutes';
+import {
+  coursePublicRouter,
+  courseManagementRouter,
+} from './routes/courseRoutes';
+import {
+  pricingPlanPublicRouter,
+  pricingPlanManagementRouter,
+} from './routes/pricingPlanRoutes';
+import {
+  siteAssetPublicRouter,
+  siteAssetManagementRouter,
+} from './routes/siteAssetRoutes';
 import errorHandler from './middleware/errorHandler';
 import { requestContextMiddleware } from './middleware/requestContextMiddleware';
 import { globalRateLimitMiddleware } from './middleware/rateLimitMiddleware';
@@ -70,10 +85,14 @@ export function createApp(): {
 
   app.use('/api/auth', authRoutes);
   app.use('/api/stats', ...managementStack, statsRoutes);
-  app.use('/api/categories', ...managementStack, categoryRoutes);
-  app.use('/api/products', ...managementStack, productRoutes);
-  app.use('/api/activities', ...managementStack, activityRoutes);
-  app.use('/api/news', ...managementStack, newsRoutes);
+  /** 仅 GET 列表，供官网匿名浏览 */
+  app.use('/api/categories', categoryRoutes);
+  app.use('/api/products', productPublicRouter);
+  app.use('/api/products', ...managementStack, productManagementRouter);
+  app.use('/api/activities', activityPublicRouter);
+  app.use('/api/activities', ...managementStack, activityManagementRouter);
+  app.use('/api/news', newsPublicRouter);
+  app.use('/api/news', ...managementStack, newsManagementRouter);
   app.use('/api/contact-messages', contactMessagePublicRouter);
   app.use(
     '/api/contact-messages',
@@ -86,9 +105,16 @@ export function createApp(): {
     ...managementStack,
     supportTicketManagementRouter
   );
-  app.use('/api/courses', ...managementStack, courseRoutes);
-  app.use('/api/pricing-plans', ...managementStack, pricingPlanRoutes);
-  app.use('/api/site-assets', ...managementStack, siteAssetRoutes);
+  app.use('/api/courses', coursePublicRouter);
+  app.use('/api/courses', ...managementStack, courseManagementRouter);
+  app.use('/api/pricing-plans', pricingPlanPublicRouter);
+  app.use(
+    '/api/pricing-plans',
+    ...managementStack,
+    pricingPlanManagementRouter
+  );
+  app.use('/api/site-assets', siteAssetPublicRouter);
+  app.use('/api/site-assets', ...managementStack, siteAssetManagementRouter);
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', message: 'Server is running' });

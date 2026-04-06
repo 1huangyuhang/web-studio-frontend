@@ -1,6 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Button, Popover, Select, Tooltip } from 'antd';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { Popover, Select, Tooltip } from 'antd';
+import {
+  CalendarOutlined,
+  LeftOutlined,
+  RightOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import type { Dayjs } from 'dayjs';
@@ -84,6 +88,29 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     return { count: inMonth.length, activeDays: daysWithEvents };
   }, [activities, cursorMonth]);
 
+  /** 本月按日期排序的议程，用于顶部速览带，减轻「大空白」感 */
+  const monthAgendaSorted = useMemo(() => {
+    const y = cursorMonth.year();
+    const m = cursorMonth.month();
+    return activities
+      .filter((a) => {
+        const k = activityDayKey(a);
+        if (!k) return false;
+        const d = dayjs(k);
+        return d.year() === y && d.month() === m;
+      })
+      .sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
+  }, [activities, cursorMonth]);
+
+  const ribbonItems = useMemo(
+    () => monthAgendaSorted.slice(0, 8),
+    [monthAgendaSorted]
+  );
+
+  const selectedDayCount = selectedDay
+    ? getActivitiesForDate(selectedDay).length
+    : 0;
+
   const gridDays = useMemo(() => buildMonthGrid(cursorMonth), [cursorMonth]);
 
   const gridWeeks = useMemo(() => chunkWeeks(gridDays), [gridDays]);
@@ -121,46 +148,103 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
   return (
     <div className="event-calendar">
       <div className="event-calendar__meta" aria-live="polite">
-        <div className="event-calendar__meta-main">
-          <span className="event-calendar__meta-kicker">本月排期</span>
-          <p className="event-calendar__meta-stats">
-            本月共 <strong>{monthStats.count}</strong>
-            <span className="event-calendar__meta-unit"> 场</span>
-            <span className="event-calendar__meta-sep" aria-hidden>
-              ·
-            </span>
-            <span className="event-calendar__meta-days">
-              覆盖 <strong>{monthStats.activeDays}</strong> 个日期
-            </span>
-          </p>
+        <div className="event-calendar__meta-brand">
+          <span className="event-calendar__meta-icon" aria-hidden>
+            <CalendarOutlined />
+          </span>
+          <div className="event-calendar__meta-main">
+            <span className="event-calendar__meta-kicker">本月排期</span>
+            <div className="event-calendar__meta-metrics">
+              <div className="event-calendar__metric">
+                <span className="event-calendar__metric-value">
+                  {monthStats.count}
+                </span>
+                <span className="event-calendar__metric-label">场活动</span>
+              </div>
+              <div className="event-calendar__metric-divider" aria-hidden />
+              <div className="event-calendar__metric">
+                <span className="event-calendar__metric-value">
+                  {monthStats.activeDays}
+                </span>
+                <span className="event-calendar__metric-label">个有排期日</span>
+              </div>
+            </div>
+            {selectedDay ? (
+              <p className="event-calendar__meta-focus">
+                {selectedDay.isSame(now, 'day') ? (
+                  <>今日聚焦 · </>
+                ) : (
+                  <>已选 {selectedDay.format('M月D日')} · </>
+                )}
+                {selectedDayCount > 0 ? (
+                  <strong>{selectedDayCount} 场</strong>
+                ) : (
+                  <span className="event-calendar__meta-focus--muted">
+                    当日暂无活动
+                  </span>
+                )}
+              </p>
+            ) : null}
+          </div>
         </div>
-        <Button
-          type="default"
-          className="event-calendar__today-btn"
+        <button
+          type="button"
+          className="event-calendar__today-pill"
           onClick={goToday}
         >
           今天
-        </Button>
+        </button>
       </div>
+
+      {ribbonItems.length > 0 ? (
+        <div
+          className="event-calendar__ribbon"
+          aria-label="本月活动速览，可快速打开详情"
+        >
+          <span className="event-calendar__ribbon-label">速览</span>
+          <div className="event-calendar__ribbon-track">
+            {ribbonItems.map((activity) => {
+              const d = dayjs(activity.date);
+              return (
+                <button
+                  key={activity.id}
+                  type="button"
+                  className={`event-calendar__ribbon-card event-calendar__chip ${pillClassForTitle(activity.title)}`}
+                  onClick={() => onActivityClick(activity)}
+                >
+                  <span className="event-calendar__chip-date">
+                    {d.format('M/D')}
+                  </span>
+                  <span className="event-calendar__chip-title">
+                    {activity.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
       <div className="event-calendar__chrome">
         <div className="event-calendar__nav">
           <div className="event-calendar__nav-primary">
-            <Button
-              type="text"
+            <button
+              type="button"
               className="event-calendar__icon-btn"
-              icon={<LeftOutlined />}
               aria-label="上一月"
               onClick={goPrevMonth}
-            />
+            >
+              <LeftOutlined />
+            </button>
             <h2 className="event-calendar__title">{titleText}</h2>
-            <Button
-              type="text"
+            <button
+              type="button"
               className="event-calendar__icon-btn"
-              icon={<RightOutlined />}
               aria-label="下一月"
               onClick={goNextMonth}
-            />
+            >
+              <RightOutlined />
+            </button>
           </div>
           <div className="event-calendar__nav-jump">
             <Select
@@ -189,10 +273,10 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
         </div>
 
         <div className="event-calendar__weekdays" role="row">
-          {WEEK_LABELS.map((label) => (
+          {WEEK_LABELS.map((label, idx) => (
             <div
               key={label}
-              className="event-calendar__weekday"
+              className={`event-calendar__weekday${idx >= 5 ? ' event-calendar__weekday--weekend' : ''}`}
               role="columnheader"
             >
               {label}
@@ -215,6 +299,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
                 const cellClasses = [
                   'event-calendar__day',
                   !inMonth && 'event-calendar__day--outside',
+                  inMonth && list.length === 0 && 'event-calendar__day--empty',
                   isToday && 'event-calendar__day--today',
                   isSelected && 'event-calendar__day--selected',
                 ]
@@ -259,7 +344,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
                         >
                           <button
                             type="button"
-                            className={`event-calendar__event ${pillClassForTitle(activity.title)}`}
+                            className={`event-calendar__event event-calendar__chip ${pillClassForTitle(activity.title)}`}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -267,7 +352,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
                             }}
                             aria-label={`查看活动：${activity.title}`}
                           >
-                            <span className="event-calendar__event-title">
+                            <span className="event-calendar__chip-title">
                               {activity.title}
                             </span>
                           </button>

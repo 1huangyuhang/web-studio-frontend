@@ -110,11 +110,24 @@ describe('Product API', () => {
     expect(getResponse.status).toBe(404);
   });
 
-  // 测试无效的API密钥
-  test('GET /api/products with invalid api key should return 401', async () => {
+  test('GET /api/products is public read (invalid api key still 200)', async () => {
     const response = await request(app)
       .get('/api/products')
       .set('x-api-key', 'invalid-api-key');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('data');
+  });
+
+  test('POST /api/products with invalid api key should return 401', async () => {
+    const response = await request(app)
+      .post('/api/products')
+      .set('x-api-key', 'invalid-api-key')
+      .send({
+        name: 'Unauthorized Create',
+        price: 1,
+        categoryId: testCategoryId,
+      });
 
     expect(response.status).toBe(401);
   });

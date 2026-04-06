@@ -27,6 +27,7 @@
   /* 标题区由 .marketing-page-shell + ly-mahogany-glass-pages 统一；此处仅保留小屏字号微调 */
 
   /* 搜索 / 价格 / 分类合并为一块抬升面，子区用淡线分隔，减少「四块拼贴」感 */
+  /* 随文档流滚动；勿用 position:sticky，否则会像「钉在视口里」不随页面上移 */
   .shop-filters-stack {
     padding: clamp(16px, 2.5vw, 22px);
     margin-bottom: clamp(20px, 3vw, 28px);
@@ -34,15 +35,6 @@
     border-radius: var(--app-saas-card-radius);
     border: 1px solid var(--app-saas-card-border);
     box-shadow: var(--app-saas-card-shadow);
-
-    @media (min-width: 768px) {
-      position: sticky;
-      top: clamp(100px, 12vh, 132px);
-      z-index: 8;
-      background: color-mix(in srgb, var(--ly-bg-raised) 94%, transparent);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
   }
 
   .shop-filters-stack .search-sort-section {
@@ -217,7 +209,7 @@
   // 产品卡片
   .product-card.ant-card {
     border-radius: var(--app-saas-card-radius);
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid var(--app-saas-card-border) !important;
     background: var(--app-card-bg) !important;
     box-shadow: var(--app-saas-card-shadow);

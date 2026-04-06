@@ -8,12 +8,19 @@ import {
 } from '../controllers/pricingPlanController';
 import { upload } from '../config/multerConfig';
 
-const router = express.Router();
+export const pricingPlanPublicRouter = express.Router();
+pricingPlanPublicRouter.get('/', getAllPricingPlans);
+pricingPlanPublicRouter.get('/:id', getPricingPlanById);
 
-router.get('/', getAllPricingPlans);
-router.get('/:id', getPricingPlanById);
-router.post('/', upload.single('image'), createPricingPlan);
-router.put('/:id', upload.single('image'), updatePricingPlan);
-router.delete('/:id', deletePricingPlan);
-
-export default router;
+export const pricingPlanManagementRouter = express.Router();
+pricingPlanManagementRouter.post(
+  '/',
+  upload.single('image'),
+  createPricingPlan
+);
+pricingPlanManagementRouter.put(
+  '/:id',
+  upload.single('image'),
+  updatePricingPlan
+);
+pricingPlanManagementRouter.delete('/:id', deletePricingPlan);

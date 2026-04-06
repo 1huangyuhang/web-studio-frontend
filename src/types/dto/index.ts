@@ -17,6 +17,9 @@ export { parseNewsListItemDto } from './news.dto';
 export type { CourseDTO } from './course.dto';
 export { parseCourseDto } from './course.dto';
 
+export type { PricingPlanDTO } from './pricingPlan.dto';
+export { parsePricingPlanDto } from './pricingPlan.dto';
+
 export type { SiteAssetDTO } from './siteAsset.dto';
 export { parseSiteAssetDto } from './siteAsset.dto';
 
