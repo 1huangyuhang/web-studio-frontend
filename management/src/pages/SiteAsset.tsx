@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Table,
   Button,
@@ -11,14 +18,25 @@ import {
   Image,
   Tag,
   Tabs,
+  Spin,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
-import axiosInstance, { apiCache } from '../services/axiosInstance';
+import axiosInstance from '../services/axiosInstance';
 import { formatManagementListLoadError } from '../utils/managementLoadErrorHint';
 import { processImageUrl } from '../utils/imageUtils';
+import AdminTableSection from '../components/AdminTableSection';
+import {
+  AdminTableRowActions,
+  AdminTableActionEdit,
+  AdminTableActionDelete,
+} from '../components/AdminTableRowActions';
 import AdminListPageShell from '../components/AdminListPageShell';
 import ManagementWriteGate from '../components/ManagementWriteGate';
+import AdminListSearchBar from '../components/AdminListSearchBar';
+import { adminListTableLocale } from '../utils/adminTableLocale';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { queryKeys } from '../queryKeys';
 
 const { TextArea } = Input;
 
@@ -32,95 +50,178 @@ interface SiteAssetRow {
   content: string | null;
   meta: string | null;
   image: string | null;
+  imageUrl?: string | null;
   videoUrl: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
 
+async function fetchSiteAssetsList(pageTab: string): Promise<SiteAssetRow[]> {
+  const res = await axiosInstance.get('/site-assets', {
+    params: {
+      ...(pageTab !== 'all' ? { page: pageTab } : {}),
+      omitImage: '1',
+    },
+  });
+  const data = Array.isArray((res as { data?: unknown }).data)
+    ? (res as { data: SiteAssetRow[] }).data
+    : [];
+  return data;
+}
+
 const SiteAssetManagement: React.FC = () => {
-  const [rows, setRows] = useState<SiteAssetRow[]>([]);
+  const queryClient = useQueryClient();
   const [pageTab, setPageTab] = useState<string>('all');
-  const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<SiteAssetRow | null>(null);
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [tabCounts, setTabCounts] = useState<Record<string, number>>({});
+  const [allPageKeys, setAllPageKeys] = useState<string[]>([]);
+  const [keywordInput, setKeywordInput] = useState('');
+  const debouncedKeyword = useDebouncedValue(keywordInput, 300);
+  const loadErrorPrint = useRef<string | null>(null);
 
-  const load = async () => {
-    try {
-      setLoading(true);
-      const res = await axiosInstance.get('/site-assets');
-      const data = Array.isArray((res as { data?: unknown }).data)
-        ? (res as { data: SiteAssetRow[] }).data
-        : [];
-      setRows(data);
-    } catch (e) {
-      message.error({
-        key: 'mgmt-site-assets-load',
-        content: formatManagementListLoadError(e, '站点素材'),
-        duration: 8,
-      });
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data,
+    isPending: loading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: queryKeys.siteAssets.list(pageTab),
+    queryFn: () => fetchSiteAssetsList(pageTab),
+  });
+
+  const rows = data ?? [];
 
   useEffect(() => {
-    void load();
-  }, []);
+    if (!isError) {
+      loadErrorPrint.current = null;
+      return;
+    }
+    const content = formatManagementListLoadError(error, '站点素材');
+    if (loadErrorPrint.current === content) return;
+    loadErrorPrint.current = content;
+    message.error({
+      key: 'mgmt-site-assets-load',
+      content,
+      duration: 8,
+    });
+    console.error(error);
+  }, [isError, error]);
 
-  const pageKeys = useMemo(
-    () => [...new Set(rows.map((r) => r.page))].sort(),
-    [rows]
-  );
+  useEffect(() => {
+    if (pageTab !== 'all' || !data) return;
+    const keys = [...new Set(data.map((r) => r.page))].sort();
+    setAllPageKeys(keys);
+    const counts: Record<string, number> = { __all: data.length };
+    keys.forEach((k) => {
+      counts[k] = data.filter((r) => r.page === k).length;
+    });
+    setTabCounts(counts);
+  }, [pageTab, data]);
 
-  const filteredRows = useMemo(() => {
-    if (pageTab === 'all') return rows;
-    return rows.filter((r) => r.page === pageTab);
-  }, [rows, pageTab]);
+  const invalidateSiteAssets = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: queryKeys.siteAssets.all });
+  }, [queryClient]);
 
-  const tabItems = useMemo(
-    () => [
-      { key: 'all', label: `全部（${rows.length}）` },
+  const displayRows = useMemo(() => {
+    const q = debouncedKeyword.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((r) => {
+      const hay = [r.groupKey, r.title ?? '', r.alt ?? '']
+        .join(' ')
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [rows, debouncedKeyword]);
+
+  const tabItems = useMemo(() => {
+    const pageKeys =
+      allPageKeys.length > 0
+        ? allPageKeys
+        : [...new Set(rows.map((r) => r.page))].sort();
+    return [
+      {
+        key: 'all',
+        label: tabCounts.__all != null ? `全部（${tabCounts.__all}）` : '全部',
+      },
       ...pageKeys.map((p) => ({
         key: p,
-        label: `${p}（${rows.filter((r) => r.page === p).length}）`,
+        label: tabCounts[p] != null ? `${p}（${tabCounts[p]}）` : p,
       })),
-    ],
-    [rows, pageKeys]
-  );
+    ];
+  }, [allPageKeys, rows, tabCounts]);
 
   useEffect(() => {
-    if (pageTab !== 'all' && !pageKeys.includes(pageTab)) {
-      setPageTab('all');
-    }
-  }, [pageKeys, pageTab]);
+    if (pageTab === 'all') return;
+    const keysFromRows = [...new Set(rows.map((r) => r.page))];
+    const known = new Set([...allPageKeys, ...keysFromRows]);
+    if (!known.has(pageTab)) setPageTab('all');
+  }, [pageTab, rows, allPageKeys]);
 
   const openCreate = () => {
     setEditing(null);
+    setDetailLoading(false);
     form.resetFields();
     setFileList([]);
     form.setFieldsValue({ sortOrder: 0, imageUrl: '' });
     setModalOpen(true);
   };
 
-  const openEdit = (record: SiteAssetRow) => {
+  const openEdit = async (record: SiteAssetRow) => {
     setEditing(record);
-    form.setFieldsValue({
-      page: record.page,
-      groupKey: record.groupKey,
-      sortOrder: record.sortOrder,
-      title: record.title ?? '',
-      alt: record.alt ?? '',
-      content: record.content ?? '',
-      meta: record.meta ?? '',
-      videoUrl: record.videoUrl ?? '',
-      imageUrl: '',
-    });
-    setFileList([]);
     setModalOpen(true);
+    form.resetFields();
+    setFileList([]);
+    setDetailLoading(true);
+    try {
+      const res = (await axiosInstance.get(`/site-assets/${record.id}`)) as {
+        data: SiteAssetRow;
+      };
+      const full = res.data;
+      form.setFieldsValue({
+        page: full.page,
+        groupKey: full.groupKey,
+        sortOrder: full.sortOrder,
+        title: full.title ?? '',
+        alt: full.alt ?? '',
+        content: full.content ?? '',
+        meta: full.meta ?? '',
+        videoUrl: full.videoUrl ?? '',
+      });
+      if (full.image) {
+        setFileList([
+          {
+            uid: '-1',
+            name: 'current',
+            status: 'done',
+            url: processImageUrl(full.image),
+          },
+        ]);
+      } else {
+        setFileList([]);
+      }
+    } catch (e) {
+      message.error({
+        content: formatManagementListLoadError(e, '站点素材详情'),
+        duration: 6,
+      });
+      form.setFieldsValue({
+        page: record.page,
+        groupKey: record.groupKey,
+        sortOrder: record.sortOrder,
+        title: record.title ?? '',
+        alt: record.alt ?? '',
+        content: record.content ?? '',
+        meta: record.meta ?? '',
+        videoUrl: record.videoUrl ?? '',
+      });
+    } finally {
+      setDetailLoading(false);
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -130,8 +231,7 @@ const SiteAssetManagement: React.FC = () => {
         try {
           await axiosInstance.delete(`/site-assets/${id}`);
           message.success('已删除');
-          apiCache.clear();
-          await load();
+          invalidateSiteAssets();
         } catch (e) {
           message.error('删除失败');
           console.error(e);
@@ -176,9 +276,8 @@ const SiteAssetManagement: React.FC = () => {
           imageUrl,
         });
         message.success('已从 URL 创建素材');
-        apiCache.clear();
         setModalOpen(false);
-        await load();
+        invalidateSiteAssets();
         setSubmitting(false);
         return;
       }
@@ -225,9 +324,8 @@ const SiteAssetManagement: React.FC = () => {
         });
         message.success('已创建');
       }
-      apiCache.clear();
       setModalOpen(false);
-      await load();
+      invalidateSiteAssets();
     } catch (e) {
       if ((e as { errorFields?: unknown })?.errorFields) return;
       message.error('保存失败');
@@ -267,19 +365,21 @@ const SiteAssetManagement: React.FC = () => {
     },
     {
       title: '预览',
-      dataIndex: 'image',
+      key: 'preview',
       width: 96,
-      render: (img: string | null) =>
-        img ? (
+      render: (_: unknown, r: SiteAssetRow) => {
+        const src = r.imageUrl || r.image;
+        return src ? (
           <Image
             width={56}
             height={56}
-            src={processImageUrl(img)}
+            src={processImageUrl(src)}
             style={{ objectFit: 'cover' }}
           />
         ) : (
-          '—'
-        ),
+          <span style={{ color: '#888', fontSize: 12 }}>仅本地图</span>
+        );
+      },
     },
     {
       title: '视频',
@@ -294,33 +394,21 @@ const SiteAssetManagement: React.FC = () => {
       fixed: 'right' as const,
       render: (_: unknown, record: SiteAssetRow) => (
         <ManagementWriteGate>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Button
-              type="primary"
-              size="small"
-              icon={<EditOutlined />}
-              onClick={() => openEdit(record)}
-            >
-              编辑
-            </Button>
-            <Button
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-              onClick={() => handleDelete(record.id)}
-            >
-              删除
-            </Button>
-          </div>
+          <AdminTableRowActions>
+            <AdminTableActionEdit onClick={() => void openEdit(record)} />
+            <AdminTableActionDelete onClick={() => handleDelete(record.id)} />
+          </AdminTableRowActions>
         </ManagementWriteGate>
       ),
     },
   ];
 
+  const hasActiveFilters = Boolean(debouncedKeyword.trim());
+
   return (
     <AdminListPageShell
       title="站点素材"
-      description="维护首页、关于页、成功案例、顶栏 Logo 等素材。支持本地上传与公网图片 URL 导入。关于页/案例正文写在「正文」；案例可填扩展 JSON。"
+      description="列表使用精简接口（不返回 BYTEA Base64），表格预览以外链图为主；仅存储在库内的图片显示「仅本地图」，编辑时将加载完整详情。按页面 Tab 筛选；可在当前结果内关键词搜索。"
       extra={
         <ManagementWriteGate>
           <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
@@ -329,25 +417,35 @@ const SiteAssetManagement: React.FC = () => {
         </ManagementWriteGate>
       }
       filter={
-        <Tabs
-          activeKey={pageTab}
-          onChange={setPageTab}
-          items={tabItems}
-          size="small"
-          type="card"
-        />
+        <div className="admin-page__filter">
+          <Tabs
+            activeKey={pageTab}
+            onChange={setPageTab}
+            items={tabItems}
+            size="small"
+            type="card"
+            style={{ marginBottom: 12 }}
+          />
+          <AdminListSearchBar
+            placeholder="在当前列表中筛选分组、标题、alt"
+            value={keywordInput}
+            onChange={setKeywordInput}
+            totalCount={displayRows.length}
+          />
+        </div>
       }
     >
-      <div className="admin-table-card">
+      <AdminTableSection>
         <Table<SiteAssetRow>
           rowKey="id"
           loading={loading}
           columns={columns}
-          dataSource={filteredRows}
+          dataSource={displayRows}
           pagination={{ pageSize: 20 }}
           scroll={{ x: 960 }}
+          locale={adminListTableLocale(hasActiveFilters)}
         />
-      </div>
+      </AdminTableSection>
 
       <Modal
         title={editing ? '编辑站点素材' : '新增站点素材'}
@@ -355,86 +453,95 @@ const SiteAssetManagement: React.FC = () => {
         onCancel={() => setModalOpen(false)}
         onOk={() => void handleSubmit()}
         confirmLoading={submitting}
+        okButtonProps={{ disabled: detailLoading }}
         width={560}
         destroyOnClose
       >
-        <Form form={form} layout="vertical" scrollToFirstError>
-          <Form.Item
-            name="page"
-            label="页面标识 page"
-            rules={[{ required: true, message: '例如 home / about / layout' }]}
-          >
-            <Input placeholder="home | about | layout" />
-          </Form.Item>
-          <Form.Item
-            name="groupKey"
-            label="分组 groupKey"
-            rules={[{ required: true, message: '例如 top_gallery、header' }]}
-          >
-            <Input placeholder="top_gallery | product_categories | header …" />
-          </Form.Item>
-          <Form.Item name="sortOrder" label="排序 sortOrder">
-            <InputNumber min={0} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item name="title" label="标题（可选，如产品系列名称）">
-            <Input />
-          </Form.Item>
-          <Form.Item name="alt" label="图片 alt 文案">
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="content"
-            label="正文 content（关于页段落、案例描述等）"
-          >
-            <TextArea
-              rows={5}
-              placeholder="支持多段纯文本，前台按分组与排序展示"
-            />
-          </Form.Item>
-          <Form.Item
-            name="meta"
-            label="扩展 JSON（可选，用于成功案例 case_item）"
-            extra='示例：{"client":"客户名","category":"分类","date":"2024-01-01","tags":["标签1"]}'
-          >
-            <TextArea
-              rows={3}
-              placeholder='{"client":"","category":"","date":"","tags":[]}'
-            />
-          </Form.Item>
-          <Form.Item name="videoUrl" label="视频地址（可选，如首页滚动区）">
-            <Input placeholder="https://…" />
-          </Form.Item>
-          {!editing ? (
+        {detailLoading ? (
+          <div style={{ textAlign: 'center', padding: 48 }}>
+            <Spin tip="加载素材详情…" />
+          </div>
+        ) : (
+          <Form form={form} layout="vertical" scrollToFirstError>
             <Form.Item
-              name="imageUrl"
-              label="图片 URL（可选，与下方上传二选一）"
-              extra="示例：https://picsum.photos/id/1018/1200/800 — 由服务端下载并存储"
+              name="page"
+              label="页面标识 page"
+              rules={[
+                { required: true, message: '例如 home / about / layout' },
+              ]}
             >
-              <Input placeholder="https://…" allowClear />
+              <Input placeholder="home | about | layout" />
             </Form.Item>
-          ) : (
-            <p style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
-              编辑时如需换图请使用下方上传；或使用删除后通过「新增」从 URL
-              导入。
-            </p>
-          )}
-          <Form.Item label="图片文件（可选）">
-            <Upload
-              listType="picture"
-              fileList={fileList}
-              beforeUpload={() => false}
-              maxCount={1}
-              onChange={({ fileList: fl }) => setFileList(fl)}
+            <Form.Item
+              name="groupKey"
+              label="分组 groupKey"
+              rules={[{ required: true, message: '例如 top_gallery、header' }]}
             >
-              <Button type="default">选择图片</Button>
-            </Upload>
-            {editing ? (
-              <div style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
-                不选择文件则保留原图
-              </div>
-            ) : null}
-          </Form.Item>
-        </Form>
+              <Input placeholder="top_gallery | product_categories | header …" />
+            </Form.Item>
+            <Form.Item name="sortOrder" label="排序 sortOrder">
+              <InputNumber min={0} style={{ width: '100%' }} />
+            </Form.Item>
+            <Form.Item name="title" label="标题（可选，如产品系列名称）">
+              <Input />
+            </Form.Item>
+            <Form.Item name="alt" label="图片 alt 文案">
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="content"
+              label="正文 content（关于页段落、案例描述等）"
+            >
+              <TextArea
+                rows={5}
+                placeholder="支持多段纯文本，前台按分组与排序展示"
+              />
+            </Form.Item>
+            <Form.Item
+              name="meta"
+              label="扩展 JSON（可选，用于成功案例 case_item）"
+              extra='示例：{"client":"客户名","category":"分类","date":"2024-01-01","tags":["标签1"]}'
+            >
+              <TextArea
+                rows={3}
+                placeholder='{"client":"","category":"","date":"","tags":[]}'
+              />
+            </Form.Item>
+            <Form.Item name="videoUrl" label="视频地址（可选，如首页滚动区）">
+              <Input placeholder="https://…" />
+            </Form.Item>
+            {!editing ? (
+              <Form.Item
+                name="imageUrl"
+                label="图片 URL（可选，与下方上传二选一）"
+                extra="示例：https://picsum.photos/id/1018/1200/800 — 由服务端下载并存储"
+              >
+                <Input placeholder="https://…" allowClear />
+              </Form.Item>
+            ) : (
+              <p style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
+                编辑时如需换图请使用下方上传；或使用删除后通过「新增」从 URL
+                导入。
+              </p>
+            )}
+            <Form.Item label="图片文件（可选）">
+              <Upload
+                listType="picture"
+                fileList={fileList}
+                beforeUpload={() => false}
+                maxCount={1}
+                onChange={({ fileList: fl }) => setFileList(fl)}
+              >
+                <Button type="default">选择图片</Button>
+              </Upload>
+              {editing ? (
+                <div style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
+                  不选择文件则保留原图
+                </div>
+              ) : null}
+            </Form.Item>
+          </Form>
+        )}
       </Modal>
     </AdminListPageShell>
   );

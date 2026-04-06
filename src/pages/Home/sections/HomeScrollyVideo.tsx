@@ -22,7 +22,7 @@ export default function HomeScrollyVideo({ src = DEFAULT_HERO_VIDEO }: Props) {
         id="redwood-video"
         height="clamp(420px, 88dvh, 920px)"
       >
-        <div className="home-hero-scrolly__content">
+        <div className="home-hero-scrolly__content home-hero-scrolly__content--enter">
           <span className="home-hero-scrolly__eyebrow">林之源 · 红木美学</span>
           <Title level={1} className="home-hero-scrolly__title">
             传承工艺，筑就恒久之美
@@ -48,7 +48,9 @@ export default function HomeScrollyVideo({ src = DEFAULT_HERO_VIDEO }: Props) {
             </Button>
           </Space>
           <div className="home-hero-scrolly__scroll-hint">
-            向下滚动 · 浏览更多
+            <span className="home-hero-scrolly__scroll-hint__inner">
+              向下滚动 · 浏览更多
+            </span>
           </div>
         </div>
       </ScrollyVideo>

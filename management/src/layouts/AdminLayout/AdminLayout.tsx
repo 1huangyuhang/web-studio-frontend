@@ -21,6 +21,7 @@ import {
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
 import { ADMIN_NAV_GROUPS, getBreadcrumbSegments } from '@/config/menuConfig';
+import { getManagementSocketHttpOrigin } from '@/config/managementApiBase';
 import AdminWorkbenchBar from '@/components/AdminWorkbenchBar';
 import './index.less';
 
@@ -32,6 +33,7 @@ const SIDER_COLLAPSED = 72;
 const MGMT_HINT_EVENT = 'mgmt-api-hint';
 const SESSION_DISMISS_NETWORK = 'mgmt-hint-network-dismissed';
 const SESSION_DISMISS_READONLY = 'mgmt-hint-readonly-dismissed';
+const SESSION_DISMISS_BACKEND_HEALTH = 'mgmt-hint-backend-health-dismissed';
 
 const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -43,6 +45,23 @@ const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [apiHint, setApiHint] = useState<null | 'network' | 'readOnly'>(null);
+  const [backendHealthBad, setBackendHealthBad] = useState(false);
+
+  /** 直连后端根路径 /health（不经 Vite /api），与业务请求链路区分，尽早发现「进程未起或端口错位」 */
+  useEffect(() => {
+    if (sessionStorage.getItem(SESSION_DISMISS_BACKEND_HEALTH)) return;
+    const origin = getManagementSocketHttpOrigin();
+    const ac = new AbortController();
+    const timer = window.setTimeout(() => ac.abort(), 4000);
+    void fetch(`${origin.replace(/\/$/, '')}/health`, {
+      signal: ac.signal,
+    })
+      .then((res) => {
+        if (!res.ok) setBackendHealthBad(true);
+      })
+      .catch(() => setBackendHealthBad(true))
+      .finally(() => window.clearTimeout(timer));
+  }, []);
 
   useEffect(() => {
     const onHint = (e: Event) => {
@@ -66,6 +85,11 @@ const AdminLayout: React.FC = () => {
     if (apiHint === 'readOnly')
       sessionStorage.setItem(SESSION_DISMISS_READONLY, '1');
     setApiHint(null);
+  };
+
+  const dismissBackendHealthHint = () => {
+    sessionStorage.setItem(SESSION_DISMISS_BACKEND_HEALTH, '1');
+    setBackendHealthBad(false);
   };
 
   const selectedKey = location.pathname === '' ? '/' : location.pathname;
@@ -249,6 +273,17 @@ const AdminLayout: React.FC = () => {
 
         <Content className="admin-shell__content">
           <div className="admin-shell__content-inner">
+            {backendHealthBad ? (
+              <Alert
+                type="error"
+                showIcon
+                closable
+                onClose={dismissBackendHealthHint}
+                message="后端服务未响应（/health）"
+                description={`已探测 ${getManagementSocketHttpOrigin()}/health 失败。请在本机执行 cd backend && npm run dev，并确认 PORT 与 Vite 代理目标一致；联调自检：npm run check:management-api。`}
+                style={{ marginBottom: 16 }}
+              />
+            ) : null}
             {apiHint === 'network' ? (
               <Alert
                 type="warning"

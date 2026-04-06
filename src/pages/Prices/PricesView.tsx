@@ -139,6 +139,9 @@ export default function PricesView() {
               >
                 立即选择
               </SiteButton>
+              <Text type="secondary" className="plan-footnote">
+                可随时调整方案，具体以合约为准
+              </Text>
             </div>
           </Card>
         </Col>

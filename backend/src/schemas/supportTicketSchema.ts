@@ -23,6 +23,13 @@ export const supportTicketQuerySchema = z.object({
     .transform((val) => parseInt(val, 10))
     .refine((val) => val > 0 && val <= 100),
   status: z.nativeEnum(TicketStatus).optional(),
+  search: z
+    .string()
+    .optional()
+    .transform((v) => {
+      const t = (v ?? '').trim();
+      return t.length > 0 ? t : undefined;
+    }),
 });
 
 export const patchSupportTicketSchema = z.object({

@@ -1,5 +1,5 @@
 /**
- * 顶栏 Logo：使用 public 下 SVG，避免缺失本地 JPG 导致构建失败（可替换为品牌资源）。
+ * 静态 Logo 路径（分享图、邮件等）；顶栏请使用 `BrandLogo` 组件以支持主题字色。
  */
 export const logo = '/logo.svg';
 

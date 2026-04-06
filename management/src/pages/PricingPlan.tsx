@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Table,
   Button,
@@ -10,15 +11,25 @@ import {
   Upload,
   Switch,
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
 import axiosInstance, { apiCache } from '../services/axiosInstance';
 import wsService from '../services/websocket';
 import EnhancedPagination from '../components/EnhancedPagination';
+import AdminTableSection from '../components/AdminTableSection';
+import {
+  AdminTableRowActions,
+  AdminTableActionEdit,
+  AdminTableActionDelete,
+} from '../components/AdminTableRowActions';
 import AdminListPageShell from '../components/AdminListPageShell';
 import ManagementWriteGate from '../components/ManagementWriteGate';
+import AdminListSearchBar from '../components/AdminListSearchBar';
+import { parseAdminListUrlParams } from '../utils/adminListUrlParams';
+import { adminListTableLocale } from '../utils/adminTableLocale';
 import { parsePaginatedList } from '../types/api';
 import { processImageUrl } from '../utils/imageUtils';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 
 interface PlanRow {
   id: number;
@@ -33,14 +44,50 @@ interface PlanRow {
 }
 
 const PricingPlanManagement: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    page,
+    pageSize,
+    search: urlSearch,
+  } = useMemo(() => parseAdminListUrlParams(searchParams), [searchParams]);
+
+  const [searchInput, setSearchInput] = useState(urlSearch);
+  useEffect(() => {
+    setSearchInput(urlSearch);
+  }, [urlSearch]);
+
+  const debouncedInput = useDebouncedValue(searchInput, 400);
+  useEffect(() => {
+    const t = debouncedInput.trim();
+    const u = urlSearch.trim();
+    if (t === u) return;
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      if (t) p.set('search', t);
+      else p.delete('search');
+      p.set('page', '1');
+      return p;
+    });
+  }, [debouncedInput, urlSearch, setSearchParams]);
+
+  const setListParams = useCallback(
+    (next: { page?: number; pageSize?: number }) => {
+      setSearchParams((prev) => {
+        const p = new URLSearchParams(prev);
+        if (next.page != null) p.set('page', String(next.page));
+        if (next.pageSize != null) p.set('pageSize', String(next.pageSize));
+        return p;
+      });
+    },
+    [setSearchParams]
+  );
+
   const [rows, setRows] = useState<PlanRow[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<PlanRow | null>(null);
   const [form] = Form.useForm();
   const [listLoading, setListLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -63,8 +110,13 @@ const PricingPlanManagement: React.FC = () => {
   const load = useCallback(async () => {
     setListLoading(true);
     try {
+      const st = urlSearch.trim();
       const res = await axiosInstance.get('/pricing-plans', {
-        params: { page, pageSize },
+        params: {
+          page,
+          pageSize,
+          ...(st ? { search: st } : {}),
+        },
       });
       const { list, total: t } =
         parsePaginatedList<Record<string, unknown>>(res);
@@ -76,7 +128,7 @@ const PricingPlanManagement: React.FC = () => {
     } finally {
       setListLoading(false);
     }
-  }, [page, pageSize]);
+  }, [page, pageSize, urlSearch]);
 
   useEffect(() => {
     void load();
@@ -231,32 +283,21 @@ const PricingPlanManagement: React.FC = () => {
       width: 160,
       render: (_: unknown, r: PlanRow) => (
         <ManagementWriteGate>
-          <>
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => openEdit(r)}
-            >
-              编辑
-            </Button>
-            <Button
-              type="link"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => handleDelete(r.id)}
-            >
-              删除
-            </Button>
-          </>
+          <AdminTableRowActions>
+            <AdminTableActionEdit onClick={() => openEdit(r)} />
+            <AdminTableActionDelete onClick={() => handleDelete(r.id)} />
+          </AdminTableRowActions>
         </ManagementWriteGate>
       ),
     },
   ];
 
+  const hasListFilters = Boolean(urlSearch.trim());
+
   return (
     <AdminListPageShell
       title="价格套餐"
-      description="维护前台价格页套餐、权益列表与推荐位，与站点价格页数据源一致。"
+      description="维护前台价格页套餐与推荐位；关键词检索写入地址栏。"
       extra={
         <ManagementWriteGate>
           <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
@@ -264,8 +305,31 @@ const PricingPlanManagement: React.FC = () => {
           </Button>
         </ManagementWriteGate>
       }
+      filter={
+        <div className="admin-page__filter">
+          <AdminListSearchBar
+            placeholder="搜索名称、描述"
+            value={searchInput}
+            onChange={setSearchInput}
+            totalCount={total}
+          />
+        </div>
+      }
     >
-      <div className="admin-table-card">
+      <AdminTableSection
+        pagination={
+          <EnhancedPagination
+            currentPage={page}
+            pageSize={pageSize}
+            total={total}
+            onChange={(p, ps) => {
+              const nextSize = ps ?? pageSize;
+              const nextPage = nextSize !== pageSize ? 1 : p;
+              setListParams({ page: nextPage, pageSize: nextSize });
+            }}
+          />
+        }
+      >
         <Table
           rowKey="id"
           columns={columns}
@@ -273,19 +337,9 @@ const PricingPlanManagement: React.FC = () => {
           pagination={false}
           loading={listLoading}
           scroll={{ x: 'max-content' }}
+          locale={adminListTableLocale(hasListFilters)}
         />
-      </div>
-      <div className="admin-pagination-wrap">
-        <EnhancedPagination
-          currentPage={page}
-          pageSize={pageSize}
-          total={total}
-          onChange={(p, ps) => {
-            setPage(p);
-            setPageSize(ps);
-          }}
-        />
-      </div>
+      </AdminTableSection>
 
       <Modal
         title={editing ? '编辑套餐' : '新建套餐'}

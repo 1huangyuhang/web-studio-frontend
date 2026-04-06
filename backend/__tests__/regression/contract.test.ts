@@ -129,6 +129,20 @@ describe('Regression: HTTP contract', () => {
     }
   });
 
+  test('GET /api/site-assets?omitImage=1 returns list rows without large base64 blobs', async () => {
+    const res = await request(app)
+      .get('/api/site-assets')
+      .query({ omitImage: '1' })
+      .set('x-api-key', apiKey);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('data');
+    expect(Array.isArray(res.body.data)).toBe(true);
+    for (const row of res.body.data as { image?: string | null }[]) {
+      expect(row.image == null || row.image === '').toBe(true);
+    }
+  });
+
   test('GET /api/site-assets without API key returns 401', async () => {
     const res = await request(app)
       .get('/api/site-assets')

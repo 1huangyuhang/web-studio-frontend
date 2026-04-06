@@ -1,6 +1,7 @@
 import type { SiteAsset } from '@prisma/client';
 import type { z } from 'zod';
 import * as repo from '../../infrastructure/persistence/siteAssetRepository';
+import type { SiteAssetListRow } from '../../infrastructure/persistence/siteAssetRepository';
 import { HttpError } from '../../utils/httpError';
 import { serializeMediaFields } from '../../utils/serializeMedia';
 import {
@@ -12,6 +13,30 @@ import type { SerializedSiteAsset } from './types';
 
 export function serializeSiteAsset(row: SiteAsset): SerializedSiteAsset {
   const media = serializeMediaFields(row);
+  return {
+    id: row.id,
+    page: row.page,
+    groupKey: row.groupKey,
+    sortOrder: row.sortOrder,
+    title: row.title,
+    alt: row.alt,
+    content: row.content,
+    meta: row.meta,
+    ...media,
+    videoUrl: row.videoUrl,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+/** 列表精简：不序列化 BYTEA→Base64，编辑时再 GET /:id */
+export function serializeSiteAssetListItem(
+  row: SiteAssetListRow
+): SerializedSiteAsset {
+  const media = serializeMediaFields({
+    image: null,
+    imageUrl: row.imageUrl,
+  });
   return {
     id: row.id,
     page: row.page,
@@ -41,9 +66,14 @@ type FromUrlParsed = z.infer<typeof createSiteAssetFromUrlSchema>;
 const MAX_IMPORT_IMAGE_BYTES = 12 * 1024 * 1024;
 
 export async function listSiteAssetsApplication(
-  pageFilter?: string
+  pageFilter?: string,
+  options?: { omitImage?: boolean }
 ): Promise<SerializedSiteAsset[]> {
   const where = pageFilter ? { page: pageFilter } : {};
+  if (options?.omitImage) {
+    const list = await repo.findManySiteAssetsMeta(where);
+    return list.map(serializeSiteAssetListItem);
+  }
   const list = await repo.findManySiteAssets(where);
   return list.map(serializeSiteAsset);
 }

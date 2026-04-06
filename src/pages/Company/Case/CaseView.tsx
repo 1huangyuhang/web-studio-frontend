@@ -1,13 +1,14 @@
-import { Card, List, Typography, Tag } from 'antd';
+import { Card, List, Typography, Tag, Pagination } from 'antd';
 import { useState } from 'react';
 import {
   processImageUrl,
   handleImageError,
   handleImageLoad,
 } from '@/utils/imageUtils';
-import SimplePagination from '@/components/ui/SimplePagination';
 
 const { Title, Text, Paragraph } = Typography;
+
+const MAX_VISIBLE_TAGS = 4;
 
 interface CaseItem {
   id: number;
@@ -82,9 +83,14 @@ export default function CaseView() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
-  const handlePaginationChange = (page: number, size: number) => {
+  const handlePaginationChange = (page: number, size?: number) => {
     setCurrentPage(page);
+    if (size != null) setPageSize(size);
+  };
+
+  const handlePageSizeChange = (_current: number, size: number) => {
     setPageSize(size);
+    setCurrentPage(1);
   };
 
   const startIndex = (currentPage - 1) * pageSize;
@@ -122,11 +128,16 @@ export default function CaseView() {
                     {item.description}
                   </Paragraph>
                   <div className="case-tags">
-                    {item.tags.map((tag, index) => (
+                    {item.tags.slice(0, MAX_VISIBLE_TAGS).map((tag, index) => (
                       <Tag key={index} className="case-tag">
                         {tag}
                       </Tag>
                     ))}
+                    {item.tags.length > MAX_VISIBLE_TAGS ? (
+                      <Tag className="case-tag case-tag--more">
+                        +{item.tags.length - MAX_VISIBLE_TAGS}
+                      </Tag>
+                    ) : null}
                   </div>
                   <div className="case-actions">
                     <Text className="view-details">查看详情</Text>
@@ -139,11 +150,15 @@ export default function CaseView() {
       </div>
 
       <div className="pagination-container">
-        <SimplePagination
-          currentPage={currentPage}
-          pageSize={pageSize}
+        <Pagination
+          current={currentPage}
           total={caseData.length}
+          pageSize={pageSize}
+          showSizeChanger
+          showQuickJumper
+          showTotal={(total) => `共 ${total} 条记录`}
           onChange={handlePaginationChange}
+          onShowSizeChange={handlePageSizeChange}
         />
       </div>
     </>

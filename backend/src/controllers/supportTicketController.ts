@@ -7,6 +7,7 @@ import {
   supportTicketQuerySchema,
   patchSupportTicketSchema,
 } from '../schemas/supportTicketSchema';
+import { prismaStringContains } from '../utils/prismaStringFilter';
 
 function listRow(row: {
   id: number;
@@ -61,10 +62,23 @@ export const createSupportTicket = async (req: Request, res: Response) => {
 
 export const getAllSupportTickets = async (req: Request, res: Response) => {
   const q = supportTicketQuerySchema.parse(req.query);
-  const { page, pageSize, status } = q;
+  const { page, pageSize, status, search } = q;
   const skip = (page - 1) * pageSize;
-  const where: Prisma.SupportTicketWhereInput = {};
-  if (status) where.status = status;
+  const where: Prisma.SupportTicketWhereInput = {
+    ...(status ? { status } : {}),
+    ...(search
+      ? {
+          OR: [
+            { fullName: prismaStringContains(search) },
+            { emailAddress: prismaStringContains(search) },
+            { messageSubject: prismaStringContains(search) },
+            { askYourQuestion: prismaStringContains(search) },
+            { companyName: prismaStringContains(search) },
+            { phoneNumber: prismaStringContains(search) },
+          ],
+        }
+      : {}),
+  };
   const [rows, total] = await Promise.all([
     prisma.supportTicket.findMany({
       where,

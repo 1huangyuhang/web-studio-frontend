@@ -13,6 +13,13 @@ import {
   createSiteAssetFromUrlApplication,
 } from '../application/site-asset/siteAssetApplication';
 
+function parseOmitImageFlag(raw: unknown): boolean {
+  if (raw === true) return true;
+  if (typeof raw !== 'string') return false;
+  const t = raw.trim().toLowerCase();
+  return t === '1' || t === 'true' || t === 'yes';
+}
+
 export const getSiteAssets = async (
   req: Request,
   res: Response,
@@ -20,7 +27,8 @@ export const getSiteAssets = async (
 ) => {
   try {
     const page = req.query['page'] as string | undefined;
-    const list = await listSiteAssetsApplication(page);
+    const omitImage = parseOmitImageFlag(req.query['omitImage']);
+    const list = await listSiteAssetsApplication(page, { omitImage });
     res.json({ data: list });
   } catch (e) {
     next(e);

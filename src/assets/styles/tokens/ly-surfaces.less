@@ -14,7 +14,8 @@ html[data-theme='dark'] {
   --ly-radius-lg: 18px;
   --ly-container-max: 1120px;
   --ly-container-wide: 1240px;
-  --ly-container-pad-x: clamp(20px, 5vw, 48px);
+  /* 水平安全区：16–32px 量级，大屏不再拉到 48px，避免左右过空（对齐常见 Web/Material 边距习惯） */
+  --ly-container-pad-x: clamp(16px, 3.5vw, 32px);
   --ly-footer-bg: linear-gradient(180deg, #0c0c0f 0%, #09090b 100%);
   --ly-footer-border: rgba(255, 255, 255, 0.08);
   --ly-footer-text: var(--app-heading);
@@ -37,7 +38,8 @@ html[data-theme='light'] {
   --ly-radius-lg: 18px;
   --ly-container-max: 1120px;
   --ly-container-wide: 1240px;
-  --ly-container-pad-x: clamp(20px, 5vw, 48px);
+  /* 水平安全区：16–32px 量级，大屏不再拉到 48px，避免左右过空（对齐常见 Web/Material 边距习惯） */
+  --ly-container-pad-x: clamp(16px, 3.5vw, 32px);
   --ly-footer-bg: var(--ly-bg-canvas);
   --ly-footer-border: rgba(15, 23, 42, 0.08);
   --ly-footer-text: var(--app-heading);

@@ -2,7 +2,7 @@
 @import '../styles/company.global.less';
 
 .about-page {
-  padding: 20px 0;
+  padding: 0;
 
   .page-header {
     .company-shared-page-header();
@@ -10,11 +10,14 @@
 
   // 通用区块标题
   .section-title {
-    font-size: 24px;
-    font-weight: 600;
+    font-size: var(--type-h3);
+    font-weight: var(--app-heading-weight, 600);
+    letter-spacing: var(--track-heading);
+    line-height: var(--leading-tight);
     color: var(--app-heading);
     margin: 0 0 24px 0;
     text-align: center;
+    font-family: var(--font-heading);
   }
 
   // 关于我们区块
@@ -27,7 +30,7 @@
     width: 100%;
     height: 100%;
     min-height: 300px;
-    border-radius: var(--app-card-radius, 14px);
+    border-radius: var(--app-saas-card-radius);
     overflow: hidden;
     border: 1px solid var(--app-card-border);
     box-shadow: var(--app-card-shadow);
@@ -52,6 +55,7 @@
     justify-content: center;
 
     .about-text {
+      max-width: 65ch;
       font-size: 16px;
       color: var(--app-text-secondary);
       line-height: 1.8;
@@ -60,10 +64,25 @@
     }
   }
 
-  // 区块分隔线
-  .section-divider {
-    margin: 48px 0;
-    border-color: var(--app-card-border);
+  .about-section-stack {
+    width: 100%;
+  }
+
+  /* 柔和区隔：渐变细线 + 留白，替代 Ant Divider 实线 */
+  .about-section-soft-break {
+    flex-shrink: 0;
+    height: 1px;
+    margin: clamp(36px, 6vw, 64px) auto;
+    max-width: min(560px, 92%);
+    border: none;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in srgb, var(--app-card-border) 45%, transparent) 22%,
+      color-mix(in srgb, var(--app-accent-cinnabar) 18%, transparent) 50%,
+      color-mix(in srgb, var(--app-card-border) 45%, transparent) 78%,
+      transparent 100%
+    );
   }
 
   // 核心优势区块
@@ -73,15 +92,15 @@
 
   // 优势卡片
   .advantage-card {
-    border-radius: var(--app-card-radius, 14px);
+    border-radius: var(--app-saas-card-radius);
     background: var(--app-card-bg) !important;
-    box-shadow: var(--app-card-shadow);
-    border: 1px solid var(--app-card-border) !important;
+    box-shadow: var(--app-saas-card-shadow);
+    border: 1px solid var(--app-saas-card-border) !important;
     .app-tx-lift();
     height: 100%;
 
     &:hover {
-      box-shadow: var(--app-card-shadow-hover);
+      box-shadow: var(--app-saas-card-shadow-hover);
       border-color: var(--app-card-border-hover) !important;
       transform: translateY(-2px);
     }
@@ -107,8 +126,8 @@
     margin-bottom: 16px;
 
     .advantage-icon {
-      font-size: 24px;
-      font-weight: 600;
+      font-size: 28px;
+      line-height: 1;
       color: @primary-color;
     }
   }
@@ -237,8 +256,8 @@
       }
     }
 
-    .section-divider {
-      margin: 32px 0;
+    .about-section-soft-break {
+      margin: clamp(28px, 8vw, 40px) auto;
     }
 
     .advantage-card {

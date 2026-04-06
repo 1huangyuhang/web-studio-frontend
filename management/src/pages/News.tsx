@@ -1,44 +1,70 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  Table,
-  Button,
-  Modal,
-  Form,
-  Input,
-  message,
-  Upload,
-  Space,
-} from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Button, Modal, Form, Input, message, Upload } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import axiosInstance from '@/services/axiosInstance';
 import wsService from '@/services/websocket';
 import EnhancedPagination from '@/components/EnhancedPagination';
+import AdminTableSection from '@/components/AdminTableSection';
+import {
+  AdminTableRowActions,
+  AdminTableActionEdit,
+  AdminTableActionDelete,
+} from '@/components/AdminTableRowActions';
 import AdminListPageShell from '@/components/AdminListPageShell';
+import AdminListSearchBar from '@/components/AdminListSearchBar';
+import { parseAdminListUrlParams } from '@/utils/adminListUrlParams';
+import { adminListTableLocale } from '@/utils/adminTableLocale';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useListQueryErrorToast } from '@/hooks/useListQueryErrorToast';
 import { queryKeys } from '@/queryKeys';
 import { fetchNewsPage, type NewsRow } from '@/api/adminLists';
 
 const NewsManagement: React.FC = () => {
   const queryClient = useQueryClient();
-  const [searchInput, setSearchInput] = useState('');
-  const debouncedSearch = useDebouncedValue(searchInput, 400);
-  const prevDebounced = useRef(debouncedSearch);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const {
+    page: currentPage,
+    pageSize,
+    search: urlSearch,
+  } = useMemo(() => parseAdminListUrlParams(searchParams), [searchParams]);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-
+  const [searchInput, setSearchInput] = useState(urlSearch);
   useEffect(() => {
-    if (prevDebounced.current !== debouncedSearch) {
-      prevDebounced.current = debouncedSearch;
-      setCurrentPage(1);
-    }
-  }, [debouncedSearch]);
+    setSearchInput(urlSearch);
+  }, [urlSearch]);
+
+  const debouncedInput = useDebouncedValue(searchInput, 400);
+  useEffect(() => {
+    const t = debouncedInput.trim();
+    const u = urlSearch.trim();
+    if (t === u) return;
+    setSearchParams((prev) => {
+      const p = new URLSearchParams(prev);
+      if (t) p.set('search', t);
+      else p.delete('search');
+      p.set('page', '1');
+      return p;
+    });
+  }, [debouncedInput, urlSearch, setSearchParams]);
+
+  const setListParams = useCallback(
+    (next: { page?: number; pageSize?: number }) => {
+      setSearchParams((prev) => {
+        const p = new URLSearchParams(prev);
+        if (next.page != null) p.set('page', String(next.page));
+        if (next.pageSize != null) p.set('pageSize', String(next.pageSize));
+        return p;
+      });
+    },
+    [setSearchParams]
+  );
 
   const listParams = {
     page: currentPage,
     pageSize,
-    search: debouncedSearch.trim(),
+    search: urlSearch.trim(),
   };
 
   const { data, isPending, isError, error, refetch } = useQuery({
@@ -46,14 +72,7 @@ const NewsManagement: React.FC = () => {
     queryFn: () => fetchNewsPage(listParams),
   });
 
-  useEffect(() => {
-    if (isError && error) {
-      message.error({
-        key: 'mgmt-news-list',
-        content: `获取新闻列表失败: ${error instanceof Error ? error.message : String(error)}`,
-      });
-    }
-  }, [isError, error]);
+  useListQueryErrorToast(isError, error, 'mgmt-news-list', '获取新闻列表失败');
 
   const news = data?.list ?? [];
   const total = data?.total ?? 0;
@@ -253,52 +272,29 @@ const NewsManagement: React.FC = () => {
       align: 'center' as const,
       fixed: 'right' as const,
       render: (_: unknown, record: NewsRow) => (
-        <div
-          className="action-buttons"
-          style={{ display: 'flex', gap: 8, justifyContent: 'center' }}
-        >
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            size="small"
-            className="edit-button"
-            onClick={() => showModal(record)}
-            style={{ flex: 1, minWidth: 60 }}
-          >
-            编辑
-          </Button>
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            size="small"
-            className="delete-button"
-            onClick={() => handleDelete(record.id)}
-            style={{ flex: 1, minWidth: 60 }}
-          >
-            删除
-          </Button>
-        </div>
+        <AdminTableRowActions center>
+          <AdminTableActionEdit onClick={() => showModal(record)} />
+          <AdminTableActionDelete onClick={() => handleDelete(record.id)} />
+        </AdminTableRowActions>
       ),
     },
   ];
 
   const searchFilter = (
-    <Space wrap className="admin-page__filter-row">
-      <Input.Search
-        allowClear
+    <div className="admin-page__filter">
+      <AdminListSearchBar
         placeholder="搜索标题、正文或摘要"
         value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-        onSearch={(v) => setSearchInput(v)}
-        style={{ maxWidth: 360 }}
+        onChange={setSearchInput}
+        totalCount={total}
       />
-    </Space>
+    </div>
   );
 
   return (
     <AdminListPageShell
       title="新闻管理"
-      description="与前台新闻数据源一致；支持标题、内容、摘要关键词检索。"
+      description="与前台新闻数据源一致；关键词写入地址栏，刷新后保留。"
       extra={
         <Button
           type="primary"
@@ -310,7 +306,20 @@ const NewsManagement: React.FC = () => {
       }
       filter={searchFilter}
     >
-      <div className="table-container">
+      <AdminTableSection
+        pagination={
+          <EnhancedPagination
+            currentPage={currentPage}
+            pageSize={pageSize}
+            total={total}
+            onChange={(page, size) => {
+              const nextSize = size ?? pageSize;
+              const nextPage = nextSize !== pageSize ? 1 : page;
+              setListParams({ page: nextPage, pageSize: nextSize });
+            }}
+          />
+        }
+      >
         <Table
           columns={columns}
           dataSource={news}
@@ -318,19 +327,10 @@ const NewsManagement: React.FC = () => {
           bordered
           pagination={false}
           loading={isPending}
+          scroll={{ x: 'max-content' }}
+          locale={adminListTableLocale(Boolean(urlSearch.trim()))}
         />
-      </div>
-
-      <EnhancedPagination
-        currentPage={currentPage}
-        pageSize={pageSize}
-        total={total}
-        onChange={(page, size) => {
-          const nextSize = size ?? pageSize;
-          setCurrentPage(nextSize !== pageSize ? 1 : page);
-          setPageSize(nextSize);
-        }}
-      />
+      </AdminTableSection>
 
       <Modal
         title={isEditing ? '编辑新闻' : '新增新闻'}

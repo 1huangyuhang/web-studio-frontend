@@ -1,4 +1,5 @@
 @import (reference) '../../assets/styles/foundation/index.less';
+@import (reference) '../../assets/styles/utilities/marketing-section.less';
 
 .shop-page {
   padding: 0;
@@ -23,25 +24,52 @@
     padding: 48px 16px;
   }
 
-  // 页面标题
-  .page-title {
-    text-align: center;
-    margin-bottom: 40px;
-    padding: 20px 0;
-    border-bottom: 1px solid var(--app-card-border);
+  /* 标题区由 .marketing-page-shell + ly-mahogany-glass-pages 统一；此处仅保留小屏字号微调 */
 
-    h1 {
-      font-size: 32px;
-      font-weight: 600;
-      color: var(--app-heading);
-      margin: 0 0 8px 0;
-    }
+  /* 搜索 / 价格 / 分类合并为一块抬升面，子区用淡线分隔，减少「四块拼贴」感 */
+  .shop-filters-stack {
+    padding: clamp(16px, 2.5vw, 22px);
+    margin-bottom: clamp(20px, 3vw, 28px);
+    background: var(--ly-bg-raised);
+    border-radius: var(--app-saas-card-radius);
+    border: 1px solid var(--app-saas-card-border);
+    box-shadow: var(--app-saas-card-shadow);
 
-    p {
-      font-size: 16px;
-      color: var(--app-text-secondary);
-      margin: 0;
+    @media (min-width: 768px) {
+      position: sticky;
+      top: clamp(100px, 12vh, 132px);
+      z-index: 8;
+      background: color-mix(in srgb, var(--ly-bg-raised) 94%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
+  }
+
+  .shop-filters-stack .search-sort-section {
+    margin-bottom: 0;
+    padding-bottom: clamp(16px, 2.5vw, 20px);
+    border-bottom: 1px solid
+      color-mix(in srgb, var(--app-card-border) 55%, transparent);
+  }
+
+  .shop-filters-stack .price-range-section {
+    margin: clamp(16px, 2.5vw, 20px) 0 0;
+    padding: 0 0 clamp(16px, 2.5vw, 20px);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    border-bottom: 1px solid
+      color-mix(in srgb, var(--app-card-border) 55%, transparent);
+  }
+
+  .shop-filters-stack .category-filters {
+    margin: clamp(16px, 2.5vw, 20px) 0 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
   }
 
   // 搜索和排序
@@ -86,15 +114,9 @@
     }
   }
 
-  // 通用区块标题
+  // 通用区块标题（与 utilities/marketing-section 对齐）
   .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    font-weight: 500;
-    color: var(--app-heading);
-    font-size: 16px;
+    .marketing-section-header();
   }
 
   // 价格范围滑块
@@ -176,11 +198,11 @@
 
   // 产品网格
   .products-section {
-    padding: 20px;
-    background: var(--app-card-bg);
-    border-radius: var(--app-card-radius, 14px);
-    border: 1px solid var(--app-card-border);
-    box-shadow: var(--app-card-shadow);
+    padding: clamp(16px, 2.5vw, 22px);
+    background: var(--ly-bg-raised);
+    border-radius: var(--app-saas-card-radius);
+    border: 1px solid var(--app-saas-card-border);
+    box-shadow: var(--app-saas-card-shadow);
 
     .product-count {
       color: var(--app-text-tertiary);
@@ -194,11 +216,11 @@
 
   // 产品卡片
   .product-card.ant-card {
-    border-radius: var(--app-card-radius, 14px);
+    border-radius: var(--app-saas-card-radius);
     overflow: hidden;
-    border: 1px solid var(--app-card-border) !important;
+    border: 1px solid var(--app-saas-card-border) !important;
     background: var(--app-card-bg) !important;
-    box-shadow: var(--app-card-shadow);
+    box-shadow: var(--app-saas-card-shadow);
     .app-tx-lift();
     height: 100%;
     display: flex;
@@ -210,7 +232,7 @@
     }
 
     &:hover {
-      box-shadow: var(--app-card-shadow-hover);
+      box-shadow: var(--app-saas-card-shadow-hover);
       border-color: var(--app-card-border-hover) !important;
       transform: translateY(-2px);
     }
@@ -224,7 +246,8 @@
 
     .product-image-wrapper {
       position: relative;
-      height: 250px;
+      width: 100%;
+      aspect-ratio: 4 / 3;
       overflow: hidden;
       background: var(--app-card-image-bg);
 
@@ -235,8 +258,10 @@
         .app-tx-transform();
       }
 
-      &:hover .product-image {
-        transform: scale(1.05);
+      @media (prefers-reduced-motion: no-preference) {
+        &:hover .product-image {
+          transform: scale(1.04);
+        }
       }
 
       .favorite-btn {
@@ -274,8 +299,9 @@
         position: absolute;
         top: 12px;
         left: 12px;
-        background-color: @primary-color;
-        color: #fff;
+        background-color: var(--app-badge-on-image-bg);
+        color: var(--app-badge-on-image-fg);
+        border: 1px solid color-mix(in srgb, var(--app-badge-on-image-fg) 18%, transparent);
         padding: 4px 12px;
         font-size: 12px;
         border-radius: 12px;
@@ -340,11 +366,11 @@
 
     .page-title {
       h1 {
-        font-size: 24px;
+        font-size: var(--type-h3, 1.25rem) !important;
       }
 
       p {
-        font-size: 14px;
+        font-size: var(--type-small, 0.875rem);
       }
     }
 
@@ -375,10 +401,6 @@
     .product-card {
       margin-bottom: 16px;
 
-      .product-image-wrapper {
-        height: 200px;
-      }
-
       .product-info {
         padding: 12px;
 
@@ -396,10 +418,8 @@
 
   @media (max-width: 480px) {
     .page-title {
-      margin-bottom: 20px;
-
       h1 {
-        font-size: 20px;
+        font-size: var(--type-h4, 1.125rem) !important;
       }
     }
 
@@ -421,10 +441,43 @@
       }
     }
 
-    .product-card {
-      .product-image-wrapper {
-        height: 180px;
+  }
+
+  .shop-product-detail-body {
+    .shop-product-detail-thumb {
+      border-radius: var(--app-saas-card-radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+      aspect-ratio: 16 / 10;
+      background: var(--app-card-image-bg);
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
       }
+    }
+
+    .shop-product-detail-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 0 0 8px;
+      color: var(--app-text-secondary);
+    }
+
+    .shop-product-detail-price {
+      font-size: var(--type-h4);
+      font-weight: 700;
+      color: var(--app-accent-cinnabar);
+      margin: 0 0 12px;
+    }
+
+    .shop-product-detail-hint {
+      margin: 0;
+      font-size: var(--type-small);
     }
   }
 }

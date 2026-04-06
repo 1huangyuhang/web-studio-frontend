@@ -21,8 +21,14 @@ export type NewsListParams = {
 const actRoot = ['activities'] as const;
 const prodRoot = ['products'] as const;
 const newsRoot = ['news'] as const;
+const siteAssetsRoot = ['site-assets'] as const;
+const statsRoot = ['stats'] as const;
 
 export const queryKeys = {
+  stats: {
+    all: statsRoot,
+    summary: () => [...statsRoot, 'summary'] as const,
+  },
   activities: {
     all: actRoot,
     lists: () => [...actRoot, 'list'] as const,
@@ -37,5 +43,12 @@ export const queryKeys = {
     all: newsRoot,
     lists: () => [...newsRoot, 'list'] as const,
     list: (p: NewsListParams) => [...newsRoot, 'list', p] as const,
+  },
+  siteAssets: {
+    all: siteAssetsRoot,
+    lists: () => [...siteAssetsRoot, 'list'] as const,
+    /** 管理端列表固定 omitImage=1，避免 BYTEA→Base64 撑爆 JSON */
+    list: (pageTab: string) =>
+      [...siteAssetsRoot, 'list', pageTab, { omitImage: true }] as const,
   },
 };

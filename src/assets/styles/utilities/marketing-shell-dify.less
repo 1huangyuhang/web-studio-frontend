@@ -5,6 +5,38 @@
 .top-layout main .marketing-page-shell {
   display: flex;
   flex-direction: column;
-  gap: var(--app-marketing-stack-gap);
+  gap: min(var(--app-marketing-stack-gap), clamp(24px, 4.2vw, 44px));
   padding-bottom: var(--app-marketing-pad-bottom);
+}
+
+/* hero 与正文首块之间：轻晕衔接（无实线），尊重减弱动效 */
+.top-layout main .marketing-page-shell > .marketing-section-block:first-of-type {
+  position: relative;
+  padding-top: calc(var(--app-section-y-sm) * 0.85);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .top-layout main .marketing-page-shell > .marketing-section-block:first-of-type::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(72%, 560px);
+    height: 44px;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 100% 100% at 50% 0%,
+      color-mix(in srgb, var(--app-accent-cinnabar) 14%, transparent) 0%,
+      transparent 70%
+    );
+    opacity: 0.5;
+    filter: blur(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .top-layout main .marketing-page-shell > .marketing-section-block:first-of-type::before {
+    display: none;
+  }
 }

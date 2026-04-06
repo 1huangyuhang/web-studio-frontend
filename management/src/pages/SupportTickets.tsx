@@ -1,13 +1,31 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Table, Button, Tag, message, Modal, Select, Typography } from 'antd';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Table,
+  Button,
+  Tag,
+  message,
+  Modal,
+  Select,
+  Typography,
+  Space,
+} from 'antd';
 import axiosInstance, { apiCache } from '../services/axiosInstance';
 import wsService from '../services/websocket';
 import EnhancedPagination from '../components/EnhancedPagination';
+import AdminTableSection from '../components/AdminTableSection';
+import {
+  AdminTableRowActions,
+  AdminTableActionAux,
+  AdminTableActionDelete,
+} from '../components/AdminTableRowActions';
 import AdminListPageShell from '../components/AdminListPageShell';
 import ManagementWriteGate from '../components/ManagementWriteGate';
 import { canWriteInManagementUi } from '@/utils/managementWriteAccess';
 import { parsePaginatedList } from '../types/api';
 import { emitMgmtStatsSummaryRefresh } from '@/utils/managementStatsRefresh';
+import AdminListSearchBar from '../components/AdminListSearchBar';
+import { adminListTableLocale } from '../utils/adminTableLocale';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 
 const { Paragraph } = Typography;
 
@@ -79,6 +97,15 @@ const SupportTickets: React.FC = () => {
   const [listLoading, setListLoading] = useState(false);
   const [detail, setDetail] = useState<Detail | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebouncedValue(searchInput, 400);
+  const prevDebounced = useRef(debouncedSearch);
+  useEffect(() => {
+    if (prevDebounced.current !== debouncedSearch) {
+      prevDebounced.current = debouncedSearch;
+      setPage(1);
+    }
+  }, [debouncedSearch]);
 
   const mapRow = (item: Record<string, unknown>): ListRow => ({
     id: Number(item.id),
@@ -98,11 +125,13 @@ const SupportTickets: React.FC = () => {
   const load = useCallback(async () => {
     setListLoading(true);
     try {
+      const st = debouncedSearch.trim();
       const res = await axiosInstance.get('/support-tickets', {
         params: {
           page,
           pageSize,
           ...(statusFilter ? { status: statusFilter } : {}),
+          ...(st ? { search: st } : {}),
         },
       });
       const { list, total: t } =
@@ -115,7 +144,7 @@ const SupportTickets: React.FC = () => {
     } finally {
       setListLoading(false);
     }
-  }, [page, pageSize, statusFilter]);
+  }, [page, pageSize, statusFilter, debouncedSearch]);
 
   useEffect(() => {
     void load();
@@ -217,60 +246,71 @@ const SupportTickets: React.FC = () => {
       key: 'act',
       width: 160,
       render: (_: unknown, r: ListRow) => (
-        <>
-          <Button
-            type="link"
-            size="small"
-            onClick={() => void openDetail(r.id)}
-          >
+        <AdminTableRowActions>
+          <AdminTableActionAux onClick={() => void openDetail(r.id)}>
             详情
-          </Button>
+          </AdminTableActionAux>
           {r.hasAttachment && r.attachmentName ? (
-            <Button
-              type="link"
-              size="small"
+            <AdminTableActionAux
               onClick={() => void downloadAttachment(r.id, r.attachmentName!)}
             >
               下载
-            </Button>
+            </AdminTableActionAux>
           ) : null}
           <ManagementWriteGate>
-            <Button
-              type="link"
-              danger
-              size="small"
-              onClick={() => remove(r.id)}
-            >
-              删除
-            </Button>
+            <AdminTableActionDelete onClick={() => remove(r.id)} />
           </ManagementWriteGate>
-        </>
+        </AdminTableRowActions>
       ),
     },
   ];
 
+  const hasFilters = Boolean(debouncedSearch.trim() || statusFilter);
+
   return (
     <AdminListPageShell
       title="帮助工单"
-      description="前台帮助中心提交的工单，可查看详情、更新状态或删除。"
+      description="前台帮助中心提交的工单，可查看详情、更新状态或删除；支持姓名、邮箱、主题、问题描述等关键词检索。"
       filter={
-        <Select
-          allowClear
-          placeholder="按状态筛选"
-          style={{ width: 200, maxWidth: '100%' }}
-          value={statusFilter}
-          onChange={(v) => {
-            setStatusFilter(v);
-            setPage(1);
-          }}
-          options={TICKET_STATUSES.map((value) => ({
-            value,
-            label: STATUS_LABEL[value],
-          }))}
-        />
+        <div className="admin-page__filter">
+          <Space wrap align="center" size="middle">
+            <AdminListSearchBar
+              placeholder="搜索姓名、邮箱、主题、问题描述…"
+              value={searchInput}
+              onChange={setSearchInput}
+              totalCount={total}
+            />
+            <Select
+              allowClear
+              placeholder="按状态筛选"
+              style={{ width: 200, maxWidth: '100%' }}
+              value={statusFilter}
+              onChange={(v) => {
+                setStatusFilter(v);
+                setPage(1);
+              }}
+              options={TICKET_STATUSES.map((value) => ({
+                value,
+                label: STATUS_LABEL[value],
+              }))}
+            />
+          </Space>
+        </div>
       }
     >
-      <div className="admin-table-card">
+      <AdminTableSection
+        pagination={
+          <EnhancedPagination
+            currentPage={page}
+            pageSize={pageSize}
+            total={total}
+            onChange={(p, ps) => {
+              setPage(p);
+              setPageSize(ps);
+            }}
+          />
+        }
+      >
         <Table
           rowKey="id"
           columns={columns}
@@ -278,19 +318,9 @@ const SupportTickets: React.FC = () => {
           pagination={false}
           loading={listLoading}
           scroll={{ x: 960 }}
+          locale={adminListTableLocale(hasFilters)}
         />
-      </div>
-      <div className="admin-pagination-wrap">
-        <EnhancedPagination
-          currentPage={page}
-          pageSize={pageSize}
-          total={total}
-          onChange={(p, ps) => {
-            setPage(p);
-            setPageSize(ps);
-          }}
-        />
-      </div>
+      </AdminTableSection>
 
       <Modal
         title={`工单 #${detail?.id ?? ''}`}

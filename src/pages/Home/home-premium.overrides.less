@@ -17,6 +17,8 @@
 .home-page.home-premium {
   position: relative;
   isolation: isolate;
+  /* 与 HomeScrollyVideo 负边距出血一致，供过渡桥对齐主视觉底边 */
+  --home-hero-breakout-x: var(--site-main-pad-x, clamp(16px, 4vw, 48px));
 
   /* 固定视口环境光：弱化「一块一块」拼贴感，偏 DeFi 展台气质 */
   &::after {
@@ -36,6 +38,15 @@
   > *:not(.home-flow-bridge) {
     position: relative;
     z-index: 1;
+  }
+
+  /* Hero 底部叠化桥：与主视频同宽出血，避免resize 后中间一条「窄白带」 */
+  .home-flow-bridge--from-hero {
+    width: calc(100% + 2 * var(--home-hero-breakout-x));
+    max-width: none;
+    margin-left: calc(-1 * var(--home-hero-breakout-x));
+    margin-right: calc(-1 * var(--home-hero-breakout-x));
+    box-sizing: border-box;
   }
 
   /* 数据 / 价值 / 产品 / 匠心 / CTA：同一套毛玻璃群聚底板 + 圆角，削弱「一块一块」割裂感 */
@@ -544,14 +555,15 @@ html[data-theme='dark'] .home-page.home-premium .heritage-section .heritage-item
   height: clamp(48px, 7vw, 88px);
   margin: clamp(-36px, -5vw, -24px) 0 clamp(-44px, -6vw, -32px);
   pointer-events: none;
-  overflow: visible;
+  /* 负百分比定位的伪元素会撑宽整页滚动区域；横向裁剪，纵向仍允许与上下区块叠化 */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .home-flow-bridge::before {
   content: '';
   position: absolute;
-  left: -8%;
-  right: -8%;
+  inset-inline: 0;
   top: 50%;
   height: 160%;
   transform: translateY(-50%);
@@ -563,6 +575,10 @@ html[data-theme='dark'] .home-page.home-premium .heritage-section .heritage-item
     rgba(252, 248, 245, 0) 100%
   );
   filter: blur(22px);
+  /* 略补回原先左右外扩的柔和感 */
+  box-shadow:
+    0 0 48px 24px rgba(196, 165, 116, 0.04),
+    0 0 72px 36px rgba(128, 50, 46, 0.03);
 }
 
 .home-flow-bridge::after {
@@ -597,42 +613,50 @@ html[data-theme='dark'] .home-page.home-premium .heritage-section .heritage-item
   filter: blur(28px);
 }
 
-/* Hero 视频底部 → 品牌叙事：较薄叠化 + 缓慢形变/明暗动画，减少静态「雾带」感 */
+/* Hero 视频底部 → 正文：竖向叠化由主视觉 ::after 承担，此处只做全宽柔光与细线（水平与视频对齐靠 .home-premium 内出血） */
 .home-flow-bridge--from-hero {
-  height: clamp(52px, 8vw, 96px);
-  margin: clamp(-44px, -6vw, -30px) 0 clamp(-36px, -5vw, -26px);
+  height: clamp(48px, min(7.5vw, 10dvh), 92px);
+  margin-top: clamp(-40px, -5.5vw, -26px);
+  margin-bottom: clamp(-32px, -4.5vw, -22px);
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .home-flow-bridge--from-hero::before {
-  left: -12%;
-  right: -12%;
-  height: 200%;
+  inset-inline: 0;
+  height: 220%;
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 0%,
-    color-mix(in srgb, var(--ly-bg-canvas) 22%, transparent) 24%,
-    color-mix(in srgb, var(--ly-bg-canvas) 52%, rgba(0, 0, 0, 0.04)) 52%,
-    color-mix(in srgb, var(--ly-bg-canvas) 72%, transparent) 100%
+    color-mix(in srgb, var(--ly-bg-canvas) 12%, transparent) 28%,
+    color-mix(in srgb, var(--ly-bg-canvas) 38%, rgba(0, 0, 0, 0.03)) 52%,
+    color-mix(in srgb, var(--ly-bg-canvas) 58%, transparent) 78%,
+    color-mix(in srgb, var(--ly-bg-canvas) 18%, transparent) 100%
   );
-  filter: blur(28px);
-  opacity: 0.9;
-  animation: homeBridgeVeilFlow 20s ease-in-out infinite;
+  filter: blur(32px);
+  opacity: 0.88;
+  animation: homeBridgeVeilFlow 22s ease-in-out infinite;
+  box-shadow:
+    0 0 48px 20px color-mix(in srgb, var(--ly-bg-canvas) 32%, transparent),
+    0 0 80px 36px rgba(128, 50, 46, 0.035);
 }
 
 .home-flow-bridge--from-hero::after {
-  opacity: 0.5;
+  left: 0;
+  right: 0;
+  opacity: 0.42;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(196, 165, 116, 0.32) 48%,
-    rgba(128, 50, 46, 0.2) 50%,
-    rgba(196, 165, 116, 0.32) 52%,
+    rgba(196, 165, 116, 0.22) 42%,
+    rgba(128, 50, 46, 0.16) 50%,
+    rgba(196, 165, 116, 0.22) 58%,
     transparent 100%
   );
   box-shadow:
-    0 0 28px color-mix(in srgb, var(--ly-bg-canvas) 40%, rgba(128, 50, 46, 0.12)),
-    0 0 64px rgba(196, 165, 116, 0.06);
-  animation: homeBridgeAccentPulse 12s ease-in-out infinite;
+    0 0 20px color-mix(in srgb, var(--ly-bg-canvas) 35%, rgba(128, 50, 46, 0.08)),
+    0 0 48px rgba(196, 165, 116, 0.05);
+  animation: homeBridgeAccentPulse 14s ease-in-out infinite;
 }
 
 @keyframes homeBridgeVeilFlow {
@@ -939,15 +963,16 @@ html[data-theme='light'] {
     background: linear-gradient(
       180deg,
       color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 0%,
-      color-mix(in srgb, var(--ly-bg-canvas) 28%, transparent) 26%,
-      color-mix(in srgb, var(--ly-bg-canvas) 58%, rgba(15, 23, 42, 0.02)) 52%,
-      color-mix(in srgb, var(--ly-bg-canvas) 78%, transparent) 100%
+      color-mix(in srgb, var(--ly-bg-canvas) 14%, transparent) 28%,
+      color-mix(in srgb, var(--ly-bg-canvas) 42%, rgba(15, 23, 42, 0.02)) 52%,
+      color-mix(in srgb, var(--ly-bg-canvas) 62%, transparent) 78%,
+      color-mix(in srgb, var(--ly-bg-canvas) 20%, transparent) 100%
     );
-    filter: blur(26px);
-    opacity: 0.88;
+    filter: blur(32px);
+    opacity: 0.9;
   }
 
   .home-flow-bridge--from-hero::after {
-    opacity: 0.44;
+    opacity: 0.36;
   }
 }

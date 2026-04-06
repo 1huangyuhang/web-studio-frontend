@@ -1,12 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Table, Button, Tag, message, Modal } from 'antd';
 import axiosInstance, { apiCache } from '../services/axiosInstance';
 import wsService from '../services/websocket';
 import EnhancedPagination from '../components/EnhancedPagination';
+import AdminTableSection from '../components/AdminTableSection';
+import {
+  AdminTableRowActions,
+  AdminTableActionAux,
+  AdminTableActionDelete,
+} from '../components/AdminTableRowActions';
 import AdminListPageShell from '../components/AdminListPageShell';
 import ManagementWriteGate from '../components/ManagementWriteGate';
+import AdminListSearchBar from '../components/AdminListSearchBar';
+import { adminListTableLocale } from '../utils/adminTableLocale';
 import { parsePaginatedList } from '../types/api';
 import { emitMgmtStatsSummaryRefresh } from '@/utils/managementStatsRefresh';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 
 interface Row {
   id: number;
@@ -27,6 +36,15 @@ const ContactMessages: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [listLoading, setListLoading] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebouncedValue(searchInput, 400);
+  const prevDebounced = useRef(debouncedSearch);
+  useEffect(() => {
+    if (prevDebounced.current !== debouncedSearch) {
+      prevDebounced.current = debouncedSearch;
+      setPage(1);
+    }
+  }, [debouncedSearch]);
 
   const mapRow = (item: Record<string, unknown>): Row => ({
     id: Number(item.id),
@@ -46,8 +64,14 @@ const ContactMessages: React.FC = () => {
   const load = useCallback(async () => {
     setListLoading(true);
     try {
+      const st = debouncedSearch.trim();
       const res = await axiosInstance.get('/contact-messages', {
-        params: { page, pageSize, unreadOnly: unreadOnly ? 'true' : undefined },
+        params: {
+          page,
+          pageSize,
+          unreadOnly: unreadOnly ? 'true' : undefined,
+          ...(st ? { search: st } : {}),
+        },
       });
       const { list, total: t } =
         parsePaginatedList<Record<string, unknown>>(res);
@@ -59,7 +83,7 @@ const ContactMessages: React.FC = () => {
     } finally {
       setListLoading(false);
     }
-  }, [page, pageSize, unreadOnly]);
+  }, [page, pageSize, unreadOnly, debouncedSearch]);
 
   useEffect(() => {
     void load();
@@ -137,34 +161,25 @@ const ContactMessages: React.FC = () => {
       width: 160,
       render: (_: unknown, r: Row) => (
         <ManagementWriteGate>
-          <>
+          <AdminTableRowActions>
             {!r.read ? (
-              <Button
-                type="link"
-                size="small"
-                onClick={() => void markRead(r.id)}
-              >
+              <AdminTableActionAux onClick={() => void markRead(r.id)}>
                 标为已读
-              </Button>
+              </AdminTableActionAux>
             ) : null}
-            <Button
-              type="link"
-              danger
-              size="small"
-              onClick={() => remove(r.id)}
-            >
-              删除
-            </Button>
-          </>
+            <AdminTableActionDelete onClick={() => remove(r.id)} />
+          </AdminTableRowActions>
         </ManagementWriteGate>
       ),
     },
   ];
 
+  const hasFilters = Boolean(debouncedSearch.trim() || unreadOnly);
+
   return (
     <AdminListPageShell
       title="联系留言"
-      description="前台「联系我们」表单提交的留言，可标已读或删除。"
+      description="前台「联系我们」表单提交的留言，可标已读或删除；支持姓名、邮箱、主题、正文等关键词检索。"
       extra={
         <Button
           type={unreadOnly ? 'primary' : 'default'}
@@ -173,8 +188,30 @@ const ContactMessages: React.FC = () => {
           {unreadOnly ? '查看全部' : '仅未读'}
         </Button>
       }
+      filter={
+        <div className="admin-page__filter">
+          <AdminListSearchBar
+            placeholder="搜索姓名、电话、邮箱、主题、内容…"
+            value={searchInput}
+            onChange={setSearchInput}
+            totalCount={total}
+          />
+        </div>
+      }
     >
-      <div className="admin-table-card">
+      <AdminTableSection
+        pagination={
+          <EnhancedPagination
+            currentPage={page}
+            pageSize={pageSize}
+            total={total}
+            onChange={(p, ps) => {
+              setPage(p);
+              setPageSize(ps);
+            }}
+          />
+        }
+      >
         <Table
           rowKey="id"
           columns={columns}
@@ -182,19 +219,9 @@ const ContactMessages: React.FC = () => {
           pagination={false}
           loading={listLoading}
           scroll={{ x: 'max-content' }}
+          locale={adminListTableLocale(hasFilters)}
         />
-      </div>
-      <div className="admin-pagination-wrap">
-        <EnhancedPagination
-          currentPage={page}
-          pageSize={pageSize}
-          total={total}
-          onChange={(p, ps) => {
-            setPage(p);
-            setPageSize(ps);
-          }}
-        />
-      </div>
+      </AdminTableSection>
     </AdminListPageShell>
   );
 };

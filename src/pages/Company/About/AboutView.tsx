@@ -1,4 +1,12 @@
-import { Card, Typography, Row, Col, Image, Divider } from 'antd';
+import { Card, Typography, Row, Col, Image } from 'antd';
+import {
+  GoldOutlined,
+  ToolOutlined,
+  SketchOutlined,
+  EnvironmentOutlined,
+  CustomerServiceOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
 import { redwoodImages } from '@/assets/images/redwood';
 import {
   processImageUrl,
@@ -10,7 +18,7 @@ const { Title, Paragraph } = Typography;
 
 export default function AboutView() {
   return (
-    <>
+    <div className="about-section-stack section-stack section-stack--loose">
       <div className="about-section">
         <Row gutter={[32, 32]}>
           <Col xs={24} md={12}>
@@ -44,7 +52,11 @@ export default function AboutView() {
         </Row>
       </div>
 
-      <Divider className="section-divider" />
+      <div
+        className="about-section-soft-break"
+        role="separator"
+        aria-hidden="true"
+      />
 
       <div className="advantages-section">
         <Title level={2} className="section-title">
@@ -54,7 +66,7 @@ export default function AboutView() {
           <Col xs={24} sm={12} md={8}>
             <Card hoverable className="advantage-card">
               <div className="advantage-icon-wrapper">
-                <div className="advantage-icon">1</div>
+                <GoldOutlined className="advantage-icon" aria-hidden />
               </div>
               <Title level={4} className="advantage-title">
                 优质材料
@@ -67,7 +79,7 @@ export default function AboutView() {
           <Col xs={24} sm={12} md={8}>
             <Card hoverable className="advantage-card">
               <div className="advantage-icon-wrapper">
-                <div className="advantage-icon">2</div>
+                <ToolOutlined className="advantage-icon" aria-hidden />
               </div>
               <Title level={4} className="advantage-title">
                 精湛工艺
@@ -80,7 +92,7 @@ export default function AboutView() {
           <Col xs={24} sm={12} md={8}>
             <Card hoverable className="advantage-card">
               <div className="advantage-icon-wrapper">
-                <div className="advantage-icon">3</div>
+                <SketchOutlined className="advantage-icon" aria-hidden />
               </div>
               <Title level={4} className="advantage-title">
                 专业设计
@@ -93,7 +105,7 @@ export default function AboutView() {
           <Col xs={24} sm={12} md={8}>
             <Card hoverable className="advantage-card">
               <div className="advantage-icon-wrapper">
-                <div className="advantage-icon">4</div>
+                <EnvironmentOutlined className="advantage-icon" aria-hidden />
               </div>
               <Title level={4} className="advantage-title">
                 环保理念
@@ -106,7 +118,10 @@ export default function AboutView() {
           <Col xs={24} sm={12} md={8}>
             <Card hoverable className="advantage-card">
               <div className="advantage-icon-wrapper">
-                <div className="advantage-icon">5</div>
+                <CustomerServiceOutlined
+                  className="advantage-icon"
+                  aria-hidden
+                />
               </div>
               <Title level={4} className="advantage-title">
                 完善服务
@@ -119,7 +134,10 @@ export default function AboutView() {
           <Col xs={24} sm={12} md={8}>
             <Card hoverable className="advantage-card">
               <div className="advantage-icon-wrapper">
-                <div className="advantage-icon">6</div>
+                <SafetyCertificateOutlined
+                  className="advantage-icon"
+                  aria-hidden
+                />
               </div>
               <Title level={4} className="advantage-title">
                 品牌信誉
@@ -132,7 +150,11 @@ export default function AboutView() {
         </Row>
       </div>
 
-      <Divider className="section-divider" />
+      <div
+        className="about-section-soft-break"
+        role="separator"
+        aria-hidden="true"
+      />
 
       <div className="history-section">
         <Title level={2} className="section-title">
@@ -218,6 +240,6 @@ export default function AboutView() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

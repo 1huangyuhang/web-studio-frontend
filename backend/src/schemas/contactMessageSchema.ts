@@ -24,4 +24,11 @@ export const contactMessageQuerySchema = z.object({
     .string()
     .optional()
     .transform((v) => v === 'true'),
+  search: z
+    .string()
+    .optional()
+    .transform((v) => {
+      const t = (v ?? '').trim();
+      return t.length > 0 ? t : undefined;
+    }),
 });

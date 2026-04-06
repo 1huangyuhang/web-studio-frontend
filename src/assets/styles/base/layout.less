@@ -2,6 +2,12 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  /* 防止负 margin / 绝对定位装饰撑出整页横向滚动；合法横向滚动请放在局部 overflow-x: auto */
+  overflow-x: clip;
+}
+
 #root {
   width: 100%;
   min-height: 100vh;

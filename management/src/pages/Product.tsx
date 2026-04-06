@@ -13,19 +13,22 @@ import {
   Checkbox,
   Space,
 } from 'antd';
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
+import { PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import { useSearchParams } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 import axiosInstance from '@/services/axiosInstance';
 import wsService from '@/services/websocket';
 import EnhancedPagination from '@/components/EnhancedPagination';
+import AdminTableSection from '@/components/AdminTableSection';
+import {
+  AdminTableRowActions,
+  AdminTableActionEdit,
+  AdminTableActionDelete,
+} from '@/components/AdminTableRowActions';
 import AdminListPageShell from '@/components/AdminListPageShell';
+import AdminListSearchBar from '@/components/AdminListSearchBar';
 import ManagementWriteGate from '@/components/ManagementWriteGate';
+import { adminListTableLocale } from '@/utils/adminTableLocale';
 import {
   loadColumnVisibility,
   saveColumnVisibility,
@@ -433,31 +436,10 @@ const ProductManagement: React.FC = () => {
         fixed: 'right',
         render: (_: unknown, record: ProductRow) =>
           writeEnabled ? (
-            <div
-              className="action-buttons"
-              style={{ display: 'flex', gap: 8, justifyContent: 'center' }}
-            >
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                size="small"
-                className="edit-button"
-                onClick={() => showModal(record)}
-                style={{ flex: 1, minWidth: 60 }}
-              >
-                编辑
-              </Button>
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                size="small"
-                className="delete-button"
-                onClick={() => handleDelete(record.id)}
-                style={{ flex: 1, minWidth: 60 }}
-              >
-                删除
-              </Button>
-            </div>
+            <AdminTableRowActions center>
+              <AdminTableActionEdit onClick={() => showModal(record)} />
+              <AdminTableActionDelete onClick={() => handleDelete(record.id)} />
+            </AdminTableRowActions>
           ) : (
             '—'
           ),
@@ -475,16 +457,14 @@ const ProductManagement: React.FC = () => {
   );
 
   const searchFilter = (
-    <Space wrap className="admin-page__filter-row">
-      <Input.Search
-        allowClear
+    <div className="admin-page__filter">
+      <AdminListSearchBar
         placeholder="按产品名称或分类名称搜索"
         value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-        onSearch={(v) => setSearchInput(v)}
-        style={{ maxWidth: 360 }}
+        onChange={setSearchInput}
+        totalCount={total}
       />
-    </Space>
+    </div>
   );
 
   return (
@@ -507,7 +487,20 @@ const ProductManagement: React.FC = () => {
       }
       filter={searchFilter}
     >
-      <div className="table-container">
+      <AdminTableSection
+        pagination={
+          <EnhancedPagination
+            currentPage={currentPage}
+            pageSize={pageSize}
+            total={total}
+            onChange={(page, size) => {
+              const nextSize = size ?? pageSize;
+              const nextPage = nextSize !== pageSize ? 1 : page;
+              setListParams({ page: nextPage, pageSize: nextSize });
+            }}
+          />
+        }
+      >
         <Table
           columns={visibleColumns}
           dataSource={products}
@@ -515,19 +508,10 @@ const ProductManagement: React.FC = () => {
           bordered
           pagination={false}
           loading={isPending}
+          scroll={{ x: 'max-content' }}
+          locale={adminListTableLocale(Boolean(urlSearch.trim()))}
         />
-      </div>
-
-      <EnhancedPagination
-        currentPage={currentPage}
-        pageSize={pageSize}
-        total={total}
-        onChange={(page, size) => {
-          const nextSize = size ?? pageSize;
-          const nextPage = nextSize !== pageSize ? 1 : page;
-          setListParams({ page: nextPage, pageSize: nextSize });
-        }}
-      />
+      </AdminTableSection>
 
       <Modal
         title={isEditing ? '编辑产品' : '新增产品'}

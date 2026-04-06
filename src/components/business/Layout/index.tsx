@@ -20,9 +20,16 @@ import {
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
+import {
+  Suspense,
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import { logout } from '@/redux/slices/userSlice';
-import { logo } from '@/assets/images/common';
+import BrandLogo from '@/components/ui/BrandLogo/BrandLogo';
 import ProgressBar from '@/components/ui/ProgressBar';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import SiteFooter from '@/components/business/SiteFooter/SiteFooter';
@@ -33,21 +40,43 @@ const { Header: AntHeader } = AntLayout;
 /** 纵向位移超过该值才切换顶栏/导航显隐，抑制触控板微抖动 */
 const SCROLL_DIR_THRESHOLD_PX = 10;
 
+/** 首页顶栏「叠视频」混合：scrollY ≤ START 为 1，≥ END 为 0，之间线性 */
+const CHROME_BLEND_SCROLL_START = 72;
+const CHROME_BLEND_SCROLL_END = 260;
+/** rAF 每帧向目标靠拢比例，越小越柔 */
+const CHROME_BLEND_LERP = 0.09;
+
+function computeChromeTargetBlend(scrollY: number): number {
+  if (scrollY <= CHROME_BLEND_SCROLL_START) return 1;
+  if (scrollY >= CHROME_BLEND_SCROLL_END) return 0;
+  return (
+    (CHROME_BLEND_SCROLL_END - scrollY) /
+    (CHROME_BLEND_SCROLL_END - CHROME_BLEND_SCROLL_START)
+  );
+}
+
 const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const [isNavVisible, setIsNavVisible] = useState(true);
-  const [topBarHeight, setTopBarHeight] = useState(56); // 顶部栏高度，移动端44px
+  const [topBarHeight, setTopBarHeight] = useState(52); // 顶部栏高度，移动端 44px
   const [navHeight, setNavHeight] = useState(64); // 导航栏高度，移动端48px
   const lastScrollYRef = useRef(0); // 使用ref替代state，避免不必要的重新渲染
   /** 合并到单帧，避免一次滚动排队多个 RAF 导致顺序错乱、导航条抖动 */
   const navRafRef = useRef<number | null>(null);
+  const topLayoutRef = useRef<HTMLDivElement | null>(null);
+  const pathnameRef = useRef(location.pathname);
+  pathnameRef.current = location.pathname;
+  const chromeTargetRef = useRef(0);
+  const chromeSmoothedRef = useRef(0);
+  const chromeBlendLoopRef = useRef<number | null>(null);
+  const reduceMotionRef = useRef(false);
   // 监听窗口大小变化，动态调整顶部栏和导航栏高度
   useEffect(() => {
     const updateHeights = () => {
       const isMobile = window.innerWidth <= 768;
-      setTopBarHeight(isMobile ? 44 : 56);
+      setTopBarHeight(isMobile ? 44 : 52);
       setNavHeight(isMobile ? 48 : 64);
     };
 
@@ -60,6 +89,87 @@ const Layout = () => {
     // 清理函数
     return () => {
       window.removeEventListener('resize', updateHeights);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') {
+      reduceMotionRef.current = false;
+      return;
+    }
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => {
+      reduceMotionRef.current = mq.matches;
+    };
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
+
+  const applyChromeBlendToDom = useCallback((value: number) => {
+    topLayoutRef.current?.style.setProperty(
+      '--chrome-media-blend',
+      value.toFixed(4)
+    );
+  }, []);
+
+  const tickChromeBlend = useCallback(() => {
+    chromeBlendLoopRef.current = null;
+    if (pathnameRef.current !== '/') {
+      chromeSmoothedRef.current = 0;
+      chromeTargetRef.current = 0;
+      applyChromeBlendToDom(0);
+      return;
+    }
+
+    const target = chromeTargetRef.current;
+    let s = chromeSmoothedRef.current;
+    if (reduceMotionRef.current) {
+      s = target;
+    } else {
+      s += (target - s) * CHROME_BLEND_LERP;
+    }
+    chromeSmoothedRef.current = s;
+    applyChromeBlendToDom(s);
+
+    const converged = reduceMotionRef.current || Math.abs(target - s) < 0.004;
+    if (!converged) {
+      chromeBlendLoopRef.current = requestAnimationFrame(tickChromeBlend);
+    }
+  }, [applyChromeBlendToDom]);
+
+  const ensureChromeBlendLoop = useCallback(() => {
+    if (chromeBlendLoopRef.current != null) return;
+    chromeBlendLoopRef.current = requestAnimationFrame(tickChromeBlend);
+  }, [tickChromeBlend]);
+
+  useLayoutEffect(() => {
+    if (location.pathname !== '/') {
+      if (chromeBlendLoopRef.current != null) {
+        cancelAnimationFrame(chromeBlendLoopRef.current);
+        chromeBlendLoopRef.current = null;
+      }
+      chromeSmoothedRef.current = 0;
+      chromeTargetRef.current = 0;
+      applyChromeBlendToDom(0);
+      return;
+    }
+
+    const t = computeChromeTargetBlend(window.scrollY);
+    chromeTargetRef.current = t;
+    chromeSmoothedRef.current = t;
+    const sync = () => applyChromeBlendToDom(t);
+    sync();
+    if (!topLayoutRef.current) {
+      requestAnimationFrame(sync);
+    }
+  }, [location.pathname, applyChromeBlendToDom]);
+
+  useEffect(() => {
+    return () => {
+      if (chromeBlendLoopRef.current != null) {
+        cancelAnimationFrame(chromeBlendLoopRef.current);
+      }
     };
   }, []);
 
@@ -94,8 +204,12 @@ const Layout = () => {
     navRafRef.current = requestAnimationFrame(() => {
       navRafRef.current = null;
       updateNavVisibility();
+      if (location.pathname === '/') {
+        chromeTargetRef.current = computeChromeTargetBlend(window.scrollY);
+        ensureChromeBlendLoop();
+      }
     });
-  }, [updateNavVisibility]);
+  }, [updateNavVisibility, location.pathname, ensureChromeBlendLoop]);
 
   useEffect(() => {
     let lastCall = 0;
@@ -237,7 +351,7 @@ const Layout = () => {
   );
 
   return (
-    <AntLayout className="top-layout">
+    <AntLayout ref={topLayoutRef} className="top-layout">
       {/* 页面游览进度条，根据菜单栏显示状态自动控制显示/隐藏 */}
       <ProgressBar isMenuVisible={isNavVisible} />
 
@@ -256,57 +370,66 @@ const Layout = () => {
           zIndex: 1000,
         }}
       >
-        <div className="top-bar-left">
-          <SearchOutlined className="top-bar-icon" />
-          <span className="phone-number">+86 13910417182</span>
-        </div>
-        <div className="top-bar-center">
-          <img src={logo} alt="Logo" className="logo" />
-        </div>
-        <div className="top-bar-right">
-          <ThemeToggle />
-          <Popover
-            content={cartPanel}
-            title="购物车"
-            trigger={['click']}
-            placement="bottomRight"
-            overlayClassName="top-bar-cart-popover"
-          >
+        <div className="site-chrome-inner">
+          <div className="top-bar-left">
+            <SearchOutlined className="top-bar-icon" />
+            <span className="phone-number">+86 13910417182</span>
+          </div>
+          <div className="top-bar-center">
             <button
               type="button"
-              className="top-bar-icon-btn cart-trigger"
-              aria-label="打开购物车预览"
-              aria-haspopup="dialog"
+              className="logo-chip"
+              onClick={() => navigate('/')}
+              aria-label="林之源 · 返回首页"
             >
-              <Badge count={cartCount} size="small" offset={[4, 0]}>
-                <span className="top-bar-badge-anchor">
-                  <ShoppingCartOutlined aria-hidden />
-                </span>
-              </Badge>
+              <BrandLogo decorative className="logo" />
             </button>
-          </Popover>
-          <Dropdown
-            menu={{ items: userMenuItems }}
-            trigger={['click']}
-            placement="bottomRight"
-            classNames={{ root: 'top-bar-user-dropdown' }}
-          >
-            <button
-              type="button"
-              className="top-bar-icon-btn user-menu-trigger"
-              aria-label="用户菜单"
-              aria-haspopup="menu"
+          </div>
+          <div className="top-bar-right">
+            <ThemeToggle />
+            <Popover
+              content={cartPanel}
+              title="购物车"
+              trigger={['click']}
+              placement="bottomRight"
+              overlayClassName="top-bar-cart-popover"
             >
-              <UserOutlined aria-hidden />
-            </button>
-          </Dropdown>
-          <Button
-            type="primary"
-            className="contact-button"
-            onClick={() => navigate('/contact')}
-          >
-            联系我们
-          </Button>
+              <button
+                type="button"
+                className="top-bar-icon-btn cart-trigger"
+                aria-label="打开购物车预览"
+                aria-haspopup="dialog"
+              >
+                <Badge count={cartCount} size="small" offset={[4, 0]}>
+                  <span className="top-bar-badge-anchor">
+                    <ShoppingCartOutlined aria-hidden />
+                  </span>
+                </Badge>
+              </button>
+            </Popover>
+            <Dropdown
+              menu={{ items: userMenuItems }}
+              trigger={['click']}
+              placement="bottomRight"
+              classNames={{ root: 'top-bar-user-dropdown' }}
+            >
+              <button
+                type="button"
+                className="top-bar-icon-btn user-menu-trigger"
+                aria-label="用户菜单"
+                aria-haspopup="menu"
+              >
+                <UserOutlined aria-hidden />
+              </button>
+            </Dropdown>
+            <Button
+              type="primary"
+              className="contact-button"
+              onClick={() => navigate('/contact')}
+            >
+              联系我们
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -329,18 +452,20 @@ const Layout = () => {
           border: 'none',
         }}
       >
-        {/* 导航菜单 */}
-        <Menu
-          mode="horizontal"
-          items={navItems}
-          selectedKeys={[location.pathname]}
-          className="nav-menu"
-          overflowedIndicator={<MenuOutlined />}
-          style={{
-            transition: 'all 0.3s ease-in-out',
-            flex: 1,
-          }}
-        />
+        <div className="site-chrome-inner site-chrome-inner--nav">
+          <Menu
+            mode="horizontal"
+            items={navItems}
+            selectedKeys={[location.pathname]}
+            className="nav-menu"
+            overflowedIndicator={<MenuOutlined />}
+            style={{
+              transition: 'all 0.3s ease-in-out',
+              flex: 1,
+              minWidth: 0,
+            }}
+          />
+        </div>
       </AntHeader>
 
       {/* 占位元素，避免内容被固定定位的导航栏遮挡 */}

@@ -2,7 +2,7 @@
 @import '../styles/company.global.less';
 
 .case-page {
-  padding: 20px 0;
+  padding: 0;
 
   .page-header {
     .company-shared-page-header();
@@ -15,14 +15,15 @@
 
   // 案例卡片
   .case-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid @border-color;
+    border-radius: var(--app-saas-card-radius);
+    box-shadow: var(--app-saas-card-shadow);
+    border: 1px solid var(--app-saas-card-border);
     .app-tx-lift();
     overflow: hidden;
 
     &:hover {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      box-shadow: var(--app-saas-card-shadow-hover);
+      border-color: var(--app-card-border-hover);
       transform: translateY(-2px);
     }
 
@@ -34,19 +35,22 @@
   // 案例图片
   .case-image-wrapper {
     width: 100%;
-    height: 220px;
+    aspect-ratio: 4 / 3;
     overflow: hidden;
-    border-radius: 4px 4px 0 0;
+    border-radius: var(--app-saas-card-radius) var(--app-saas-card-radius) 0 0;
+    background: var(--app-card-image-bg);
 
     .case-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
       .app-tx-transform();
+    }
+  }
 
-      &:hover {
-        transform: scale(1.05);
-      }
+  .case-card:hover .case-image {
+    @media (prefers-reduced-motion: no-preference) {
+      transform: scale(1.04);
     }
   }
 
@@ -166,10 +170,6 @@
       }
     }
 
-    .case-image-wrapper {
-      height: 200px;
-    }
-
     .case-title {
       font-size: 18px;
       margin-bottom: 12px;
@@ -185,10 +185,6 @@
       h1 {
         font-size: 20px;
       }
-    }
-
-    .case-image-wrapper {
-      height: 180px;
     }
 
     .case-title {

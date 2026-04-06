@@ -43,4 +43,21 @@ html[data-theme='dark'] body {
   background-color: transparent;
 }
 
+/* 图片加载失败：占位底随主题切换（与 handleImageError 添加的类配合） */
+img.image-load-error {
+  box-sizing: border-box;
+  background-color: var(--app-image-placeholder-bg);
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--app-image-placeholder-bg-subtle) 88%, transparent) 0%,
+    var(--app-image-placeholder-bg-subtle) 50%,
+    color-mix(in srgb, var(--app-image-placeholder-bg-subtle) 88%, transparent) 100%
+  );
+  object-fit: contain;
+  padding: clamp(12px, 3vw, 24px);
+  transition:
+    background-color var(--motion-duration-md) var(--motion-ease-soft),
+    background-image var(--motion-duration-md) var(--motion-ease-soft);
+}
+
 /* 通用 div.card 见 utilities/sections-cards-buttons.less（Dify 类 SaaS 卡片 token） */

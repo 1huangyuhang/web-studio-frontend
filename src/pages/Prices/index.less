@@ -1,28 +1,7 @@
 @import (reference) '../../assets/styles/foundation/index.less';
 
 .prices-page {
-  padding: 20px 0;
-
-  // 页面标题
-  .page-title {
-    text-align: center;
-    margin-bottom: 40px;
-    padding: 20px 0;
-    border-bottom: 1px solid @border-color;
-
-    h1 {
-      font-size: 32px;
-      font-weight: 600;
-      color: var(--app-heading);
-      margin: 0 0 8px 0;
-    }
-
-    p {
-      font-size: 16px;
-      color: var(--app-text-secondary);
-      margin: 0;
-    }
-  }
+  padding: 0;
 
   // 价格套餐网格
   .pricing-grid {
@@ -31,39 +10,55 @@
 
   // 价格套餐卡片
   .pricing-card {
-    border-radius: 8px;
+    border-radius: var(--app-saas-card-radius);
     overflow: hidden;
-    border: 1px solid @border-color;
+    border: 1px solid var(--app-saas-card-border);
+    box-shadow: var(--app-saas-card-shadow);
     .app-tx-lift();
     height: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
+    z-index: 0;
+
+    &:not(.popular) {
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--app-heading) 5%, transparent);
+    }
 
     &:hover {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      box-shadow: var(--app-saas-card-shadow-hover);
+      border-color: var(--app-card-border-hover);
       transform: translateY(-2px);
+      z-index: 1;
+    }
+
+    &.popular:hover {
+      z-index: 3;
     }
 
     // 推荐标签
     .popular-tag {
       position: absolute;
-      top: 16px;
-      right: 16px;
+      top: 12px;
+      right: 12px;
+      margin: 0;
       background-color: #f5222d;
       color: #fff;
       font-size: 12px;
       padding: 4px 12px;
-      border-radius: 12px;
-      z-index: 10;
+      border-radius: min(999px, calc(var(--app-saas-card-radius) * 2));
+      z-index: 12;
+      border: none;
     }
 
     // 图片区域
     .plan-image-wrapper {
       position: relative;
-      height: 200px;
+      width: 100%;
+      aspect-ratio: 4 / 3;
       overflow: hidden;
-      background-color: #fafafa;
+      border-radius: var(--app-saas-card-radius) var(--app-saas-card-radius) 0 0;
+      background: var(--app-card-image-bg);
 
       .plan-image {
         width: 100%;
@@ -71,9 +66,11 @@
         object-fit: cover;
         .app-tx-transform();
       }
+    }
 
+    @media (prefers-reduced-motion: no-preference) {
       &:hover .plan-image {
-        transform: scale(1.05);
+        transform: scale(1.04);
       }
     }
 
@@ -207,10 +204,28 @@
       }
     }
 
+    .plan-footnote {
+      display: block;
+      margin-top: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+      max-width: 22rem;
+    }
+
     // 热门套餐样式
     &.popular {
       border-color: #f5222d;
       box-shadow: 0 0 0 2px rgba(245, 34, 45, 0.08);
+      z-index: 2;
+
+      @media (min-width: 992px) and (prefers-reduced-motion: no-preference) {
+        transform: scale(1.02);
+
+        &:hover {
+          transform: scale(1.02) translateY(-2px);
+        }
+      }
 
       .select-plan-btn {
         background-color: #f5222d;
@@ -232,14 +247,13 @@
     padding: 16px 0;
 
     .page-title {
-      margin-bottom: 24px;
-
       h1 {
-        font-size: 24px;
+        font-size: var(--type-h3, 1.25rem) !important;
       }
 
-      p {
-        font-size: 14px;
+      p,
+      .ant-typography {
+        font-size: var(--type-small, 0.875rem);
       }
     }
 
@@ -249,10 +263,6 @@
 
     .pricing-card {
       margin-bottom: 16px;
-
-      .plan-image-wrapper {
-        height: 180px;
-      }
 
       .plan-info {
         padding: 16px;
@@ -284,10 +294,6 @@
 @media (max-width: 480px) {
   .prices-page {
     .pricing-card {
-      .plan-image-wrapper {
-        height: 150px;
-      }
-
       .plan-name {
         font-size: 18px;
       }

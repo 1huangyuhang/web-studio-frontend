@@ -18,7 +18,7 @@
 ### 3. 多数资源 CRUD / 列表
 
 - **Body**：`{ data: T }` 或带 `pagination` 的对象；一般无顶层 `success`。
-- **示例**：[siteAssetController](../backend/src/controllers/siteAssetController.ts) `GET /` → `{ data: SiteAsset[] }`。
+- **示例**：[siteAssetController](../backend/src/controllers/siteAssetController.ts) `GET /` → `{ data: SiteAsset[] }`。查询参数 `omitImage=1`（或 `true`）时列表不读取/返回 BYTEA 转 Base64，仅含 `imageUrl` 等字段，供管理端列表；详情与前台全量拉取仍用默认 `GET /`。
 
 ### 4. 全局错误（经 [errorHandler](../backend/src/middleware/errorHandler.ts)）
 

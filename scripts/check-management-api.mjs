@@ -35,6 +35,8 @@ const mgmtPort =
 const healthUrl = `http://127.0.0.1:${apiPort}/health`;
 const activitiesUrl = `http://127.0.0.1:${apiPort}/api/activities?page=1&pageSize=1`;
 const siteAssetsUrl = `http://127.0.0.1:${apiPort}/api/site-assets`;
+const siteAssetsListUrl = `http://127.0.0.1:${apiPort}/api/site-assets?omitImage=1`;
+const statsSummaryUrl = `http://127.0.0.1:${apiPort}/api/stats/summary`;
 
 console.log('--- 管理端 API 联调检查 ---\n');
 console.log(
@@ -86,6 +88,9 @@ async function checkMgmtGet(label, url) {
         console.log(
           '  提示: 5xx 多为数据库未迁移(P2021/P2022)或 Prisma 连库失败，请在后端终端看报错，并执行: cd backend && npx prisma migrate deploy'
         );
+        console.log(
+          '  提示: 站点素材全量列表含 BYTEA→Base64 时体积过大也可能 500；管理端应使用 ?omitImage=1（见下一条检查）。'
+        );
       }
     }
   } catch (e) {
@@ -93,7 +98,43 @@ async function checkMgmtGet(label, url) {
   }
 }
 
+/** Dashboard 同源接口：失败则非零退出，便于 CI / 本地联调门禁 */
+async function checkMgmtGetRequired(label, url) {
+  let res;
+  try {
+    res = await fetch(url, {
+      headers: { 'x-api-key': apiKey },
+      signal: AbortSignal.timeout(8000),
+    });
+  } catch (e) {
+    console.error(`\n${label} 请求失败（网络/超时）`);
+    console.error(`  GET ${url}`);
+    console.error(`  ${String(e?.message ?? e)}`);
+    process.exit(1);
+  }
+  const text = await res.text();
+  const preview = text.slice(0, 280).replace(/\s+/g, ' ');
+  console.log(`\n${label}`);
+  console.log(`  GET ${url} → HTTP ${res.status}`);
+  if (!res.ok) {
+    console.error(`  响应片段: ${preview}${text.length > 280 ? '…' : ''}`);
+    if (res.status === 401) {
+      console.error(
+        '  提示: 401 多为 API_KEY 与 backend/.env 中 API_KEY 不一致。'
+      );
+    }
+    if (res.status >= 500) {
+      console.error(
+        '  提示: 5xx 请检查数据库迁移与 DATABASE_URL；见 docs/management-api-troubleshooting.md'
+      );
+    }
+    process.exit(1);
+  }
+}
+
+await checkMgmtGetRequired('统计摘要（Dashboard 同源，必过）', statsSummaryUrl);
 await checkMgmtGet('活动列表（与管理端报错同源）', activitiesUrl);
 await checkMgmtGet('站点素材列表', siteAssetsUrl);
+await checkMgmtGet('站点素材列表（omitImage，管理端实际使用）', siteAssetsListUrl);
 
 console.log('\n检查结束。\n');

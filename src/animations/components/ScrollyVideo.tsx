@@ -187,6 +187,7 @@ const ScrollyVideo: React.FC<ScrollyVideoProps> = ({
     };
 
     const handleError = (e: Event) => {
+      setIsVideoLoaded(true);
       if (process.env.NODE_ENV === 'development') {
         console.error('Video error:', e);
         console.error('Video error details:', {
@@ -265,15 +266,13 @@ const ScrollyVideo: React.FC<ScrollyVideoProps> = ({
         muted
         playsInline
         preload="auto"
-        // 添加样式，避免刷新页面时视频闪帧
-        style={{
-          opacity: isVideoLoaded ? 1 : 0,
-          transition: 'opacity 0.3s ease',
-        }}
+        style={{ opacity: 1 }}
       />
 
       {children ? (
-        <div className="scrolly-video-overlay">
+        <div
+          className={`scrolly-video-overlay${isVideoLoaded ? ' scrolly-video-overlay--media-ready' : ''}`}
+        >
           <div className="scrolly-video-overlay__scrim" aria-hidden="true" />
           <div className="scrolly-video-overlay__inner">{children}</div>
         </div>

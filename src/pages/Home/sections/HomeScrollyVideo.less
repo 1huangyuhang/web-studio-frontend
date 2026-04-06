@@ -2,7 +2,10 @@
 
 /* 抵消 site-main 水平 padding，主视觉贴齐视口左右（版心仍在 overlay 内文案区） */
 .home-hero-scrolly {
-  --hero-breakout-x: var(--site-main-pad-x, clamp(16px, 4vw, 48px));
+  --hero-breakout-x: var(
+    --home-hero-breakout-x,
+    var(--site-main-pad-x, clamp(16px, 4vw, 48px))
+  );
   width: calc(100% + 2 * var(--hero-breakout-x));
   max-width: none;
   margin-left: calc(-1 * var(--hero-breakout-x));
@@ -10,6 +13,7 @@
   margin-top: -24px;
   padding-bottom: 0;
   box-sizing: border-box;
+  position: relative;
 }
 
 @media (max-width: 768px) {
@@ -33,26 +37,24 @@
     0 24px 56px rgba(0, 0, 0, 0.18),
     0 0 0 1px color-mix(in srgb, var(--app-text-primary) 6%, transparent);
 
-  /* 视频与下一块：较短的叠化带 + 滚动上移 + 轻微呼吸动画，避免大块静态「白墙」 */
+  /* 与下一块衔接：全宽渐变随 dvh/vw 平滑过渡，与 .home-flow-bridge 同 token 对齐 */
   &::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    height: clamp(56px, 12dvh, 140px);
+    height: clamp(72px, min(16dvh, 12vw), 180px);
     z-index: 2;
     pointer-events: none;
-    will-change: transform, opacity;
-    transform: translateY(calc(-6% * var(--scrolly-progress, 0)));
-    opacity: calc(0.68 + var(--scrolly-progress, 0) * 0.26);
-    animation: homeHeroFadeBreath 14s ease-in-out infinite;
+    opacity: 0.94;
     background: linear-gradient(
       180deg,
       transparent 0%,
-      color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 36%,
+      color-mix(in srgb, var(--ly-bg-canvas) 8%, transparent) 38%,
       color-mix(in srgb, var(--ly-bg-canvas) 38%, transparent) 68%,
-      color-mix(in srgb, var(--ly-bg-canvas) 72%, transparent) 100%
+      color-mix(in srgb, var(--ly-bg-canvas) 82%, transparent) 90%,
+      var(--ly-bg-canvas) 100%
     );
   }
 
@@ -64,31 +66,106 @@
 html[data-theme='light'] .home-hero-scrolly__video.scrolly-video-container {
   background: linear-gradient(
     165deg,
-    #241a17 0%,
-    #352823 48%,
-    #40302a 100%
+    #eef1f5 0%,
+    #e6eaef 45%,
+    #dfe5eb 100%
   );
+  box-shadow:
+    0 16px 40px rgba(15, 23, 42, 0.08),
+    0 0 0 1px color-mix(in srgb, var(--app-text-primary) 5%, transparent);
 }
 
-/* 略压暗四角，强化主视觉层次 */
+/* 首屏以视频清晰为主：关掉径向装饰层（原先与 scrim 叠层易显脏、发雾） */
+.home-hero-scrolly__video.scrolly-video-container::before {
+  opacity: 0;
+  background: none;
+}
+
+html[data-theme='light'] .home-hero-scrolly__video.scrolly-video-container::before {
+  opacity: 0;
+  background: none;
+}
+
+/* 暗色：仅上下略压暗保文案，中部尽量透，避免整屏灰雾盖住视频 */
 .home-hero-scrolly__video .scrolly-video-overlay__scrim {
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.62) 0%,
-    rgba(0, 0, 0, 0.18) 42%,
-    rgba(0, 0, 0, 0.38) 72%,
-    rgba(0, 0, 0, 0.78) 100%
+    rgba(0, 0, 0, 0.38) 0%,
+    rgba(0, 0, 0, 0.09) 22%,
+    rgba(0, 0, 0, 0.02) 48%,
+    rgba(0, 0, 0, 0.05) 72%,
+    rgba(0, 0, 0, 0.32) 100%
   );
+  /*
+   * 横向渐隐：左右边缘蒙版透明度趋近 0，中间保留压暗以托住标题，
+   * 避免「一整块透明层」把视频框死；视频两侧更通透、过渡更自然。
+   */
+  /* 中部不用 mask=#000 全不透，避免整列视频被 scrim「糊满」；文案仍靠竖向渐变 + 字影 */
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.18) 10%,
+    rgba(0, 0, 0, 0.5) 22%,
+    rgba(0, 0, 0, 0.62) 34%,
+    rgba(0, 0, 0, 0.62) 66%,
+    rgba(0, 0, 0, 0.5) 78%,
+    rgba(0, 0, 0, 0.18) 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.18) 10%,
+    rgba(0, 0, 0, 0.5) 22%,
+    rgba(0, 0, 0, 0.62) 34%,
+    rgba(0, 0, 0, 0.62) 66%,
+    rgba(0, 0, 0, 0.5) 78%,
+    rgba(0, 0, 0, 0.18) 90%,
+    transparent 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
+/* 浅色：去掉中心发白叠层，顶部/底部略压对比即可读字 */
 html[data-theme='light'] .home-hero-scrolly__video .scrolly-video-overlay__scrim {
   background: linear-gradient(
     180deg,
-    rgba(15, 23, 42, 0.56) 0%,
-    rgba(15, 23, 42, 0.12) 44%,
-    rgba(15, 23, 42, 0.32) 74%,
-    rgba(15, 23, 42, 0.66) 100%
+    rgba(15, 23, 42, 0.14) 0%,
+    rgba(15, 23, 42, 0.04) 18%,
+    transparent 40%,
+    transparent 58%,
+    rgba(15, 23, 42, 0.05) 82%,
+    rgba(15, 23, 42, 0.11) 100%
   );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.16) 10%,
+    rgba(0, 0, 0, 0.48) 22%,
+    rgba(0, 0, 0, 0.58) 34%,
+    rgba(0, 0, 0, 0.58) 66%,
+    rgba(0, 0, 0, 0.48) 78%,
+    rgba(0, 0, 0, 0.16) 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.16) 10%,
+    rgba(0, 0, 0, 0.48) 22%,
+    rgba(0, 0, 0, 0.58) 34%,
+    rgba(0, 0, 0, 0.58) 66%,
+    rgba(0, 0, 0, 0.48) 78%,
+    rgba(0, 0, 0, 0.16) 90%,
+    transparent 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 .home-hero-scrolly__content {
@@ -118,6 +195,13 @@ html[data-theme='light'] .home-hero-scrolly__video .scrolly-video-overlay__scrim
   text-shadow: 0 2px 28px rgba(0, 0, 0, 0.35);
 }
 
+html[data-theme='light'] .home-hero-scrolly__title.ant-typography {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 2px 24px rgba(0, 0, 0, 0.28),
+    0 0 40px rgba(0, 0, 0, 0.12);
+}
+
 .home-hero-scrolly__lead.ant-typography {
   margin: 0 auto 28px !important;
   max-width: 36em;
@@ -125,6 +209,12 @@ html[data-theme='light'] .home-hero-scrolly__video .scrolly-video-overlay__scrim
   line-height: var(--leading-snug) !important;
   color: var(--app-text-on-media-muted) !important;
   text-shadow: 0 1px 16px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme='light'] .home-hero-scrolly__lead.ant-typography {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 1px 18px rgba(0, 0, 0, 0.22);
 }
 
 .home-hero-scrolly__actions {
@@ -162,39 +252,81 @@ html[data-theme='light'] .home-hero-scrolly__video .scrolly-video-overlay__scrim
   font-size: var(--type-caption);
   letter-spacing: 0.08em;
   color: color-mix(in srgb, var(--app-text-on-media) 72%, transparent);
-  animation: homeHeroScrollHint 2.2s ease-in-out infinite;
+}
+
+.home-hero-scrolly__scroll-hint__inner {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero-scrolly__content--enter .home-hero-scrolly__eyebrow {
+    animation: homeHeroLineInEyebrow 0.62s cubic-bezier(0.22, 1, 0.36, 1) 0.04s both;
+  }
+
+  .home-hero-scrolly__content--enter .home-hero-scrolly__title.ant-typography {
+    animation: homeHeroLineIn 0.62s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  }
+
+  .home-hero-scrolly__content--enter .home-hero-scrolly__lead.ant-typography {
+    animation: homeHeroLineIn 0.64s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+  }
+
+  .home-hero-scrolly__content--enter .home-hero-scrolly__actions.ant-space {
+    animation: homeHeroLineIn 0.64s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
+  }
+
+  .home-hero-scrolly__content--enter .home-hero-scrolly__scroll-hint {
+    animation: homeHeroLineIn 0.62s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both;
+  }
+
+  /* 去掉无限上下位移，避免主视觉区持续「在动」 */
+  .home-hero-scrolly__content--enter .home-hero-scrolly__scroll-hint__inner {
+    animation: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-hero-scrolly__scroll-hint {
-    animation: none;
+  .home-hero-scrolly__content--enter .home-hero-scrolly__eyebrow,
+  .home-hero-scrolly__content--enter .home-hero-scrolly__title.ant-typography,
+  .home-hero-scrolly__content--enter .home-hero-scrolly__lead.ant-typography,
+  .home-hero-scrolly__content--enter .home-hero-scrolly__actions.ant-space,
+  .home-hero-scrolly__content--enter .home-hero-scrolly__scroll-hint,
+  .home-hero-scrolly__content--enter .home-hero-scrolly__scroll-hint__inner {
+    animation: none !important;
+    opacity: unset;
+    transform: none;
+  }
+
+  .home-hero-scrolly__eyebrow {
+    opacity: 0.92;
+  }
+
+  .home-hero-scrolly__scroll-hint__inner {
+    opacity: 1;
   }
 
   .home-hero-scrolly__video.scrolly-video-container::after {
-    animation: none;
-    opacity: calc(0.78 + var(--scrolly-progress, 0) * 0.18);
+    opacity: 0.88;
     transform: none;
   }
 }
 
-@keyframes homeHeroFadeBreath {
-  0%,
-  100% {
-    opacity: calc(0.62 + var(--scrolly-progress, 0) * 0.24);
+/* 仅淡入，避免与视频区叠加「动态模糊」的心理感受 */
+@keyframes homeHeroLineIn {
+  from {
+    opacity: 0;
   }
-  50% {
-    opacity: calc(0.76 + var(--scrolly-progress, 0) * 0.22);
+  to {
+    opacity: 1;
   }
 }
 
-@keyframes homeHeroScrollHint {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: translateY(0);
+@keyframes homeHeroLineInEyebrow {
+  from {
+    opacity: 0;
   }
-  50% {
-    opacity: 1;
-    transform: translateY(4px);
+  to {
+    opacity: 0.92;
   }
 }
+

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import type { Prisma } from '@prisma/client';
 import prisma from '../utils/prisma';
 import { getIo } from '../socketInstance';
+import { prismaStringContains } from '../utils/prismaStringFilter';
 import {
   createContactMessageSchema,
   contactMessageQuerySchema,
@@ -32,9 +34,23 @@ export const createContactMessage = async (req: Request, res: Response) => {
 
 export const getAllContactMessages = async (req: Request, res: Response) => {
   const q = contactMessageQuerySchema.parse(req.query);
-  const { page, pageSize, unreadOnly } = q;
+  const { page, pageSize, unreadOnly, search } = q;
   const skip = (page - 1) * pageSize;
-  const where = unreadOnly ? { read: false } : {};
+  const where: Prisma.ContactMessageWhereInput = {
+    ...(unreadOnly ? { read: false } : {}),
+    ...(search
+      ? {
+          OR: [
+            { name: prismaStringContains(search) },
+            { phone: prismaStringContains(search) },
+            { email: prismaStringContains(search) },
+            { message: prismaStringContains(search) },
+            { subject: prismaStringContains(search) },
+            { company: prismaStringContains(search) },
+          ],
+        }
+      : {}),
+  };
   const [rows, total] = await Promise.all([
     prisma.contactMessage.findMany({
       where,

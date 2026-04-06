@@ -11,7 +11,7 @@ export default function Activities() {
     <MarketingPageShell
       pageClass="activities-page"
       defaultHeroClass="page-header"
-      title={<Title level={2}>活动展示</Title>}
+      title={<Title level={1}>活动展示</Title>}
       lead={<Paragraph>了解我们最新的活动和展览</Paragraph>}
     >
       <ScrollAnimatedSection reveal className="marketing-section-block">

@@ -3,13 +3,16 @@
 /* 基础图片样式 */
 .animated-image {
   opacity: 1; /* 初始状态可见 */
-  background-color: #ffffff; /* 白色背景填充 */
+  background-color: var(--app-image-placeholder-bg);
   max-width: 100%;
   height: auto;
   display: block;
   object-fit: cover; /* 保持宽高比并覆盖整个容器 */
   object-position: center; /* 居中显示，保留重要内容 */
   overflow: hidden;
+  transition:
+    background-color var(--motion-duration-md) var(--motion-ease-soft),
+    opacity var(--motion-duration-sm) var(--motion-ease-soft);
   /* 移除所有过渡动画 */
 }
 
@@ -31,14 +34,7 @@
   transform: none;
 }
 
-/* 图片加载状态 */
-.animated-image[src^="data:image/svg+xml"] {
-  background-color: #f5f5f5;
-}
-
-/* 深色模式适配 */
-@media (prefers-color-scheme: dark) {
-  .animated-image[src^="data:image/svg+xml"] {
-    background-color: #333;
-  }
+/* 图片加载状态（内联 SVG 占位等） */
+.animated-image[src^='data:image/svg+xml'] {
+  background-color: var(--app-image-placeholder-bg-subtle);
 }

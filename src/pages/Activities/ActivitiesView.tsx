@@ -1,9 +1,10 @@
-import { Row, Col, Typography, Card, Button, Spin, Alert, Modal } from 'antd';
+import { Row, Col, Typography, Card, Button, Alert, Modal, Empty } from 'antd';
 import { SiteButton } from '@/components/ui/SiteButton/SiteButton';
 import EventCalendar from '@/components/EventCalendar';
 import { handleImageError, handleImageLoad } from '@/utils/imageUtils';
 import { mediaDisplaySrc } from '@/types/dto';
 import { useActivitiesPage } from './useActivitiesPage';
+import { MarketingListSkeleton } from '@/components/page-shell/MarketingListSkeleton';
 
 const { Title, Paragraph } = Typography;
 
@@ -21,9 +22,7 @@ export default function ActivitiesView() {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <Spin size="large" tip="加载中..." />
-      </div>
+      <MarketingListSkeleton items={6} colProps={{ xs: 24, sm: 12, md: 8 }} />
     );
   }
 
@@ -90,11 +89,9 @@ export default function ActivitiesView() {
         </Row>
       ) : (
         <div className="empty-state" aria-live="polite">
-          <Alert
-            message="暂无活动"
+          <Empty
             description="目前没有可用的活动信息，敬请期待"
-            type="info"
-            showIcon
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         </div>
       )}
@@ -149,6 +146,10 @@ export default function ActivitiesView() {
         title={selectedActivity?.title || '活动详情'}
         open={isModalVisible}
         onCancel={handleModalClose}
+        width="min(560px, 92vw)"
+        styles={{
+          body: { maxHeight: 'min(72vh, 560px)', overflowY: 'auto' },
+        }}
         footer={[
           <Button key="close" onClick={handleModalClose}>
             关闭

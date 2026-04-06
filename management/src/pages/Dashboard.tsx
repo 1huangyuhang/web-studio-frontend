@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Row, Col, Card } from 'antd';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { Row, Col, Card, Alert, Button, Spin } from 'antd';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ShoppingOutlined,
   CalendarOutlined,
@@ -14,6 +15,8 @@ import axiosInstance from '../services/axiosInstance';
 import wsService from '../services/websocket';
 import type { WebSocketEvent } from '../services/websocket';
 import type { StatsSummaryDTO, StatsSummaryResponse } from '@/types/api';
+import { queryKeys } from '@/queryKeys';
+import { formatManagementListLoadError } from '@/utils/managementLoadErrorHint';
 
 const emptyStats: StatsSummaryDTO = {
   productCount: 0,
@@ -27,6 +30,22 @@ const emptyStats: StatsSummaryDTO = {
   unreadContactMessageCount: 0,
   pendingSupportTicketCount: 0,
 };
+
+function mapStatsBody(d: StatsSummaryResponse['data']): StatsSummaryDTO {
+  if (!d) return { ...emptyStats };
+  return {
+    productCount: d.productCount ?? 0,
+    activityCount: d.activityCount ?? 0,
+    newsCount: d.newsCount ?? 0,
+    siteAssetCount: d.siteAssetCount ?? 0,
+    courseCount: d.courseCount ?? 0,
+    pricingPlanCount: d.pricingPlanCount ?? 0,
+    contactMessageCount: d.contactMessageCount ?? 0,
+    supportTicketCount: d.supportTicketCount ?? 0,
+    unreadContactMessageCount: d.unreadContactMessageCount ?? 0,
+    pendingSupportTicketCount: d.pendingSupportTicketCount ?? 0,
+  };
+}
 
 type StatDef = {
   key: keyof StatsSummaryDTO;
@@ -87,57 +106,50 @@ const STAT_DEFS: StatDef[] = [
 ];
 
 const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<StatsSummaryDTO>(emptyStats);
+  const queryClient = useQueryClient();
 
-  const fetchStats = useCallback(async () => {
-    try {
+  const { data, isPending, isError, error, refetch, isFetching } = useQuery({
+    queryKey: queryKeys.stats.summary(),
+    queryFn: async () => {
       const res = (await axiosInstance.get(
         '/stats/summary'
       )) as StatsSummaryResponse;
-      const d = res?.data;
-      if (!d) return;
-      setStats({
-        productCount: d.productCount ?? 0,
-        activityCount: d.activityCount ?? 0,
-        newsCount: d.newsCount ?? 0,
-        siteAssetCount: d.siteAssetCount ?? 0,
-        courseCount: d.courseCount ?? 0,
-        pricingPlanCount: d.pricingPlanCount ?? 0,
-        contactMessageCount: d.contactMessageCount ?? 0,
-        supportTicketCount: d.supportTicketCount ?? 0,
-        unreadContactMessageCount: d.unreadContactMessageCount ?? 0,
-        pendingSupportTicketCount: d.pendingSupportTicketCount ?? 0,
-      });
-    } catch (error) {
-      console.error('数据加载失败:', error);
-    }
-  }, []);
+      if (!res?.data) {
+        throw new Error('统计接口未返回 data');
+      }
+      return mapStatsBody(res.data);
+    },
+  });
+
+  const invalidateStats = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: queryKeys.stats.all });
+  }, [queryClient]);
 
   const wsPairs = useMemo(
     () =>
       [
-        ['product:created', fetchStats],
-        ['product:updated', fetchStats],
-        ['product:deleted', fetchStats],
-        ['activity:created', fetchStats],
-        ['activity:updated', fetchStats],
-        ['activity:deleted', fetchStats],
-        ['news:created', fetchStats],
-        ['news:updated', fetchStats],
-        ['news:deleted', fetchStats],
-        ['course:created', fetchStats],
-        ['course:updated', fetchStats],
-        ['course:deleted', fetchStats],
-        ['pricingPlan:created', fetchStats],
-        ['pricingPlan:updated', fetchStats],
-        ['pricingPlan:deleted', fetchStats],
-        ['contactMessage:created', fetchStats],
-        ['contactMessage:deleted', fetchStats],
-        ['supportTicket:created', fetchStats],
-        ['supportTicket:updated', fetchStats],
-        ['supportTicket:deleted', fetchStats],
+        ['product:created', invalidateStats],
+        ['product:updated', invalidateStats],
+        ['product:deleted', invalidateStats],
+        ['activity:created', invalidateStats],
+        ['activity:updated', invalidateStats],
+        ['activity:deleted', invalidateStats],
+        ['news:created', invalidateStats],
+        ['news:updated', invalidateStats],
+        ['news:deleted', invalidateStats],
+        ['course:created', invalidateStats],
+        ['course:updated', invalidateStats],
+        ['course:deleted', invalidateStats],
+        ['pricingPlan:created', invalidateStats],
+        ['pricingPlan:updated', invalidateStats],
+        ['pricingPlan:deleted', invalidateStats],
+        ['contactMessage:created', invalidateStats],
+        ['contactMessage:deleted', invalidateStats],
+        ['supportTicket:created', invalidateStats],
+        ['supportTicket:updated', invalidateStats],
+        ['supportTicket:deleted', invalidateStats],
       ] as [keyof WebSocketEvent, () => void][],
-    [fetchStats]
+    [invalidateStats]
   );
 
   useEffect(() => {
@@ -147,9 +159,8 @@ const Dashboard: React.FC = () => {
     };
   }, [wsPairs]);
 
-  useEffect(() => {
-    void fetchStats();
-  }, [fetchStats]);
+  const stats = data ?? emptyStats;
+  const showSkeleton = isPending || (isFetching && !data);
 
   return (
     <div className="admin-dashboard">
@@ -159,6 +170,28 @@ const Dashboard: React.FC = () => {
           数据总览与快捷感知；指标随列表与 WebSocket 事件自动刷新。
         </p>
       </div>
+
+      {isError ? (
+        <Alert
+          type="error"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="统计数据加载失败"
+          description={
+            <span>
+              {formatManagementListLoadError(error, '统计摘要')}
+              <Button
+                type="link"
+                size="small"
+                onClick={() => void refetch()}
+                style={{ paddingLeft: 8 }}
+              >
+                重试
+              </Button>
+            </span>
+          }
+        />
+      ) : null}
 
       <Row gutter={[16, 16]} className="admin-dashboard__stats">
         {STAT_DEFS.map((def) => (
@@ -175,7 +208,13 @@ const Dashboard: React.FC = () => {
                   {def.icon}
                 </span>
                 <span className="admin-dashboard__kpi-value">
-                  {stats[def.key]}
+                  {showSkeleton ? (
+                    <Spin size="small" />
+                  ) : isError ? (
+                    '—'
+                  ) : (
+                    stats[def.key]
+                  )}
                 </span>
               </div>
               <div className="admin-dashboard__kpi-label">{def.label}</div>

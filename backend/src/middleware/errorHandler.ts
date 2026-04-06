@@ -79,6 +79,17 @@ const errorHandler = (
     if (typeof err.code === 'string') {
       errorResponse.code = err.code;
     }
+  } else if (
+    err instanceof RangeError ||
+    (typeof err?.message === 'string' &&
+      err.message.includes('Invalid string length'))
+  ) {
+    errorResponse.error = 'Payload Too Large';
+    errorResponse.message =
+      '序列化响应过大（常见于列表含大量图片 Base64）。管理端列表请使用 GET /api/site-assets?omitImage=1，或改为外链 imageUrl。';
+    errorResponse.statusCode = 413;
+    errorResponse.code = 'RESPONSE_PAYLOAD_TOO_LARGE';
+    console.error('Response serialization limit:', err);
   } else {
     errorResponse.code = 'INTERNAL_ERROR';
     console.error('Unexpected error:', err);

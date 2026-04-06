@@ -1,4 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Logo">
-  <rect width="64" height="64" rx="14" fill="#80322e"/>
-  <path fill="#fff" d="M20 44V20h6l8 14 8-14h6v24h-5.5V28l-7.5 13h-4L25.5 28v16H20z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" role="img" aria-label="林之源">
+  <title>林之源</title>
+  <text
+    x="100"
+    y="26"
+    text-anchor="middle"
+    fill="#1c1410"
+    font-family="Noto Serif SC, Source Han Serif SC, Songti SC, STSong, Georgia, serif"
+    font-size="19"
+    font-weight="500"
+    letter-spacing="0.48em"
+  >林之源</text>
 </svg>

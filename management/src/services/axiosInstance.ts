@@ -116,6 +116,9 @@ axiosInstance.interceptors.response.use(
         const url = String(config.url ?? '');
         if (!url.includes('/auth/login')) {
           localStorage.removeItem('authToken');
+          const raw = import.meta.env.BASE_URL ?? '/';
+          const base = raw === '/' ? '' : raw.replace(/\/$/, '');
+          window.location.assign(base ? `${base}/login` : '/login');
         }
         const te = wrapAxiosError(error);
         console.error(te.toLogString());
