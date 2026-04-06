@@ -55,6 +55,8 @@ Kubernetes 示例：`readinessProbe.httpGet.path` 设为 `/health/ready`，`port
 - `shared/` — 前后端共用 TS 模块（如错误溯源）
 - `src/types/dto/` — 官网接口 DTO（与后端 JSON 对齐）+ `parse*Dto` / `mediaDisplaySrc`
 
+**架构总览**（模块划分、数据流、接口分层、Mermaid 图）：[docs/project-overview.md](docs/project-overview.md)。
+
 ## 许可证
 
 MIT
