@@ -26,8 +26,8 @@ cd backend && npm install && npm run dev
 
 ## 后端健康检查（部署探针）
 
-- **`GET /health`**：仅表示 Node 进程在跑，负载均衡可用来做最轻量存活检查。
-- **`GET /health/ready`**：对数据库执行 `SELECT 1`；**数据库不可连时返回 HTTP 503**，适合作为 Kubernetes `readinessProbe` 或 Docker `HEALTHCHECK`，由编排器在失败时重启实例或摘流。全局速率限制已跳过上述路径。
+- `**GET /health**`：仅表示 Node 进程在跑，负载均衡可用来做最轻量存活检查。
+- `**GET /health/ready**`：对数据库执行 `SELECT 1`；**数据库不可连时返回 HTTP 503**，适合作为 Kubernetes `readinessProbe` 或 Docker `HEALTHCHECK`，由编排器在失败时重启实例或摘流。全局速率限制已跳过上述路径。
 
 Docker 示例：
 
@@ -166,13 +166,13 @@ sequenceDiagram
 
 `createApp.ts` 中为多数业务资源采用 **双 Router** 模式：
 
-- **`*PublicRouter`**：`GET` 列表/详情等，供官网或未登录场景。
-- **`*ManagementRouter`**：挂载在 `managementStack` 下，`POST/PUT/PATCH/DELETE` 等维护操作。
+- `***PublicRouter`\*\*：`GET` 列表/详情等，供官网或未登录场景。
+- `***ManagementRouter**`：挂载在 `managementStack` 下，`POST/PUT/PATCH/DELETE` 等维护操作。
 
 典型前缀：`/api/products`、`/api/activities`、`/api/news`、`/api/site-assets`、`/api/courses`、`/api/pricing-plans`、`/api/contact-messages`、`/api/support-tickets` 等。  
-**`/api/auth`**：登录注册等。  
-**`/api/stats`**：管理端统计，整段在管理栈下。  
-**`/api/categories`**：分类列表等（以路由文件为准）。
+`**/api/auth**`：登录注册等。  
+`**/api/stats**`：管理端统计，整段在管理栈下。  
+`**/api/categories**`：分类列表等（以路由文件为准）。
 
 ```mermaid
 flowchart TB
@@ -216,7 +216,7 @@ flowchart LR
 
 - **路由**：`src/router.tsx` → `Layout` 包裹子路由，子页面多 **React.lazy** 懒加载。
 - **主题**：Redux `theme.mode` → `document.documentElement[data-theme]` + Ant Design `ConfigProvider`。
-- **服务端数据**：页面级 **`useQuery` / `useMutation`**（React Query），配合 `src/services/api/axiosInstance`（`x-api-key`、错误处理等）。
+- **服务端数据**：页面级 `**useQuery` / `useMutation`\*\*（React Query），配合 `src/services/api/axiosInstance`（`x-api-key`、错误处理等）。
 - **类型**：`src/types/dto/` 等与后端 JSON 对齐；部分页面使用 `parse*Dto` 做运行时收窄。
 
 ```mermaid
@@ -240,7 +240,7 @@ flowchart TB
 ### 领域与持久化（Prisma 概要）
 
 数据库为 **PostgreSQL**，模型包括（节选）：`User`、`Category` / `Product`、`Activity`、`News`、`SiteAsset`（按 `page` + `groupKey` 驱动官网可配置内容）、`Course`、`PricingPlan`、`ContactMessage`、`SupportTicket` 等。  
-媒体字段常见 **`Bytes?`（BYTEA）+ `imageUrl`（外链）** 双轨；管理端列表可用 **`omitImage=1`** 等查询避免大 JSON。
+媒体字段常见 `**Bytes?`（BYTEA）+ `imageUrl`（外链）** 双轨；管理端列表可用 `**omitImage=1`\*\* 等查询避免大 JSON。
 
 更完整的字段定义见 `backend/prisma/schema.prisma`。
 
@@ -266,8 +266,6 @@ flowchart TB
 | [docs/management-api-troubleshooting.md](docs/management-api-troubleshooting.md) | 管理端连不上 API 的排查   |
 | [docs/site-api-env.md](docs/site-api-env.md)（若存在）                           | 站点与 API 环境变量       |
 | [docs/mgmt-crud-verification.md](docs/mgmt-crud-verification.md)（若存在）       | 管理 CRUD 验证说明        |
-
-> **说明**：原 `docs/project-overview.md` 的完整内容已合并至本 README；该文件仅保留跳转说明，避免两处重复维护。
 
 ### 文档维护说明
 
