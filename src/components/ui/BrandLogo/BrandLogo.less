@@ -1,0 +1,40 @@
+/* 林之源字标：继承父级 color（顶栏 .logo-chip），无附加图形 */
+
+.brand-logo {
+  display: block;
+  flex-shrink: 0;
+  /* 与顶栏 .top-bar 上 --logo-svg-h 同步；无继承时略小默认 */
+  height: var(--logo-svg-h, 32px);
+  width: auto;
+  min-width: 5.125rem;
+  max-width: min(168px, 40vw);
+}
+
+.brand-logo__wordmark {
+  font-family:
+    'Noto Serif SC',
+    'Source Han Serif SC',
+    'Songti SC',
+    'STSong',
+    'STKaiti',
+    Georgia,
+    'Times New Roman',
+    serif;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: 0.48em;
+  text-rendering: geometricPrecision;
+  paint-order: stroke fill;
+  /* 末字后字距会视觉偏重，用 margin 感：整体仍居中，略收紧末字侧留白由 viewBox 承担 */
+}
+
+/* 顶栏玻璃底上：略加描边，避免字重与背景糊成一团 */
+html[data-theme='light'] .brand-logo__wordmark {
+  stroke: rgba(15, 23, 42, 0.2);
+  stroke-width: 0.55px;
+}
+
+html[data-theme='dark'] .brand-logo__wordmark {
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 0.5px;
+}

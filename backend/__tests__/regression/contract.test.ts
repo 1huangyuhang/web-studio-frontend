@@ -41,6 +41,15 @@ describe('Regression: HTTP contract', () => {
     expect(res.body).toMatchObject({ status: 'ok' });
   });
 
+  test('GET /health/ready returns ok when database is reachable', async () => {
+    const res = await request(app).get('/health/ready');
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      status: 'ok',
+      checks: { database: 'ok' },
+    });
+  });
+
   test('GET /api/stats/summary returns { data } with counters', async () => {
     const res = await request(app)
       .get('/api/stats/summary')
@@ -48,6 +57,7 @@ describe('Regression: HTTP contract', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('data');
+    expect(res.body).toHaveProperty('meta');
     const d = res.body.data;
     expect(d).toHaveProperty('productCount');
     expect(d).toHaveProperty('activityCount');
@@ -59,8 +69,10 @@ describe('Regression: HTTP contract', () => {
     expect(d).toHaveProperty('supportTicketCount');
     expect(d).toHaveProperty('unreadContactMessageCount');
     expect(d).toHaveProperty('pendingSupportTicketCount');
-    expect(typeof d.unreadContactMessageCount).toBe('number');
-    expect(typeof d.pendingSupportTicketCount).toBe('number');
+    const isNumOrNull = (v: unknown) => v === null || typeof v === 'number';
+    expect(isNumOrNull(d.unreadContactMessageCount)).toBe(true);
+    expect(isNumOrNull(d.pendingSupportTicketCount)).toBe(true);
+    expect(typeof res.body.meta.degraded).toBe('boolean');
   });
 
   test('GET /api/products returns paginated list', async () => {

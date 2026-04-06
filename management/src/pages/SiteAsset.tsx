@@ -94,7 +94,7 @@ const SiteAssetManagement: React.FC = () => {
     queryFn: () => fetchSiteAssetsList(pageTab),
   });
 
-  const rows = data ?? [];
+  const rows = useMemo(() => data ?? [], [data]);
 
   useEffect(() => {
     if (!isError) {
@@ -124,8 +124,17 @@ const SiteAssetManagement: React.FC = () => {
   }, [pageTab, data]);
 
   const invalidateSiteAssets = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: queryKeys.siteAssets.all });
-  }, [queryClient]);
+    void queryClient.invalidateQueries({
+      queryKey: queryKeys.siteAssets.list(pageTab),
+      exact: true,
+    });
+    if (pageTab !== 'all') {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.siteAssets.list('all'),
+        exact: true,
+      });
+    }
+  }, [queryClient, pageTab]);
 
   const displayRows = useMemo(() => {
     const q = debouncedKeyword.trim().toLowerCase();

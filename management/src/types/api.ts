@@ -30,8 +30,19 @@ export interface StatsSummaryDTO {
   pendingSupportTicketCount: number;
 }
 
+/** 统计接口单项计数失败时为 null，不拖垮整页 */
+export type StatsSummaryPartialDTO = {
+  [K in keyof StatsSummaryDTO]: number | null;
+};
+
+export interface StatsSummaryMeta {
+  degraded: boolean;
+  errors?: Partial<Record<keyof StatsSummaryDTO, string>>;
+}
+
 export interface StatsSummaryResponse {
-  data: StatsSummaryDTO;
+  data: StatsSummaryPartialDTO;
+  meta?: StatsSummaryMeta;
 }
 
 /** 解析列表接口：统一处理 { data, pagination } 与旧式数组 */

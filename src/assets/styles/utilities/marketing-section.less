@@ -1,0 +1,21 @@
+/* 营销页区块标题行：左侧标题 + 右侧元信息（条数、筛选值等） */
+.marketing-section-header() {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--app-card-border) 50%, transparent);
+
+  > span:first-child,
+  > h2:first-child,
+  > h3:first-child {
+    font-size: var(--type-h5);
+    font-weight: 600;
+    color: var(--app-heading);
+    letter-spacing: var(--track-heading);
+    margin: 0;
+  }
+}

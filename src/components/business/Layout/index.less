@@ -1,11 +1,5 @@
 @import (reference) '@/assets/styles/foundation/index.less';
 
-/* 日间：字标为深色，避免沿用夜间黑色 drop-shadow 显闷；顶缘高光 + slate 阴影 */
-html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.92))
-    drop-shadow(0 1px 3px rgba(15, 23, 42, calc(0.14 + 0.28 * var(--chrome-media-blend, 0))));
-}
-
 .top-layout {
   /* 首页由 JS 写入 0–1，驱动顶栏/导航与视频 Hero 的柔美叠化（非首页保持 0） */
   --chrome-media-blend: 0;
@@ -18,6 +12,46 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
   flex-direction: column;
   /* L1 与 L0 画布贯通，避免与 body 再叠一层异色 */
   background-color: transparent;
+
+  /* 顶栏 + 主导航合一：单层磨砂底，无行间缝、无叠阴影 */
+  .site-chrome-shell {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: hidden;
+    box-shadow: none;
+    background: color-mix(
+      in srgb,
+      var(--ly-chrome-liquid-bg-atop-media) calc(100% * var(--chrome-media-blend, 0)),
+      var(--ly-chrome-liquid-bg)
+    );
+    backdrop-filter: blur(
+        calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
+      )
+      saturate(var(--ly-chrome-liquid-sat));
+    -webkit-backdrop-filter: blur(
+        calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
+      )
+      saturate(var(--ly-chrome-liquid-sat));
+    border-bottom: 1px solid
+      color-mix(
+        in srgb,
+        var(--ly-chrome-liquid-border-atop-media) calc(100% * var(--chrome-media-blend, 0)),
+        color-mix(in srgb, var(--ly-chrome-liquid-border) 52%, transparent)
+      );
+    transition:
+      transform var(--chrome-reveal-duration) var(--chrome-reveal-ease),
+      opacity var(--chrome-reveal-duration) var(--chrome-reveal-ease);
+
+    &.nav-hidden {
+      pointer-events: none;
+    }
+  }
 
   .site-main {
     flex: 1;
@@ -63,54 +97,17 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background: color-mix(
-      in srgb,
-      var(--ly-chrome-liquid-bg-atop-media) calc(100% * var(--chrome-media-blend, 0)),
-      var(--ly-chrome-liquid-bg)
-    );
-    backdrop-filter: blur(
-        calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
-      )
-      saturate(var(--ly-chrome-liquid-sat));
-    -webkit-backdrop-filter: blur(
-        calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
-      )
-      saturate(var(--ly-chrome-liquid-sat));
+    flex-shrink: 0;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     height: var(--top-bar-track-h);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 var(--ly-container-pad-x);
-    /* 与主导航接缝处不用硬描边，避免「一条线」；与下方玻璃用内阴影柔化过渡 */
     border-bottom: none;
-    box-shadow:
-      var(--ly-chrome-liquid-inset),
-      var(--ly-chrome-liquid-shadow),
-      inset 0 -1px 0
-        color-mix(
-          in srgb,
-          var(--ly-chrome-liquid-border-atop-media) calc(55% * var(--chrome-media-blend, 0) + 22%),
-          var(--ly-chrome-liquid-border) 22%
-        );
-    /* 叠视频混合由 JS 低通写入 --chrome-media-blend，勿对 background/backdrop 做长 transition，否则与逐帧更新打架 */
-    transition:
-      box-shadow var(--motion-duration-md) var(--motion-ease-soft),
-      transform var(--chrome-reveal-duration) var(--chrome-reveal-ease),
-      opacity var(--chrome-reveal-duration) var(--chrome-reveal-ease);
-
-    &.nav-hidden {
-      pointer-events: none;
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background: var(--ly-chrome-liquid-shine);
-      opacity: calc(0.52 - 0.12 * var(--chrome-media-blend, 0));
-    }
+    box-shadow: none;
 
     /* 与主内容版心对齐（--ly-container-wide）；背景条仍全宽 */
     .site-chrome-inner {
@@ -139,10 +136,7 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
       justify-content: center;
     }
 
-    /*
-     * 字标胶囊：与整条顶栏共用 --ly-chrome-liquid-*，避免「一块实底」与菜单栏液态脱节。
-     * 圆角 + 略收的外晕与顶栏区分层次即可。
-     */
+    /* 字标胶囊：与 .site-chrome-shell 同一层玻璃，仅用描边与 hover 底色区分，无叠影 */
     .logo-chip {
       display: inline-flex;
       align-items: center;
@@ -164,24 +158,14 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
       );
       cursor: pointer;
       line-height: 0;
-      background: color-mix(
-        in srgb,
-        var(--ly-chrome-liquid-bg-atop-media) calc(100% * var(--chrome-media-blend, 0)),
-        var(--ly-chrome-liquid-bg)
-      );
-      box-shadow: var(--ly-chrome-liquid-inset),
-        0 0 0 1px color-mix(in srgb, var(--app-heading) 14%, transparent),
-        0 6px 22px -12px rgba(0, 0, 0, 0.24);
+      background: transparent;
+      box-shadow: none;
       isolation: isolate;
-      backdrop-filter: blur(
-          calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
-        )
-        saturate(var(--ly-chrome-liquid-sat));
-      -webkit-backdrop-filter: blur(
-          calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
-        )
-        saturate(var(--ly-chrome-liquid-sat));
-      transition: box-shadow var(--motion-duration-md) var(--motion-ease-soft);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      transition: background-color var(--motion-duration-md) var(--motion-ease-soft),
+        border-color var(--motion-duration-md) var(--motion-ease-soft),
+        color var(--motion-duration-md) var(--motion-ease-soft);
 
       &:hover {
         color: color-mix(
@@ -191,13 +175,8 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
         ) !important;
         background: color-mix(
             in srgb,
-            color-mix(
-                in srgb,
-                var(--ly-chrome-liquid-bg-atop-media) 78%,
-                rgba(255, 255, 255, 0.14) 22%
-              )
-              calc(100% * var(--chrome-media-blend, 0)),
-            color-mix(in srgb, var(--ly-chrome-liquid-bg) 68%, var(--ly-bg-raised) 32%)
+            rgba(255, 255, 255, 0.12) calc(100% * var(--chrome-media-blend, 0)),
+            color-mix(in srgb, var(--ly-bg-raised) 55%, transparent)
           )
           !important;
         border-color: color-mix(
@@ -207,15 +186,39 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
             color-mix(in srgb, var(--ly-chrome-liquid-border) 62%, var(--app-accent-cinnabar) 38%)
           )
           !important;
-        box-shadow: var(--ly-chrome-liquid-inset),
-          0 0 0 1px color-mix(in srgb, var(--app-heading) 18%, transparent),
-          0 10px 28px -10px rgba(0, 0, 0, 0.28),
-          0 0 36px -14px color-mix(in srgb, var(--app-accent-cinnabar) 22%, transparent);
+        box-shadow: none;
       }
 
       &:focus-visible {
         outline: 2px solid var(--app-accent-cinnabar);
         outline-offset: 3px;
+      }
+    }
+
+    html[data-theme='light'] & {
+      .logo-chip {
+        color: color-mix(
+          in srgb,
+          rgba(255, 252, 248, 0.98) calc(100% * var(--chrome-media-blend, 0)),
+          color-mix(in srgb, var(--app-heading) 88%, #020617 12%)
+        );
+
+        .brand-logo__wordmark {
+          stroke: color-mix(
+            in srgb,
+            rgba(255, 255, 255, 0.28) calc(100% * var(--chrome-media-blend, 0)),
+            rgba(15, 23, 42, 0.45)
+          );
+          stroke-width: 0.65px;
+        }
+
+        &:hover {
+          color: color-mix(
+            in srgb,
+            #fff calc(100% * var(--chrome-media-blend, 0)),
+            color-mix(in srgb, var(--app-heading) 80%, var(--app-accent-cinnabar) 20%)
+          ) !important;
+        }
       }
     }
 
@@ -232,10 +235,6 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
         rgba(255, 255, 255, 0.95) calc(100% * var(--chrome-media-blend, 0)),
         var(--top-bar-utility-fg)
       );
-      text-shadow:
-        0 0 1px color-mix(in srgb, rgba(0, 0, 0, 0.85) calc(100% * var(--chrome-media-blend, 0)), transparent),
-        0 1px 3px color-mix(in srgb, rgba(0, 0, 0, 0.65) calc(100% * var(--chrome-media-blend, 0)), transparent),
-        0 4px 18px color-mix(in srgb, rgba(0, 0, 0, 0.45) calc(100% * var(--chrome-media-blend, 0)), transparent);
       cursor: pointer;
       .app-tx-color-bg-transform();
       padding: 8px;
@@ -276,10 +275,6 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
         rgba(255, 255, 255, 0.95) calc(100% * var(--chrome-media-blend, 0)),
         var(--top-bar-utility-fg)
       );
-      text-shadow:
-        0 0 1px color-mix(in srgb, rgba(0, 0, 0, 0.85) calc(100% * var(--chrome-media-blend, 0)), transparent),
-        0 1px 3px color-mix(in srgb, rgba(0, 0, 0, 0.65) calc(100% * var(--chrome-media-blend, 0)), transparent),
-        0 4px 18px color-mix(in srgb, rgba(0, 0, 0, 0.45) calc(100% * var(--chrome-media-blend, 0)), transparent);
       .app-tx-color-bg-transform();
 
       .anticon {
@@ -341,10 +336,6 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
         var(--top-bar-utility-fg)
       );
       font-weight: 500;
-      text-shadow:
-        0 0 1px color-mix(in srgb, rgba(0, 0, 0, 0.88) calc(100% * var(--chrome-media-blend, 0)), transparent),
-        0 1px 3px color-mix(in srgb, rgba(0, 0, 0, 0.7) calc(100% * var(--chrome-media-blend, 0)), transparent),
-        0 4px 18px color-mix(in srgb, rgba(0, 0, 0, 0.48) calc(100% * var(--chrome-media-blend, 0)), transparent);
       .app-tx-color();
 
       &:hover {
@@ -363,12 +354,7 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
       max-width: min(168px, 40vw);
       cursor: inherit;
       display: block;
-      /*
-       * 原先阴影强度 × chrome-media-blend，在 blend=0 时完全消失，字标与玻璃底融在一起。
-       * 常态保留轻轮廓；叠 Hero 时随 blend 加重。
-       */
-      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, calc(0.26 + 0.32 * var(--chrome-media-blend, 0))))
-        drop-shadow(0 0 1px rgba(0, 0, 0, calc(0.14 + 0.42 * var(--chrome-media-blend, 0))));
+      filter: none;
       .app-tx-transform();
     }
 
@@ -381,11 +367,11 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
       padding: 8px 20px !important;
       font-size: 15px !important;
       .app-tx-contact-btn-important();
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      box-shadow: none;
 
       &:hover {
         transform: translateY(-1px) !important;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: none !important;
       }
     }
   }
@@ -395,42 +381,17 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
     isolation: isolate;
     overflow-x: auto;
     overflow-y: hidden;
-    background: color-mix(
-      in srgb,
-      var(--ly-chrome-liquid-bg-atop-media) calc(100% * var(--chrome-media-blend, 0)),
-      var(--ly-chrome-liquid-bg)
-    );
-    backdrop-filter: blur(
-        calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
-      )
-      saturate(var(--ly-chrome-liquid-sat));
-    -webkit-backdrop-filter: blur(
-        calc(var(--ly-chrome-liquid-blur) + 4px * var(--chrome-media-blend, 0))
-      )
-      saturate(var(--ly-chrome-liquid-sat));
-    border-bottom: 1px solid
-      color-mix(
-        in srgb,
-        var(--ly-chrome-liquid-border-atop-media) calc(100% * var(--chrome-media-blend, 0)),
-        var(--ly-chrome-liquid-border)
-      );
+    flex-shrink: 0;
+    background: transparent !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: none !important;
     padding: 0 var(--ly-container-pad-x) !important;
-    box-shadow: var(--ly-chrome-liquid-inset), var(--ly-chrome-liquid-shadow);
+    box-shadow: none;
     height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: box-shadow var(--motion-duration-md) var(--motion-ease-soft);
-
-    &::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      background: var(--ly-chrome-liquid-shine);
-      opacity: calc(0.52 - 0.12 * var(--chrome-media-blend, 0));
-    }
 
     .site-chrome-inner--nav {
       position: relative;
@@ -460,6 +421,8 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
     background-color: transparent !important;
     display: flex;
     align-items: center;
+    /* 随父级 .nav-bar 显隐时略跟手（opacity 由父层统一也可，此处保留过渡供子项重排时更顺） */
+    transition: opacity var(--chrome-reveal-duration) var(--chrome-reveal-ease);
     .app-tx-menu-shell();
     /* flex 子项默认 min-width:auto，横向 Menu 易撑破视口；收缩后交给 overflowedIndicator */
     flex: 1 1 auto;
@@ -473,10 +436,6 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
         rgba(255, 255, 255, 0.98) calc(100% * var(--chrome-media-blend, 0)),
         color-mix(in srgb, var(--app-text-primary) 62%, var(--app-text-secondary) 38%)
       ) !important;
-      text-shadow:
-        0 0 1px color-mix(in srgb, rgba(0, 0, 0, 0.88) calc(100% * var(--chrome-media-blend, 0)), transparent),
-        0 1px 3px color-mix(in srgb, rgba(0, 0, 0, 0.68) calc(100% * var(--chrome-media-blend, 0)), transparent),
-        0 4px 16px color-mix(in srgb, rgba(0, 0, 0, 0.42) calc(100% * var(--chrome-media-blend, 0)), transparent);
       font-size: 15px;
       font-weight: 500;
       padding: 0 20px !important;
@@ -532,8 +491,7 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
             var(--app-accent-cinnabar)
           );
           border-radius: 2px;
-          box-shadow: 0 0 8px
-            color-mix(in srgb, rgba(255, 255, 255, 0.45) calc(100% * var(--chrome-media-blend, 0)), transparent);
+          box-shadow: none;
         }
       }
     }
@@ -709,53 +667,33 @@ html[data-theme='light'] .top-layout .top-bar .logo-chip .logo {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* 顶栏无动画；仅压低静态高光层，保留液态 blur（blur 非动画） */
-  .top-layout .top-bar,
-  .top-layout .nav-bar,
+  .top-layout .site-chrome-shell,
   .top-layout .top-bar .logo-chip {
     transition: none !important;
   }
 
-  .top-layout .top-bar::after,
-  .top-layout .nav-bar::after {
-    opacity: 0.28;
-  }
-
   .top-layout .top-bar .logo-chip {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: var(--ly-glass-top-bar-bg);
+    background: transparent;
     border-color: var(--ly-chrome-liquid-border);
-    box-shadow: var(--chrome-header-shadow);
+    box-shadow: none;
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  .top-layout .top-bar,
-  .top-layout .nav-bar {
+  .top-layout .site-chrome-shell {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-  }
-
-  .top-layout .top-bar {
     background: var(--ly-glass-top-bar-bg);
-  }
-
-  .top-layout .nav-bar {
-    background: var(--ly-glass-nav-bg);
-  }
-
-  .top-layout .top-bar::after,
-  .top-layout .nav-bar::after {
-    opacity: 0;
   }
 
   .top-layout .top-bar .logo-chip {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    background: var(--ly-glass-top-bar-bg);
+    background: transparent;
     border-color: var(--ly-chrome-liquid-border);
-    box-shadow: var(--chrome-header-shadow);
+    box-shadow: none;
   }
 }
 

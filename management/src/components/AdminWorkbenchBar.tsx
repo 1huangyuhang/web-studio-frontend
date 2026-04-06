@@ -30,8 +30,12 @@ const AdminWorkbenchBar: React.FC = () => {
       )) as StatsSummaryResponse;
       const d = res?.data;
       if (!d) return;
-      setUnreadContactCount(d.unreadContactMessageCount ?? 0);
-      setPendingTicketCount(d.pendingSupportTicketCount ?? 0);
+      setUnreadContactCount(
+        d.unreadContactMessageCount == null ? 0 : d.unreadContactMessageCount
+      );
+      setPendingTicketCount(
+        d.pendingSupportTicketCount == null ? 0 : d.pendingSupportTicketCount
+      );
     } catch {
       /* 静默失败，避免与 Dashboard 重复弹窗 */
     }

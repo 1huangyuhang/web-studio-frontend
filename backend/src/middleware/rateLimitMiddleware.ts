@@ -18,8 +18,9 @@ export const globalRateLimitMiddleware = rateLimit({
     code: 'RATE_LIMIT_GLOBAL',
     timestamp: new Date().toISOString(),
   },
-  // 跳过健康检查路由
-  skip: (req: Request) => req.path === '/health',
+  // 跳过健康检查 / 就绪探针
+  skip: (req: Request) =>
+    req.path === '/health' || req.path === '/health/ready',
 });
 
 /**

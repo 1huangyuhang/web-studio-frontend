@@ -109,11 +109,14 @@ const ProductManagement: React.FC = () => {
     });
   }, [debouncedInput, urlSearch, setSearchParams]);
 
-  const queryListParams = {
-    page: currentPage,
-    pageSize,
-    search: urlSearch,
-  };
+  const queryListParams = useMemo(
+    () => ({
+      page: currentPage,
+      pageSize,
+      search: urlSearch,
+    }),
+    [currentPage, pageSize, urlSearch]
+  );
 
   const { data, isPending, isError, error, refetch } = useQuery({
     queryKey: queryKeys.products.list(queryListParams),
@@ -133,7 +136,8 @@ const ProductManagement: React.FC = () => {
   useEffect(() => {
     const invalidate = () => {
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.products.lists(),
+        queryKey: queryKeys.products.list(queryListParams),
+        exact: true,
       });
     };
     wsService.on('product:created', invalidate);
@@ -144,7 +148,7 @@ const ProductManagement: React.FC = () => {
       wsService.off('product:updated', invalidate);
       wsService.off('product:deleted', invalidate);
     };
-  }, [queryClient]);
+  }, [queryClient, queryListParams]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -263,7 +267,8 @@ const ProductManagement: React.FC = () => {
       }
 
       await queryClient.invalidateQueries({
-        queryKey: queryKeys.products.lists(),
+        queryKey: queryKeys.products.list(queryListParams),
+        exact: true,
       });
       setIsModalVisible(false);
     } catch (err: unknown) {
@@ -284,7 +289,8 @@ const ProductManagement: React.FC = () => {
             await axiosInstance.delete(`/products/${id}`);
             message.success('产品删除成功');
             await queryClient.invalidateQueries({
-              queryKey: queryKeys.products.lists(),
+              queryKey: queryKeys.products.list(queryListParams),
+              exact: true,
             });
           } catch (err: unknown) {
             console.error('删除产品失败:', err);
@@ -294,7 +300,7 @@ const ProductManagement: React.FC = () => {
         },
       });
     },
-    [queryClient, refetch]
+    [queryClient, refetch, queryListParams]
   );
 
   const writeEnabled = canWriteInManagementUi();

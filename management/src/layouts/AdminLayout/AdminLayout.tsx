@@ -21,8 +21,12 @@ import {
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
 import { ADMIN_NAV_GROUPS, getBreadcrumbSegments } from '@/config/menuConfig';
-import { getManagementSocketHttpOrigin } from '@/config/managementApiBase';
+import {
+  formatManagementHealthProbeLabel,
+  getManagementHealthProbeUrl,
+} from '@/config/managementApiBase';
 import AdminWorkbenchBar from '@/components/AdminWorkbenchBar';
+import { useManagementStatsSync } from '@/realtime/useManagementStatsSync';
 import './index.less';
 
 const { Header, Content, Sider } = Layout;
@@ -36,6 +40,7 @@ const SESSION_DISMISS_READONLY = 'mgmt-hint-readonly-dismissed';
 const SESSION_DISMISS_BACKEND_HEALTH = 'mgmt-hint-backend-health-dismissed';
 
 const AdminLayout: React.FC = () => {
+  useManagementStatsSync();
   const navigate = useNavigate();
   const location = useLocation();
   const screens = Grid.useBreakpoint();
@@ -47,13 +52,12 @@ const AdminLayout: React.FC = () => {
   const [apiHint, setApiHint] = useState<null | 'network' | 'readOnly'>(null);
   const [backendHealthBad, setBackendHealthBad] = useState(false);
 
-  /** 直连后端根路径 /health（不经 Vite /api），与业务请求链路区分，尽早发现「进程未起或端口错位」 */
+  /** 开发：同源 GET /health，经 Vite 代理到 REDWOOD_PORT_API；生产：后端 HTTP 源上的 /health */
   useEffect(() => {
     if (sessionStorage.getItem(SESSION_DISMISS_BACKEND_HEALTH)) return;
-    const origin = getManagementSocketHttpOrigin();
     const ac = new AbortController();
     const timer = window.setTimeout(() => ac.abort(), 4000);
-    void fetch(`${origin.replace(/\/$/, '')}/health`, {
+    void fetch(getManagementHealthProbeUrl(), {
       signal: ac.signal,
     })
       .then((res) => {
@@ -211,13 +215,7 @@ const AdminLayout: React.FC = () => {
         </Sider>
       )}
 
-      <Layout
-        className="admin-shell__main"
-        style={{
-          marginLeft: mainOffset,
-          transition: 'margin-left 0.2s ease',
-        }}
-      >
+      <Layout className="admin-shell__main" style={{ marginLeft: mainOffset }}>
         <Header className="admin-shell__header">
           <Button
             type="text"
@@ -280,7 +278,7 @@ const AdminLayout: React.FC = () => {
                 closable
                 onClose={dismissBackendHealthHint}
                 message="后端服务未响应（/health）"
-                description={`已探测 ${getManagementSocketHttpOrigin()}/health 失败。请在本机执行 cd backend && npm run dev，并确认 PORT 与 Vite 代理目标一致；联调自检：npm run check:management-api。`}
+                description={`已探测 ${formatManagementHealthProbeLabel()} 失败。说明：/health 只表示「本机 Node 后端是否在监听」，不检查数据库是否已启动；库已开但后端没跑、或后端启动时因连库失败立刻退出，都会出现本提示。请在另一终端执行 cd backend && npm run dev，并确认终端持续打印 Server is running；若进程秒退，请看 DATABASE_URL / Prisma 迁移报错。PORT 须与 scripts/dev-ports.env 的 REDWOOD_PORT_API 一致。联调自检：npm run check:management-api。`}
                 style={{ marginBottom: 16 }}
               />
             ) : null}
@@ -291,7 +289,7 @@ const AdminLayout: React.FC = () => {
                 closable
                 onClose={dismissApiHint}
                 message="无法连接后端 API"
-                description="官网与管理端列表可能无法加载。请先在本机启动后端与数据库，或使用仓库根目录 npm run start:all。"
+                description="官网与管理端列表可能无法加载。请先在本机启动后端 API（cd backend && npm run dev）；数据库需可用但若仅库开着而后端未监听端口仍会失败。也可使用仓库根目录 npm run start:all。"
                 style={{ marginBottom: 16 }}
               />
             ) : null}

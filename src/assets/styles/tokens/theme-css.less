@@ -146,20 +146,24 @@ html[data-theme='dark'] {
   --ly-chrome-liquid-inset: 0 1px 0 rgba(255, 255, 255, 0.11) inset;
   --ly-chrome-liquid-shadow: 0 1px 0 rgba(255, 255, 255, 0.04),
     0 18px 50px -22px rgba(0, 0, 0, 0.48);
+  /* 与下栏接缝处避免再叠一层 1px 外描边，仅用柔阴影 */
+  --ly-chrome-liquid-shadow-ambient: 0 18px 50px -22px rgba(0, 0, 0, 0.48);
   --ly-chrome-liquid-shadow-atop-media: 0 18px 48px -20px rgba(0, 0, 0, 0.42);
   --ly-chrome-liquid-inset-atop-media: 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  /* 顶栏底缘与主导航顶缘：极弱顶光，避免与上栏底 inset 叠成硬缝 */
+  --ly-chrome-liquid-inset-navjoin: inset 0 1px 0 rgba(255, 255, 255, 0.042);
   --ly-chrome-liquid-shine: linear-gradient(
     118deg,
     rgba(255, 255, 255, 0.07) 0%,
     transparent 38%,
-    rgba(212, 101, 92, 0.05) 52%,
+    rgba(212, 101, 92, 0.022) 52%,
     transparent 78%
   );
   --ly-chrome-liquid-shine-atop-media: linear-gradient(
     118deg,
     rgba(255, 255, 255, 0.05) 0%,
     transparent 40%,
-    rgba(212, 101, 92, 0.06) 54%,
+    rgba(212, 101, 92, 0.028) 54%,
     transparent 78%
   );
 
@@ -328,30 +332,34 @@ html[data-theme='light'] {
    * Hero 大光比（雾面/天空很亮）：若仍用浅白玻璃，白字菜单会融进背景。
    * 叠视频时用偏深冷灰半透明 + 更强 blur，仍保持「透」但托起白字与浅色图标。
    */
-  --ly-chrome-liquid-bg-atop-media: color-mix(in srgb, #0f172a 48%, transparent);
+  /* 略加深 + 暖边：叠高亮视频时仍像「设计过的」玻璃条，不灰糊 */
+  --ly-chrome-liquid-bg-atop-media: color-mix(in srgb, #0f172a 56%, transparent);
   --ly-chrome-liquid-blur: 18px;
   --ly-chrome-liquid-blur-atop-media: 22px;
-  --ly-chrome-liquid-sat: 1.58;
+  --ly-chrome-liquid-sat: 1.62;
   --ly-chrome-liquid-border: rgba(15, 23, 42, 0.072);
-  --ly-chrome-liquid-border-atop-media: rgba(255, 255, 255, 0.14);
+  --ly-chrome-liquid-border-atop-media: rgba(255, 255, 255, 0.2);
   --ly-chrome-liquid-inset: 0 1px 0 rgba(255, 255, 255, 0.88) inset;
-  --ly-chrome-liquid-inset-atop-media: 0 1px 0 rgba(255, 255, 255, 0.14) inset;
+  --ly-chrome-liquid-inset-atop-media: 0 1px 0 rgba(255, 255, 255, 0.22) inset;
   --ly-chrome-liquid-shadow: 0 1px 0 rgba(15, 23, 42, 0.04),
     0 14px 40px -18px rgba(15, 23, 42, 0.09);
-  --ly-chrome-liquid-shadow-atop-media: 0 10px 40px -12px rgba(0, 0, 0, 0.38);
+  --ly-chrome-liquid-shadow-ambient: 0 14px 40px -18px rgba(15, 23, 42, 0.09);
+  --ly-chrome-liquid-shadow-atop-media: 0 12px 44px -10px rgba(0, 0, 0, 0.42),
+    0 0 48px -20px color-mix(in srgb, var(--app-accent-cinnabar) 12%, transparent);
+  --ly-chrome-liquid-inset-navjoin: inset 0 1px 0 rgba(255, 255, 255, 0.26);
   --ly-chrome-liquid-shine: linear-gradient(
     118deg,
     rgba(255, 255, 255, 0.45) 0%,
     transparent 40%,
-    rgba(176, 61, 54, 0.04) 55%,
+    rgba(176, 61, 54, 0.018) 55%,
     transparent 80%
   );
   --ly-chrome-liquid-shine-atop-media: linear-gradient(
     118deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    transparent 38%,
-    rgba(176, 61, 54, 0.07) 52%,
-    transparent 76%
+    rgba(255, 255, 255, 0.14) 0%,
+    transparent 36%,
+    rgba(176, 61, 54, 0.045) 50%,
+    transparent 74%
   );
 
   --chrome-header-border: rgba(15, 23, 42, 0.08);

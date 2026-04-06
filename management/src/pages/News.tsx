@@ -61,11 +61,14 @@ const NewsManagement: React.FC = () => {
     [setSearchParams]
   );
 
-  const listParams = {
-    page: currentPage,
-    pageSize,
-    search: urlSearch.trim(),
-  };
+  const listParams = useMemo(
+    () => ({
+      page: currentPage,
+      pageSize,
+      search: urlSearch.trim(),
+    }),
+    [currentPage, pageSize, urlSearch]
+  );
 
   const { data, isPending, isError, error, refetch } = useQuery({
     queryKey: queryKeys.news.list(listParams),
@@ -79,7 +82,10 @@ const NewsManagement: React.FC = () => {
 
   useEffect(() => {
     const invalidate = () => {
-      void queryClient.invalidateQueries({ queryKey: queryKeys.news.lists() });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.news.list(listParams),
+        exact: true,
+      });
     };
     wsService.on('news:created', invalidate);
     wsService.on('news:updated', invalidate);
@@ -89,7 +95,7 @@ const NewsManagement: React.FC = () => {
       wsService.off('news:updated', invalidate);
       wsService.off('news:deleted', invalidate);
     };
-  }, [queryClient]);
+  }, [queryClient, listParams]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -157,7 +163,10 @@ const NewsManagement: React.FC = () => {
         message.success('新闻创建成功');
       }
 
-      await queryClient.invalidateQueries({ queryKey: queryKeys.news.lists() });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.news.list(listParams),
+        exact: true,
+      });
       setIsModalVisible(false);
     } catch (err: unknown) {
       console.error('操作失败:', err);
@@ -187,7 +196,8 @@ const NewsManagement: React.FC = () => {
           await axiosInstance.delete(`/news/${id}`);
           message.success('新闻删除成功');
           await queryClient.invalidateQueries({
-            queryKey: queryKeys.news.lists(),
+            queryKey: queryKeys.news.list(listParams),
+            exact: true,
           });
         } catch (err: unknown) {
           console.error('删除新闻失败:', err);

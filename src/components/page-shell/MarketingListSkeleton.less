@@ -1,0 +1,52 @@
+.marketing-list-skeleton {
+  &__card {
+    .ant-card-body {
+      padding: 16px;
+    }
+  }
+
+  &__media {
+    margin-bottom: 16px;
+    border-radius: var(--app-saas-card-radius, 16px);
+    overflow: hidden;
+  }
+
+  &__image {
+    width: 100% !important;
+    height: 200px !important;
+
+    .ant-skeleton-image {
+      width: 100% !important;
+      height: 200px !important;
+      border-radius: var(--app-saas-card-radius, 16px);
+    }
+  }
+}
+
+.marketing-news-list-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &__card {
+    .ant-card-body {
+      padding: 20px;
+    }
+  }
+
+  &__thumb-wrap {
+    border-radius: var(--app-saas-card-radius, 16px);
+    overflow: hidden;
+  }
+
+  &__thumb {
+    width: 100% !important;
+    height: 180px !important;
+
+    .ant-skeleton-image {
+      width: 100% !important;
+      height: 180px !important;
+      border-radius: var(--app-saas-card-radius, 16px);
+    }
+  }
+}

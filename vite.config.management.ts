@@ -27,6 +27,11 @@ export default defineConfig({
         target: `http://127.0.0.1:${ports.api}`,
         changeOrigin: true,
       },
+      /** 与 AdminLayout /health 探测同源，避免硬编码 3000 与 dev-ports 不一致 */
+      '/health': {
+        target: `http://127.0.0.1:${ports.api}`,
+        changeOrigin: true,
+      },
     },
   },
   build: {

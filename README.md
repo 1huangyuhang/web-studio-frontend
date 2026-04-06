@@ -24,6 +24,20 @@ cd backend && npm install && npm run dev
 
 环境变量参考：`backend/.env.example`、根目录 `.env.example`、`management/.env.example`。
 
+## 后端健康检查（部署探针）
+
+- **`GET /health`**：仅表示 Node 进程在跑，负载均衡可用来做最轻量存活检查。
+- **`GET /health/ready`**：对数据库执行 `SELECT 1`；**数据库不可连时返回 HTTP 503**，适合作为 Kubernetes `readinessProbe` 或 Docker `HEALTHCHECK`，由编排器在失败时重启实例或摘流。全局速率限制已跳过上述路径。
+
+Docker 示例：
+
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:3000/health/ready || exit 1
+```
+
+Kubernetes 示例：`readinessProbe.httpGet.path` 设为 `/health/ready`，`port` 与容器内后端监听端口一致（默认与 `PORT` 环境变量相同，常见为 3000）。
+
 ## API Key（`API_KEY` / `VITE_API_KEY`）
 
 - **必须一致**：后端环境变量 `API_KEY` 与官网、管理端构建时的 `VITE_API_KEY` 须相同，否则带 `x-api-key` 的请求会返回 401。本地默认均为 `default-api-key`（见各目录 `.env.example`）。

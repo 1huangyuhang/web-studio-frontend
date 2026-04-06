@@ -33,6 +33,7 @@ const mgmtPort =
     : readEnvPort('REDWOOD_PORT_MANAGEMENT', 3001);
 
 const healthUrl = `http://127.0.0.1:${apiPort}/health`;
+const healthReadyUrl = `http://127.0.0.1:${apiPort}/health/ready`;
 const activitiesUrl = `http://127.0.0.1:${apiPort}/api/activities?page=1&pageSize=1`;
 const siteAssetsUrl = `http://127.0.0.1:${apiPort}/api/site-assets`;
 const siteAssetsListUrl = `http://127.0.0.1:${apiPort}/api/site-assets?omitImage=1`;
@@ -56,6 +57,25 @@ try {
   console.log(
     `后端 ${healthUrl} → OK (${text.slice(0, 120)}${text.length > 120 ? '…' : ''})`
   );
+  try {
+    const readyRes = await fetch(healthReadyUrl, {
+      signal: AbortSignal.timeout(5000),
+    });
+    const readyText = await readyRes.text();
+    if (readyRes.ok) {
+      console.log(
+        `后端 ${healthReadyUrl} → OK (${readyText.slice(0, 120)}${readyText.length > 120 ? '…' : ''})`
+      );
+    } else {
+      console.warn(
+        `后端 ${healthReadyUrl} → HTTP ${readyRes.status}（数据库可能未就绪，部署探针会判失败）`
+      );
+    }
+  } catch (e2) {
+    console.warn(
+      `后端 ${healthReadyUrl} 请求异常（可忽略若暂未连库）: ${String(e2?.message ?? e2)}`
+    );
+  }
 } catch (e) {
   console.error(
     `后端 ${healthUrl} 不可达 → 管理端列表会报 HTTP 500/网络错误。请先启动: cd backend && npm run dev`

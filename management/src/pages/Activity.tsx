@@ -61,11 +61,14 @@ const ActivityManagement: React.FC = () => {
     [setSearchParams]
   );
 
-  const listParams = {
-    page: currentPage,
-    pageSize,
-    search: urlSearch.trim(),
-  };
+  const listParams = useMemo(
+    () => ({
+      page: currentPage,
+      pageSize,
+      search: urlSearch.trim(),
+    }),
+    [currentPage, pageSize, urlSearch]
+  );
 
   const { data, isPending, isError, error, refetch } = useQuery({
     queryKey: queryKeys.activities.list(listParams),
@@ -85,7 +88,8 @@ const ActivityManagement: React.FC = () => {
   useEffect(() => {
     const invalidate = () => {
       void queryClient.invalidateQueries({
-        queryKey: queryKeys.activities.lists(),
+        queryKey: queryKeys.activities.list(listParams),
+        exact: true,
       });
     };
     wsService.on('activity:created', invalidate);
@@ -96,7 +100,7 @@ const ActivityManagement: React.FC = () => {
       wsService.off('activity:updated', invalidate);
       wsService.off('activity:deleted', invalidate);
     };
-  }, [queryClient]);
+  }, [queryClient, listParams]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -168,7 +172,8 @@ const ActivityManagement: React.FC = () => {
       }
 
       await queryClient.invalidateQueries({
-        queryKey: queryKeys.activities.lists(),
+        queryKey: queryKeys.activities.list(listParams),
+        exact: true,
       });
       setIsModalVisible(false);
     } catch (err: unknown) {
@@ -199,7 +204,8 @@ const ActivityManagement: React.FC = () => {
           await axiosInstance.delete(`/activities/${id}`);
           message.success('活动删除成功');
           await queryClient.invalidateQueries({
-            queryKey: queryKeys.activities.lists(),
+            queryKey: queryKeys.activities.list(listParams),
+            exact: true,
           });
         } catch (err: unknown) {
           console.error('删除活动失败:', err);

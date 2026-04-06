@@ -355,118 +355,104 @@ const Layout = () => {
       {/* 页面游览进度条，根据菜单栏显示状态自动控制显示/隐藏 */}
       <ProgressBar isMenuVisible={isNavVisible} />
 
-      {/* 顶部栏 */}
+      {/* 顶栏 + 主导航：单容器固定定位，一层玻璃底，消除两行之间的缝与叠影 */}
       <div
-        className={`top-bar ${isNavVisible ? '' : 'nav-hidden'}`}
-        style={{
-          transform: isNavVisible
-            ? 'translateY(0)'
-            : `translateY(-${topBarHeight}px)`,
-          transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-        }}
-      >
-        <div className="site-chrome-inner">
-          <div className="top-bar-left">
-            <SearchOutlined className="top-bar-icon" />
-            <span className="phone-number">+86 13910417182</span>
-          </div>
-          <div className="top-bar-center">
-            <button
-              type="button"
-              className="logo-chip"
-              onClick={() => navigate('/')}
-              aria-label="林之源 · 返回首页"
-            >
-              <BrandLogo decorative className="logo" />
-            </button>
-          </div>
-          <div className="top-bar-right">
-            <ThemeToggle />
-            <Popover
-              content={cartPanel}
-              title="购物车"
-              trigger={['click']}
-              placement="bottomRight"
-              overlayClassName="top-bar-cart-popover"
-            >
-              <button
-                type="button"
-                className="top-bar-icon-btn cart-trigger"
-                aria-label="打开购物车预览"
-                aria-haspopup="dialog"
-              >
-                <Badge count={cartCount} size="small" offset={[4, 0]}>
-                  <span className="top-bar-badge-anchor">
-                    <ShoppingCartOutlined aria-hidden />
-                  </span>
-                </Badge>
-              </button>
-            </Popover>
-            <Dropdown
-              menu={{ items: userMenuItems }}
-              trigger={['click']}
-              placement="bottomRight"
-              classNames={{ root: 'top-bar-user-dropdown' }}
-            >
-              <button
-                type="button"
-                className="top-bar-icon-btn user-menu-trigger"
-                aria-label="用户菜单"
-                aria-haspopup="menu"
-              >
-                <UserOutlined aria-hidden />
-              </button>
-            </Dropdown>
-            <Button
-              type="primary"
-              className="contact-button"
-              onClick={() => navigate('/contact')}
-            >
-              联系我们
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* 导航栏 */}
-      <AntHeader
-        className={`nav-bar ${isNavVisible ? '' : 'nav-hidden'}`}
+        className={`site-chrome-shell ${isNavVisible ? '' : 'nav-hidden'}`}
         style={{
           transform: isNavVisible
             ? 'translateY(0)'
             : `translateY(-${topBarHeight + navHeight}px)`,
-          transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          position: 'fixed',
-          top: topBarHeight,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          margin: 0,
-          padding: 0,
-          height: navHeight,
-          border: 'none',
+          opacity: isNavVisible ? 1 : 0,
         }}
       >
-        <div className="site-chrome-inner site-chrome-inner--nav">
-          <Menu
-            mode="horizontal"
-            items={navItems}
-            selectedKeys={[location.pathname]}
-            className="nav-menu"
-            overflowedIndicator={<MenuOutlined />}
-            style={{
-              transition: 'all 0.3s ease-in-out',
-              flex: 1,
-              minWidth: 0,
-            }}
-          />
+        <div className="top-bar">
+          <div className="site-chrome-inner">
+            <div className="top-bar-left">
+              <SearchOutlined className="top-bar-icon" />
+              <span className="phone-number">+86 13910417182</span>
+            </div>
+            <div className="top-bar-center">
+              <button
+                type="button"
+                className="logo-chip"
+                onClick={() => navigate('/')}
+                aria-label="林之源 · 返回首页"
+              >
+                <BrandLogo decorative className="logo" />
+              </button>
+            </div>
+            <div className="top-bar-right">
+              <ThemeToggle />
+              <Popover
+                content={cartPanel}
+                title="购物车"
+                trigger={['click']}
+                placement="bottomRight"
+                overlayClassName="top-bar-cart-popover"
+              >
+                <button
+                  type="button"
+                  className="top-bar-icon-btn cart-trigger"
+                  aria-label="打开购物车预览"
+                  aria-haspopup="dialog"
+                >
+                  <Badge count={cartCount} size="small" offset={[4, 0]}>
+                    <span className="top-bar-badge-anchor">
+                      <ShoppingCartOutlined aria-hidden />
+                    </span>
+                  </Badge>
+                </button>
+              </Popover>
+              <Dropdown
+                menu={{ items: userMenuItems }}
+                trigger={['click']}
+                placement="bottomRight"
+                classNames={{ root: 'top-bar-user-dropdown' }}
+              >
+                <button
+                  type="button"
+                  className="top-bar-icon-btn user-menu-trigger"
+                  aria-label="用户菜单"
+                  aria-haspopup="menu"
+                >
+                  <UserOutlined aria-hidden />
+                </button>
+              </Dropdown>
+              <Button
+                type="primary"
+                className="contact-button"
+                onClick={() => navigate('/contact')}
+              >
+                联系我们
+              </Button>
+            </div>
+          </div>
         </div>
-      </AntHeader>
+
+        <AntHeader
+          className={`nav-bar ${isNavVisible ? '' : 'nav-hidden'}`}
+          style={{
+            margin: 0,
+            padding: 0,
+            height: navHeight,
+            border: 'none',
+          }}
+        >
+          <div className="site-chrome-inner site-chrome-inner--nav">
+            <Menu
+              mode="horizontal"
+              items={navItems}
+              selectedKeys={[location.pathname]}
+              className="nav-menu"
+              overflowedIndicator={<MenuOutlined />}
+              style={{
+                flex: 1,
+                minWidth: 0,
+              }}
+            />
+          </div>
+        </AntHeader>
+      </div>
 
       {/* 占位元素，避免内容被固定定位的导航栏遮挡 */}
       <div

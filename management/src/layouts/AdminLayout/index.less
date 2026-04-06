@@ -12,6 +12,8 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
+    transition: margin-left var(--admin-sider-motion-duration)
+      var(--admin-sider-motion-ease);
   }
 
   .admin-shell__sider {
@@ -27,6 +29,16 @@
       var(--admin-sider-bg) 0%,
       #0e1319 100%
     ) !important;
+
+    /* 与主区 margin-left 同轨，避免侧栏与内容「各动各的」 */
+    &.ant-layout-sider {
+      transition:
+        width var(--admin-sider-motion-duration) var(--admin-sider-motion-ease),
+        min-width var(--admin-sider-motion-duration)
+          var(--admin-sider-motion-ease),
+        max-width var(--admin-sider-motion-duration)
+          var(--admin-sider-motion-ease) !important;
+    }
 
     .ant-layout-sider-children {
       display: flex;
@@ -87,6 +99,9 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
     border-inline-end: none !important;
     padding: 8px 0 16px;
 
@@ -256,6 +271,17 @@
   .admin-shell__content-inner {
     max-width: var(--admin-content-max-width);
     margin: 0 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-shell {
+    --admin-sider-motion-duration: 0.01ms;
+
+    .admin-shell__sider.ant-layout-sider,
+    .admin-shell__main.ant-layout {
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 

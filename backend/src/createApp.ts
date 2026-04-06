@@ -27,6 +27,7 @@ import { adminUserReadOnlyMiddleware } from './middleware/adminUserReadOnlyMiddl
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swaggerConfig';
 import { setSocketServer } from './socketInstance';
+import prisma from './utils/prisma';
 
 const managementStack: express.RequestHandler[] = [
   managementAuthMiddleware,
@@ -91,6 +92,22 @@ export function createApp(): {
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', message: 'Server is running' });
+  });
+
+  /** 就绪探针：含数据库连通性，供 Docker/K8s 重启决策（失败返回 503） */
+  app.get('/health/ready', async (_req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      res.json({
+        status: 'ok',
+        checks: { database: 'ok' as const },
+      });
+    } catch {
+      res.status(503).json({
+        status: 'unavailable',
+        checks: { database: 'fail' as const },
+      });
+    }
   });
 
   app.use(

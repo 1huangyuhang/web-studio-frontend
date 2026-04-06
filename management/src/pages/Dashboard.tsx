@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React from 'react';
 import { Row, Col, Card, Alert, Button, Spin } from 'antd';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   ShoppingOutlined,
   CalendarOutlined,
@@ -12,40 +12,32 @@ import {
   CustomerServiceOutlined,
 } from '@ant-design/icons';
 import axiosInstance from '../services/axiosInstance';
-import wsService from '../services/websocket';
-import type { WebSocketEvent } from '../services/websocket';
-import type { StatsSummaryDTO, StatsSummaryResponse } from '@/types/api';
+import type {
+  StatsSummaryDTO,
+  StatsSummaryPartialDTO,
+  StatsSummaryResponse,
+} from '@/types/api';
 import { queryKeys } from '@/queryKeys';
 import { formatManagementListLoadError } from '@/utils/managementLoadErrorHint';
 
-const emptyStats: StatsSummaryDTO = {
-  productCount: 0,
-  activityCount: 0,
-  newsCount: 0,
-  siteAssetCount: 0,
-  courseCount: 0,
-  pricingPlanCount: 0,
-  contactMessageCount: 0,
-  supportTicketCount: 0,
-  unreadContactMessageCount: 0,
-  pendingSupportTicketCount: 0,
+const emptyPartial: StatsSummaryPartialDTO = {
+  productCount: null,
+  activityCount: null,
+  newsCount: null,
+  siteAssetCount: null,
+  courseCount: null,
+  pricingPlanCount: null,
+  contactMessageCount: null,
+  supportTicketCount: null,
+  unreadContactMessageCount: null,
+  pendingSupportTicketCount: null,
 };
 
-function mapStatsBody(d: StatsSummaryResponse['data']): StatsSummaryDTO {
-  if (!d) return { ...emptyStats };
-  return {
-    productCount: d.productCount ?? 0,
-    activityCount: d.activityCount ?? 0,
-    newsCount: d.newsCount ?? 0,
-    siteAssetCount: d.siteAssetCount ?? 0,
-    courseCount: d.courseCount ?? 0,
-    pricingPlanCount: d.pricingPlanCount ?? 0,
-    contactMessageCount: d.contactMessageCount ?? 0,
-    supportTicketCount: d.supportTicketCount ?? 0,
-    unreadContactMessageCount: d.unreadContactMessageCount ?? 0,
-    pendingSupportTicketCount: d.pendingSupportTicketCount ?? 0,
-  };
-}
+type DashboardStatsState = {
+  metrics: StatsSummaryPartialDTO;
+  degraded: boolean;
+  errors: Partial<Record<keyof StatsSummaryDTO, string>>;
+};
 
 type StatDef = {
   key: keyof StatsSummaryDTO;
@@ -106,60 +98,24 @@ const STAT_DEFS: StatDef[] = [
 ];
 
 const Dashboard: React.FC = () => {
-  const queryClient = useQueryClient();
-
   const { data, isPending, isError, error, refetch, isFetching } = useQuery({
     queryKey: queryKeys.stats.summary(),
-    queryFn: async () => {
+    queryFn: async (): Promise<DashboardStatsState> => {
       const res = (await axiosInstance.get(
         '/stats/summary'
       )) as StatsSummaryResponse;
       if (!res?.data) {
         throw new Error('统计接口未返回 data');
       }
-      return mapStatsBody(res.data);
+      return {
+        metrics: res.data,
+        degraded: res.meta?.degraded ?? false,
+        errors: res.meta?.errors ?? {},
+      };
     },
   });
 
-  const invalidateStats = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: queryKeys.stats.all });
-  }, [queryClient]);
-
-  const wsPairs = useMemo(
-    () =>
-      [
-        ['product:created', invalidateStats],
-        ['product:updated', invalidateStats],
-        ['product:deleted', invalidateStats],
-        ['activity:created', invalidateStats],
-        ['activity:updated', invalidateStats],
-        ['activity:deleted', invalidateStats],
-        ['news:created', invalidateStats],
-        ['news:updated', invalidateStats],
-        ['news:deleted', invalidateStats],
-        ['course:created', invalidateStats],
-        ['course:updated', invalidateStats],
-        ['course:deleted', invalidateStats],
-        ['pricingPlan:created', invalidateStats],
-        ['pricingPlan:updated', invalidateStats],
-        ['pricingPlan:deleted', invalidateStats],
-        ['contactMessage:created', invalidateStats],
-        ['contactMessage:deleted', invalidateStats],
-        ['supportTicket:created', invalidateStats],
-        ['supportTicket:updated', invalidateStats],
-        ['supportTicket:deleted', invalidateStats],
-      ] as [keyof WebSocketEvent, () => void][],
-    [invalidateStats]
-  );
-
-  useEffect(() => {
-    wsPairs.forEach(([ev, fn]) => wsService.on(ev, fn));
-    return () => {
-      wsPairs.forEach(([ev, fn]) => wsService.off(ev, fn));
-    };
-  }, [wsPairs]);
-
-  const stats = data ?? emptyStats;
+  const metrics = data?.metrics ?? emptyPartial;
   const showSkeleton = isPending || (isFetching && !data);
 
   return (
@@ -193,34 +149,63 @@ const Dashboard: React.FC = () => {
         />
       ) : null}
 
+      {!isError && data?.degraded ? (
+        <Alert
+          type="warning"
+          showIcon
+          closable
+          style={{ marginBottom: 16 }}
+          message="部分统计暂不可用"
+          description="个别计数接口失败，已单独标为「—」；其余指标仍可参考。可稍后重试加载。"
+        />
+      ) : null}
+
       <Row gutter={[16, 16]} className="admin-dashboard__stats">
-        {STAT_DEFS.map((def) => (
-          <Col xs={24} sm={12} lg={8} xl={6} key={def.key}>
-            <Card
-              bordered={false}
-              className={`admin-dashboard__kpi-card admin-dashboard__kpi-card--${def.accent}`}
-            >
-              <div className="admin-dashboard__kpi-top">
-                <span
-                  className={`admin-dashboard__kpi-icon admin-dashboard__kpi-icon--${def.accent}`}
-                  aria-hidden
-                >
-                  {def.icon}
-                </span>
-                <span className="admin-dashboard__kpi-value">
-                  {showSkeleton ? (
-                    <Spin size="small" />
-                  ) : isError ? (
-                    '—'
-                  ) : (
-                    stats[def.key]
-                  )}
-                </span>
-              </div>
-              <div className="admin-dashboard__kpi-label">{def.label}</div>
-            </Card>
-          </Col>
-        ))}
+        {STAT_DEFS.map((def) => {
+          const raw = metrics[def.key];
+          const cellError = data?.errors?.[def.key];
+          return (
+            <Col xs={24} sm={12} lg={8} xl={6} key={def.key}>
+              <Card
+                bordered={false}
+                className={`admin-dashboard__kpi-card admin-dashboard__kpi-card--${def.accent}`}
+              >
+                <div className="admin-dashboard__kpi-top">
+                  <span
+                    className={`admin-dashboard__kpi-icon admin-dashboard__kpi-icon--${def.accent}`}
+                    aria-hidden
+                  >
+                    {def.icon}
+                  </span>
+                  <span className="admin-dashboard__kpi-value">
+                    {showSkeleton ? (
+                      <Spin size="small" />
+                    ) : isError ? (
+                      '—'
+                    ) : raw === null ? (
+                      '—'
+                    ) : (
+                      raw
+                    )}
+                  </span>
+                </div>
+                <div className="admin-dashboard__kpi-label">{def.label}</div>
+                {!showSkeleton && !isError && cellError ? (
+                  <div
+                    className="admin-dashboard__kpi-hint"
+                    style={{
+                      marginTop: 8,
+                      fontSize: 12,
+                      color: 'var(--app-text-tertiary, #888)',
+                    }}
+                  >
+                    该项加载失败
+                  </div>
+                ) : null}
+              </Card>
+            </Col>
+          );
+        })}
       </Row>
     </div>
   );

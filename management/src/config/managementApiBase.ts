@@ -58,3 +58,22 @@ export function getManagementSocketHttpOrigin(): string {
 export function getManagementSocketUrl(): string {
   return getManagementSocketHttpOrigin().replace(/^http/, 'ws');
 }
+
+/**
+ * 存活探测 URL：开发用同源 `/health`，走 Vite 代理到 `REDWOOD_PORT_API`；
+ * 生产用后端 HTTP 源（与 Socket 一致）。
+ */
+export function getManagementHealthProbeUrl(): string {
+  if (import.meta.env.DEV) {
+    return '/health';
+  }
+  return `${getManagementSocketHttpOrigin().replace(/\/$/, '')}/health`;
+}
+
+/** 告警文案用的人类可读探测目标 */
+export function formatManagementHealthProbeLabel(): string {
+  if (import.meta.env.DEV && typeof window !== 'undefined') {
+    return `${window.location.origin}/health（由 Vite 代理至后端，与 /api 同源目标）`;
+  }
+  return `${getManagementSocketHttpOrigin()}/health`;
+}
