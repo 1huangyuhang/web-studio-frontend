@@ -161,6 +161,10 @@ export default function Home() {
   return (
     <div className="home-page home-premium">
       <HomeScrollyVideo src={heroVideo} />
+      <div
+        className="home-flow-bridge home-flow-bridge--from-hero"
+        aria-hidden
+      />
       <HomeTopGallery
         topGallerySrcs={topGallerySrcs}
         galleryTitle={galleryTitle}

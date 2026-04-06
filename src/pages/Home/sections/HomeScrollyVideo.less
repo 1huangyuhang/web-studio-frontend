@@ -1,13 +1,14 @@
 @import (reference) '@/assets/styles/foundation/index.less';
 
-/* site-main 全宽后占满主区内边距盒，不再用负 margin 对消 */
+/* 抵消 site-main 水平 padding，主视觉贴齐视口左右（版心仍在 overlay 内文案区） */
 .home-hero-scrolly {
-  width: 100%;
+  --hero-breakout-x: var(--site-main-pad-x, clamp(16px, 4vw, 48px));
+  width: calc(100% + 2 * var(--hero-breakout-x));
   max-width: none;
-  margin-left: 0;
-  margin-right: 0;
+  margin-left: calc(-1 * var(--hero-breakout-x));
+  margin-right: calc(-1 * var(--hero-breakout-x));
   margin-top: -24px;
-  padding-bottom: 8px;
+  padding-bottom: 0;
   box-sizing: border-box;
 }
 
@@ -18,9 +19,73 @@
 }
 
 .home-hero-scrolly__video.scrolly-video-container {
-  border-radius: 0 0 var(--ly-radius-lg) var(--ly-radius-lg);
+  border-radius: 0 0 clamp(18px, 2.8vw, 28px) clamp(18px, 2.8vw, 28px);
   overflow: hidden;
   min-height: clamp(420px, 88dvh, 920px);
+  /* 与全局 ScrollyVideo 占位渐变协调，略加深底部以贴合红木 Hero */
+  background: linear-gradient(
+    165deg,
+    #0e0807 0%,
+    #1a100d 38%,
+    #221814 100%
+  );
+  box-shadow:
+    0 24px 56px rgba(0, 0, 0, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--app-text-primary) 6%, transparent);
+
+  /* 视频与下一块内容：底部叠化到页面画布（随滚动略增强，衔接更顺） */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: clamp(96px, 22dvh, 240px);
+    z-index: 2;
+    pointer-events: none;
+    opacity: calc(0.82 + var(--scrolly-progress, 0) * 0.2);
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 28%,
+      color-mix(in srgb, var(--ly-bg-canvas) 55%, transparent) 62%,
+      var(--ly-bg-canvas) 100%
+    );
+  }
+
+  .scrolly-video-overlay {
+    z-index: 3;
+  }
+}
+
+html[data-theme='light'] .home-hero-scrolly__video.scrolly-video-container {
+  background: linear-gradient(
+    165deg,
+    #241a17 0%,
+    #352823 48%,
+    #40302a 100%
+  );
+}
+
+/* 略压暗四角，强化主视觉层次 */
+.home-hero-scrolly__video .scrolly-video-overlay__scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.62) 0%,
+    rgba(0, 0, 0, 0.18) 42%,
+    rgba(0, 0, 0, 0.38) 72%,
+    rgba(0, 0, 0, 0.78) 100%
+  );
+}
+
+html[data-theme='light'] .home-hero-scrolly__video .scrolly-video-overlay__scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.56) 0%,
+    rgba(15, 23, 42, 0.12) 44%,
+    rgba(15, 23, 42, 0.32) 74%,
+    rgba(15, 23, 42, 0.66) 100%
+  );
 }
 
 .home-hero-scrolly__content {
@@ -100,6 +165,10 @@
 @media (prefers-reduced-motion: reduce) {
   .home-hero-scrolly__scroll-hint {
     animation: none;
+  }
+
+  .home-hero-scrolly__video.scrolly-video-container::after {
+    opacity: 0.92;
   }
 }
 

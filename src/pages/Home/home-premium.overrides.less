@@ -522,6 +522,17 @@ html[data-theme='dark'] .home-page.home-premium .heritage-section .heritage-item
   .home-page.home-premium .home-unified-flow-section .action-content {
     animation: none !important;
   }
+
+  .home-flow-bridge--from-hero {
+    height: clamp(48px, 8vw, 88px);
+    margin: clamp(-40px, -5vw, -28px) 0 clamp(-32px, -4vw, -22px);
+  }
+
+  .home-flow-bridge--from-hero::before,
+  .home-flow-bridge--from-hero::after {
+    filter: none;
+    opacity: 0.65;
+  }
 }
 
 /* ---------- 区块之间的「流动桥」：光带 + 模糊叠化，衔接上下容器 ---------- */
@@ -584,6 +595,42 @@ html[data-theme='dark'] .home-page.home-premium .heritage-section .heritage-item
   filter: blur(28px);
 }
 
+/* Hero 视频底部 → 品牌叙事：加高叠化带 + 轻微上移，盖住圆角与硬边 */
+.home-flow-bridge--from-hero {
+  height: clamp(64px, 10vw, 120px);
+  margin: clamp(-52px, -7vw, -36px) 0 clamp(-40px, -5.5vw, -28px);
+}
+
+.home-flow-bridge--from-hero::before {
+  left: -12%;
+  right: -12%;
+  height: 220%;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 0%,
+    color-mix(in srgb, var(--ly-bg-canvas) 35%, transparent) 18%,
+    color-mix(in srgb, var(--ly-bg-canvas) 72%, rgba(0, 0, 0, 0.06)) 55%,
+    color-mix(in srgb, var(--ly-bg-canvas) 88%, transparent) 100%
+  );
+  filter: blur(32px);
+  opacity: 0.95;
+}
+
+.home-flow-bridge--from-hero::after {
+  opacity: 0.55;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(196, 165, 116, 0.35) 48%,
+    rgba(128, 50, 46, 0.22) 50%,
+    rgba(196, 165, 116, 0.35) 52%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 28px color-mix(in srgb, var(--ly-bg-canvas) 40%, rgba(128, 50, 46, 0.12)),
+    0 0 64px rgba(196, 165, 116, 0.06);
+}
+
 .home-flow-bridge--to-dark::after {
   background: linear-gradient(
     90deg,
@@ -617,6 +664,29 @@ html[data-theme='dark'] .home-page .home-flow-bridge::after {
     transparent 100%
   );
   box-shadow: none;
+}
+
+html[data-theme='dark'] .home-page .home-flow-bridge--from-hero::before {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--ly-bg-canvas) 18%, transparent) 22%,
+    color-mix(in srgb, var(--ly-bg-canvas) 62%, transparent) 52%,
+    var(--ly-bg-canvas) 100%
+  );
+  filter: blur(44px);
+  opacity: 0.9;
+}
+
+html[data-theme='dark'] .home-page .home-flow-bridge--from-hero::after {
+  opacity: 0.3;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(196, 165, 116, 0.16) 50%,
+    transparent 100%
+  );
+  box-shadow: 0 0 48px rgba(0, 0, 0, 0.22);
 }
 
 /* 价值主张：淡科技网格，与上文柔化衔接 */
@@ -835,5 +905,21 @@ html[data-theme='light'] {
       transparent 100%
     );
     box-shadow: none;
+  }
+
+  .home-flow-bridge--from-hero::before {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--ly-bg-canvas) 0%, transparent) 0%,
+      color-mix(in srgb, var(--ly-bg-canvas) 42%, transparent) 20%,
+      color-mix(in srgb, var(--ly-bg-canvas) 82%, rgba(15, 23, 42, 0.03)) 54%,
+      color-mix(in srgb, var(--ly-bg-canvas) 94%, transparent) 100%
+    );
+    filter: blur(32px);
+    opacity: 0.95;
+  }
+
+  .home-flow-bridge--from-hero::after {
+    opacity: 0.48;
   }
 }

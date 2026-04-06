@@ -68,6 +68,11 @@ const ScrollyVideo: React.FC<ScrollyVideoProps> = ({
           video.currentTime = video.duration * scrollProgress;
         }
 
+        container.style.setProperty(
+          '--scrolly-progress',
+          scrollProgress.toFixed(4)
+        );
+
         // 根据滚动进度设置视频结束状态
         // 只有当进度变化超过阈值时才更新状态，减少重渲染
         if (scrollProgress >= 1.0 && !isVideoEnded) {
